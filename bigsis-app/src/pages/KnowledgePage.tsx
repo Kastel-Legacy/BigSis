@@ -15,7 +15,8 @@ const KnowledgePage: React.FC = () => {
                         Brain Dashboard
                     </h1>
                     <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                        Manage Big SIS knowledge base. Ingest PDF documents or launch automated PubMed research agents to enrich the neural network.
+                        Interface d'administration de la base de connaissances Big SIS.
+                        Ingestion de PDF et recherche PubMed automatisée.
                     </p>
                 </div>
 

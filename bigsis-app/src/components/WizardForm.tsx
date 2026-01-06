@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { analyzeWrinkles } from '../api';
 import { ArrowRight, Loader2, User, Smile, Baby, Check } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 const WizardForm: React.FC = () => {
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
@@ -70,15 +72,15 @@ const WizardForm: React.FC = () => {
             {/* Step 1: Area Selection */}
             {step === 1 && (
                 <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-4 duration-500">
-                    <h2 className="text-2xl font-bold text-white mb-2">Quelle zone vous préoccupe ?</h2>
-                    <p className="text-blue-200/60 mb-6 text-sm">Sélectionnez la zone principale à analyser</p>
+                    <h2 className="text-2xl font-bold text-white mb-2">{t('wizard.step1.title')}</h2>
+                    <p className="text-blue-200/60 mb-6 text-sm">{t('wizard.step1.subtitle')}</p>
 
                     <div className="grid grid-cols-2 gap-3 mb-6">
                         {[
-                            { id: 'front', label: 'Front', icon: User },
-                            { id: 'glabelle', label: 'Glabelle', icon: Smile }, // Using Smile as placeholder for expression lines
-                            { id: 'pattes_oie', label: 'Pattes d\'oie', icon: Smile },
-                            { id: 'sillon_nasogenien', label: 'Sillon Naso.', icon: User }
+                            { id: 'front', label: t('zone.forehead'), icon: User },
+                            { id: 'glabelle', label: t('zone.glabella'), icon: Smile },
+                            { id: 'pattes_oie', label: t('zone.eyes'), icon: Smile },
+                            { id: 'sillon_nasogenien', label: t('zone.mouth'), icon: User }
                         ].map((opt) => (
                             <OptionCard
                                 key={opt.id}
@@ -102,7 +104,7 @@ const WizardForm: React.FC = () => {
                                 }
                             `}
                         >
-                            Suivant <ArrowRight size={16} />
+                            {t('wizard.next')} <ArrowRight size={16} />
                         </button>
                     </div>
                 </div>
@@ -111,8 +113,8 @@ const WizardForm: React.FC = () => {
             {/* Step 2: Wrinkle Type */}
             {step === 2 && (
                 <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-4 duration-500">
-                    <h2 className="text-2xl font-bold text-white mb-2">Décrivez vos rides</h2>
-                    <p className="text-blue-200/60 mb-6 text-sm">Comment se manifestent-elles principalement ?</p>
+                    <h2 className="text-2xl font-bold text-white mb-2">{t('wizard.step2.title')}</h2>
+                    <p className="text-blue-200/60 mb-6 text-sm">{t('wizard.step2.subtitle')}</p>
 
                     <div className="grid grid-cols-1 gap-3 mb-6">
                         <button
@@ -126,10 +128,9 @@ const WizardForm: React.FC = () => {
                             `}
                         >
                             <div className="flex items-center justify-between mb-1">
-                                <span className="font-medium text-white">Liées aux expressions</span>
+                                <span className="font-medium text-white">{t('wrinkle.expression')}</span>
                                 {formData.wrinkle_type === 'expression' && <Check size={18} className="text-cyan-400" />}
                             </div>
-                            <p className="text-xs text-blue-200/60">Apparaissent seulement quand je bouge mon visage (sourire, froncement...)</p>
                         </button>
 
                         <button
@@ -143,16 +144,15 @@ const WizardForm: React.FC = () => {
                             `}
                         >
                             <div className="flex items-center justify-between mb-1">
-                                <span className="font-medium text-white">Marquées au repos</span>
+                                <span className="font-medium text-white">{t('wrinkle.static')}</span>
                                 {formData.wrinkle_type === 'statique' && <Check size={18} className="text-cyan-400" />}
                             </div>
-                            <p className="text-xs text-blue-200/60">Toujours visibles, même sans bouger le visage.</p>
                         </button>
                     </div>
 
                     <div className="mt-auto flex justify-between">
                         <button onClick={handleBack} className="text-blue-200/60 hover:text-white transition-colors text-sm px-4">
-                            Retour
+                            {t('wizard.back')}
                         </button>
                         <button
                             disabled={!formData.wrinkle_type}
@@ -165,7 +165,7 @@ const WizardForm: React.FC = () => {
                                 }
                             `}
                         >
-                            Suivant <ArrowRight size={16} />
+                            {t('wizard.next')} <ArrowRight size={16} />
                         </button>
                     </div>
                 </div>
@@ -174,8 +174,8 @@ const WizardForm: React.FC = () => {
             {/* Step 3: Specifics */}
             {step === 3 && (
                 <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-4 duration-500">
-                    <h2 className="text-2xl font-bold text-white mb-2">Derniers détails</h2>
-                    <p className="text-blue-200/60 mb-6 text-sm">Pour sécuriser l'analyse</p>
+                    <h2 className="text-2xl font-bold text-white mb-2">{t('wizard.step3.title')}</h2>
+                    <p className="text-blue-200/60 mb-6 text-sm">{t('wizard.step3.subtitle')}</p>
 
                     <div className="mb-8">
                         <label className={`
@@ -199,14 +199,14 @@ const WizardForm: React.FC = () => {
                             />
                             <div className="flex items-center gap-2">
                                 <Baby size={20} className={formData.pregnancy ? 'text-purple-300' : 'text-blue-200/60'} />
-                                <span className={formData.pregnancy ? 'text-white' : 'text-blue-100/80'}>Je suis enceinte ou allaitante</span>
+                                <span className={formData.pregnancy ? 'text-white' : 'text-blue-100/80'}>{t('form.pregnancy')}</span>
                             </div>
                         </label>
                     </div>
 
                     <div className="mt-auto flex justify-between items-center">
                         <button onClick={handleBack} className="text-blue-200/60 hover:text-white transition-colors text-sm px-4">
-                            Retour
+                            {t('wizard.back')}
                         </button>
                         <button
                             onClick={handleSubmit}
@@ -222,11 +222,11 @@ const WizardForm: React.FC = () => {
                             {loading ? (
                                 <>
                                     <Loader2 className="animate-spin" size={18} />
-                                    Analyse...
+                                    {t('wizard.analyzing')}
                                 </>
                             ) : (
                                 <>
-                                    Obtenir mon analyse
+                                    {t('wizard.analyze')}
                                     <ArrowRight size={18} />
                                 </>
                             )}
