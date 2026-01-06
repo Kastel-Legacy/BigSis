@@ -142,13 +142,18 @@ class ProcedureContraindication(Base):
 
 # --- AUDIT / TRACE ---
 
+from sqlalchemy.dialects.postgresql import UUID, JSONB, ARRAY
+
+# ... (imports)
+
+# ... inside DecisionTrace class ...
 class DecisionTrace(Base):
     __tablename__ = "decision_traces"
     id = Column(Integer, primary_key=True, index=True)
     session_id = Column(String, index=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
     input_snapshot = Column(JSONB)
-    rules_triggered = Column(JSONB) # Was ARRAY(String), using JSONB for compatibility
+    rules_triggered = Column(ARRAY(String)) # Reverted to ARRAY for Prod DB compatibility
     evidence_used = Column(JSONB) 
     final_output = Column(JSONB)
     user_feedback = Column(JSONB, nullable=True)
