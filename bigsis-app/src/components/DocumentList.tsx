@@ -3,7 +3,7 @@ import { FileText, Trash2, Calendar, Database, Search, Loader2, AlertCircle, Eye
 import { API_URL, getDocument } from '../api'; // Import API_URL and getDocument
 
 interface Document {
-    id: number;
+    id: string; // Changed to string for UUID
     title: string;
     created_at: string;
     metadata: any;
@@ -19,7 +19,7 @@ const DocumentList: React.FC = () => {
 
     const fetchDocuments = async () => {
         try {
-            const response = await fetch(`${API_URL}/knowledge/documents`); // Use API_URL
+            const response = await fetch(`${API_URL}/knowledge/documents`);
             if (response.ok) {
                 const data = await response.json();
                 setDocuments(data);
@@ -41,7 +41,7 @@ const DocumentList: React.FC = () => {
         return () => clearInterval(interval);
     }, []);
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => { // id strings
         if (!confirm("Are you sure you want to delete this document?")) return;
 
         try {
@@ -58,7 +58,7 @@ const DocumentList: React.FC = () => {
         }
     };
 
-    const handleView = async (id: number) => {
+    const handleView = async (id: string) => { // id string
         setViewLoading(true);
         try {
             const doc = await getDocument(id);

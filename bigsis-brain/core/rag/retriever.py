@@ -2,7 +2,7 @@ from typing import List, Tuple
 from sqlalchemy import select
 from core.db.database import AsyncSessionLocal
 from core.db.models import Chunk, DocumentVersion, Document
-from core.llm.embeddings import get_embedding
+from core.rag.embeddings import get_embedding
 
 async def retrieve_evidence(query: str, limit: int = 3, threshold: float = 0.7) -> List[dict]:
     """

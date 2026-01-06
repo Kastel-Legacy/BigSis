@@ -1,7 +1,7 @@
 from sqlalchemy.future import select
 from core.db.database import AsyncSessionLocal
 from core.db.models import Source, Document, DocumentVersion, Chunk
-from core.llm.embeddings import get_embedding
+from core.rag.embeddings import get_embedding
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import hashlib
 
