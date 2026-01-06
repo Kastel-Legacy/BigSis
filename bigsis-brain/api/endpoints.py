@@ -143,3 +143,28 @@ async def delete_document(doc_id: int):
         except Exception as e:
             await session.rollback()
             raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/knowledge/documents/{doc_id}")
+async def get_document(doc_id: int):
+    """
+    Get a single document and its chunks (content).
+    """
+    async with AsyncSessionLocal() as session:
+        # Fetch Document
+        result = await session.execute(select(SourceDocument).where(SourceDocument.id == doc_id))
+        doc = result.scalars().first()
+        
+        if not doc:
+            raise HTTPException(status_code=404, detail="Document not found")
+            
+        # Fetch Chunks
+        result_chunks = await session.execute(select(EvidenceChunk).where(EvidenceChunk.document_id == doc_id).order_by(EvidenceChunk.chunk_index))
+        chunks = result_chunks.scalars().all()
+        
+        return {
+            "id": doc.id,
+            "title": doc.title,
+            "created_at": doc.created_at,
+            "metadata": doc.metadata_json,
+            "chunks": [{"index": c.chunk_index, "text": c.content_text} for c in chunks]
+        }

@@ -80,8 +80,16 @@ export interface FicheData {
   le_conseil_bigsis?: string;
 }
 
+
 export const getFiche = async (pmid: string): Promise<FicheData> => {
   const response = await axios.get(`${API_URL}/fiches/${pmid}`);
   return response.data;
 };
 
+export const getDocument = async (id: number): Promise<any> => {
+  const response = await fetch(`${API_URL}/knowledge/documents/${id}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch document');
+  }
+  return response.json();
+};
