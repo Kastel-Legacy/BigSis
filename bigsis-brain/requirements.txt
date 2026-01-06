@@ -15,3 +15,6 @@ tqdm
 fpdf
 psycopg2-binary
 python-multipart
+langchain
+langchain-community
+tiktoken
