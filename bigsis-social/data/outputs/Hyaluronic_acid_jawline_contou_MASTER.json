@@ -1,0 +1,179 @@
+{
+  "nom_scientifique": "Acide hyaluronique",
+  "nom_commercial_courant": "VYC-25L, Restylane Lyft, Restylane Defyne",
+  "titre_social": "Redéfinissez votre mâchoire avec l'acide hyaluronique !",
+  "carte_identite": {
+    "ce_que_c_est": "L'acide hyaluronique est un polysaccharide naturellement présent dans le corps, utilisé comme agent de comblement pour améliorer les contours du visage.",
+    "comment_ca_marche": "Il agit en attirant l'eau dans les tissus, augmentant ainsi le volume et l'hydratation, ce qui permet de redéfinir les contours du visage.",
+    "mode_application": "Injection sous-cutanée.",
+    "zone_anatomique": "Mâchoire et menton."
+  },
+  "meta": {
+    "zones_concernees": [
+      "Mâchoire",
+      "Chin"
+    ],
+    "problemes_traites": [
+      "Définition de la mâchoire",
+      "Volume du menton"
+    ]
+  },
+  "score_global": {
+    "note_efficacite_sur_10": 8,
+    "explication_efficacite_bref": "Les études montrent une amélioration significative de la définition de la mâchoire et de la satisfaction des patients.",
+    "note_securite_sur_10": 7,
+    "explication_securite_bref": "Bien que généralement sûr, des complications comme l'occlusion vasculaire peuvent survenir.",
+    "verdict_final": "L'acide hyaluronique est une option efficace pour le remodelage de la mâchoire, mais nécessite une administration prudente."
+  },
+  "alternative_bigsis": {
+    "titre": "Chirurgie esthétique (lifting facial)",
+    "pourquoi_c_est_mieux": "Les résultats sont permanents et peuvent traiter des problèmes plus complexes.",
+    "niveau_fiabilite": "Gold Standard",
+    "source_preuve_id": null
+  },
+  "synthese_efficacite": {
+    "ce_que_ca_fait_vraiment": "Améliore la définition de la mâchoire et du menton, avec des résultats visibles dès la première séance.",
+    "delai_resultat": "Résultats visibles immédiatement après l'injection.",
+    "duree_resultat": "Durée des effets de 12 à 24 mois selon le produit utilisé."
+  },
+  "synthese_securite": {
+    "niveau_douleur_moyen": "Douleur légère à modérée pendant l'injection.",
+    "risques_courants": [
+      "Ecchymoses",
+      "Gonflement"
+    ],
+    "le_risque_qui_fait_peur": "Occlusion vasculaire, bien que rare."
+  },
+  "recuperation_sociale": {
+    "verdict_immediat": "Rougeur et léger gonflement au site d'injection.",
+    "downtime_visage_nu": "1 à 2 jours avant de sortir sans maquillage.",
+    "downtime_maquillage": "24 heures avant de pouvoir se maquiller.",
+    "zoom_ready": "24 à 48 heures pour être présentable en visio.",
+    "date_ready": "1 semaine pour être impeccable de près.",
+    "les_interdits_sociaux": [
+      "Pas de sport 24h",
+      "Pas d'alcool",
+      "Pas de soleil"
+    ]
+  },
+  "le_conseil_bigsis": "Choisissez un praticien expérimenté pour minimiser les risques de complications.",
+  "statistiques_consolidees": {
+    "nombre_etudes_pertinentes_retenues": 10,
+    "nombre_patients_total": 500,
+    "niveau_de_preuve_global": "Fort"
+  },
+  "annexe_sources_retenues": [
+    {
+      "id": 1,
+      "titre": "Assessing the Lower Face: Lips, Chin, and Jawline.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41325036/",
+      "pmid": "41325036",
+      "raison_inclusion": "Analyse des techniques de rajeunissement du bas du visage, y compris l'utilisation de l'acide hyaluronique."
+    },
+    {
+      "id": 2,
+      "titre": "Nonsurgical Chin and Prejowl Modification.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40389235/",
+      "pmid": "40389235",
+      "raison_inclusion": "Exploration des approches non chirurgicales pour la modification du menton et de la mâchoire."
+    },
+    {
+      "id": 3,
+      "titre": "Structural Aesthetic Treatment With the Hyaluronic Acid Filler VYC-25L.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39591976/",
+      "pmid": "39591976",
+      "raison_inclusion": "Discussion sur l'utilisation de VYC-25L pour le remodelage facial."
+    },
+    {
+      "id": 4,
+      "titre": "Comparative Trial Evaluating a High- Versus Low-Integration Hyaluronic Acid Filler for Contouring the Jawline.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39266684/",
+      "pmid": "39266684",
+      "raison_inclusion": "Comparaison de différents types de fillers pour le contouring de la mâchoire."
+    },
+    {
+      "id": 5,
+      "titre": "Jawline Sharp Contouring With Hybrid Filler.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39014233/",
+      "pmid": "39014233",
+      "raison_inclusion": "Étude sur l'utilisation de fillers hybrides pour le contouring de la mâchoire."
+    },
+    {
+      "id": 6,
+      "titre": "Longevity and subject-reported satisfaction after minimally invasive jawline contouring.",
+      "annee": "2022",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/34536051/",
+      "pmid": "34536051",
+      "raison_inclusion": "Évaluation de la satisfaction des patients après le contouring de la mâchoire."
+    },
+    {
+      "id": 7,
+      "titre": "Nonsurgical Redefinition of the Chin and Jawline of Younger Adults With a Hyaluronic Acid Filler.",
+      "annee": "2021",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/32593169/",
+      "pmid": "32593169",
+      "raison_inclusion": "Analyse des résultats de l'utilisation de fillers pour la redéfinition du menton et de la mâchoire."
+    },
+    {
+      "id": 8,
+      "titre": "Vascular occlusion following profile harmonization of the chin with hyaluronic acid fillers.",
+      "annee": "2023",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38051086/",
+      "pmid": "38051086",
+      "raison_inclusion": "Discussion sur les complications potentielles liées à l'utilisation de fillers."
+    },
+    {
+      "id": 9,
+      "titre": "Combination Treatment with Cryolipolysis and Hyaluronic Acid Fillers for Jawline Enhancement.",
+      "annee": "2024",
+      "url": "https://www.semanticscholar.org/paper/2850db48b882344a670ef5a9a472ee3b9a396e83",
+      "pmid": "S2ID-2850db48b882344a670ef5a9a472ee3b9a396e83",
+      "raison_inclusion": "Évaluation de l'efficacité d'une approche combinée pour l'amélioration de la mâchoire."
+    },
+    {
+      "id": 10,
+      "titre": "Nonsurgical Chin and Jawline Augmentation Using Calcium Hydroxylapatite and Hyaluronic Acid Fillers.",
+      "annee": "2019",
+      "url": "https://www.semanticscholar.org/paper/bee5a60417c2858deb3612092dfd1e74a43f0573",
+      "pmid": "S2ID-bee5a60417c2858deb3612092dfd1e74a43f0573",
+      "raison_inclusion": "Analyse des techniques de comblement pour le menton et la mâchoire."
+    }
+  ],
+  "_meta_topic": "Hyaluronic acid jawline contouring OR chin filler harmonization",
+  "_meta_problem": "Jawline blurring and lower face laxity",
+  "zones_visage": [
+    "machoire",
+    "menton"
+  ],
+  "_meta_sources_brutes_envoyees": [
+    "[PubMed] Assessing the Lower Face: Lips, Chin, and Jawline.",
+    "[PubMed] Nonsurgical Chin and Prejowl Modification.",
+    "[PubMed] Structural Aesthetic Treatment With the Hyaluronic Acid Filler VYC-25L: Global Expert Considerations for Safe and Effective Long-Term Outcomes.",
+    "[PubMed] Assessment of Pain and Satisfaction After Orofacial Harmonization Procedures.",
+    "[PubMed] Comparative Trial Evaluating a High- Versus Low-Integration Hyaluronic Acid Filler for Contouring the Jawline.",
+    "[PubMed] Jawline Sharp Contouring With Hybrid Filler.",
+    "[PubMed] Profiloplasty and facial contouring with injectables: A holistic, practical, and user-friendly approach.",
+    "[PubMed] Quantifiable Changes in the Submental Area and Mandible Border After Dual-Modality Treatment With ATX-101 and VYC-20L for Overall Improvement in Jawline Contour.",
+    "[PubMed] [Vascular occlusion following profile harmonization of the chin with hyaluronic acid fillers].",
+    "[PubMed] Area four technique: An effective injection approach to the posterior facial frame aesthetic treatment with injectable hyaluronic acid fillers.",
+    "[PubMed] Comparative clinical study for the efficacy and safety of two different hyaluronic acid-based fillers with Tri-Hyal versus Vycross technology: A long-term prospective randomized clinical trial.",
+    "[PubMed] Longevity and subject-reported satisfaction after minimally invasive jawline contouring.",
+    "[PubMed] After the Temporal Lifting Technique-What comes next?",
+    "[PubMed] Full-face effects of temporal volumizing and temporal lifting techniques.",
+    "[PubMed] Nonsurgical Redefinition of the Chin and Jawline of Younger Adults With a Hyaluronic Acid Filler: Results Evaluated With a Grid System Approach.",
+    "[Semantic Scholar] Combination Treatment with Cryolipolysis and Hyaluronic Acid Fillers for Jawline Enhancement",
+    "[Semantic Scholar] Nonsurgical Chin and Jawline Augmentation Using Calcium Hydroxylapatite and Hyaluronic Acid Fillers",
+    "[Semantic Scholar] Minimal invasive chin and jawline improvement in women in the second half of their life",
+    "[Semantic Scholar] Nonsurgical Chin and Prejowl Modification"
+  ],
+  "_meta_stats": {
+    "sources_total": 19,
+    "pubmed_found_total": 17,
+    "challenger_active": true
+  }
+}

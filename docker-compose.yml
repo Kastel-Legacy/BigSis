@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # Base Database with pgvector
+  db:
+    image: ankane/pgvector:v0.4.1 # Postgres 15 + pgvector
+    container_name: bigsis_db
+    environment:
+      POSTGRES_USER: bigsis_user
+      POSTGRES_PASSWORD: bigsis_password
+      POSTGRES_DB: bigsis
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - bigsis_net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U bigsis_user -d bigsis" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Brain (Backend API)
+  brain:
+    build:
+      context: ./bigsis-brain
+      dockerfile: Dockerfile
+    container_name: bigsis_brain
+    volumes:
+      - ./bigsis-brain:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://bigsis_user:bigsis_password@db:5432/bigsis
+      - OPENAI_API_KEY=sk-placeholder-key
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - bigsis_net
+
+  # App (Frontend)
+  app:
+    build:
+      context: ./bigsis-app
+      dockerfile: Dockerfile
+    container_name: bigsis_app
+    volumes:
+      - ./bigsis-app:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - brain
+    networks:
+      - bigsis_net
+
+  # Social Generator
+  social:
+    image: python:3.11-slim
+    container_name: bigsis_social
+    volumes:
+      - ./bigsis-social:/app
+    working_dir: /app
+    command: tail -f /dev/null # Keep alive for manual script execution
+    networks:
+      - bigsis_net
+
+volumes:
+  db_data:
+
+
+networks:
+  bigsis_net:
+    driver: bridge

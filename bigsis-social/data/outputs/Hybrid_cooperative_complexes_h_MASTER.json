@@ -1,0 +1,175 @@
+{
+  "nom_scientifique": "Hybrid Cooperative Complex Hyaluronic Acid (HCC HA)",
+  "nom_commercial_courant": "Profhilo",
+  "titre_social": "Le Profhilo, l'hydratation ultime !",
+  "carte_identite": {
+    "ce_que_c_est": "Un injectable à base d'acide hyaluronique utilisant la technologie NAHYCO pour le remodelage bio et l'hydratation de la peau.",
+    "comment_ca_marche": "Il restaure l'hydratation et la structure de la peau en libérant de l'acide hyaluronique dans les couches profondes, stimulant ainsi la production de collagène et d'élastine.",
+    "mode_application": "Injection sous-cutanée.",
+    "zone_anatomique": "Visage, cou, et zones du corps présentant un relâchement cutané."
+  },
+  "meta": {
+    "zones_concernees": [
+      "Visage",
+      "Cou"
+    ],
+    "problemes_traites": [
+      "Relâchement cutané",
+      "Texture de la peau"
+    ]
+  },
+  "score_global": {
+    "note_efficacite_sur_10": 8,
+    "explication_efficacite_bref": "Les études montrent une amélioration significative de la laxité et de la texture de la peau avec une satisfaction élevée des patients.",
+    "note_securite_sur_10": 9,
+    "explication_securite_bref": "Les effets secondaires sont généralement légers et transitoires, avec un bon profil de sécurité basé sur des données post-commercialisation.",
+    "verdict_final": "Profhilo est une option efficace et sûre pour le remodelage et l'hydratation de la peau."
+  },
+  "alternative_bigsis": {
+    "titre": "Acide hyaluronique réticulé (ex: Juvederm, Restylane)",
+    "pourquoi_c_est_mieux": "Ces produits offrent une correction plus ciblée des rides et des volumes, bien que Profhilo soit meilleur pour l'hydratation globale.",
+    "niveau_fiabilite": "Gold Standard",
+    "source_preuve_id": null
+  },
+  "synthese_efficacite": {
+    "ce_que_ca_fait_vraiment": "Améliore la fermeté, la texture et l'hydratation de la peau, avec des résultats visibles après quelques semaines.",
+    "delai_resultat": "Résultats visibles en 30 jours.",
+    "duree_resultat": "Durée des effets de 6 à 12 mois."
+  },
+  "synthese_securite": {
+    "niveau_douleur_moyen": "Douleur légère à modérée pendant l'injection.",
+    "risques_courants": [
+      "Rougeur",
+      "Gonflement",
+      "Ecchymoses"
+    ],
+    "le_risque_qui_fait_peur": "Réactions locales d'hypersensibilité, bien que rares."
+  },
+  "recuperation_sociale": {
+    "verdict_immediat": "Rougeur et léger gonflement au site d'injection.",
+    "downtime_visage_nu": "1 à 2 jours avant de sortir sans maquillage.",
+    "downtime_maquillage": "24 heures avant de pouvoir se maquiller.",
+    "zoom_ready": "1 à 2 jours pour être présentable en visio.",
+    "date_ready": "1 semaine pour être impeccable de près.",
+    "les_interdits_sociaux": [
+      "Pas de sport 24h",
+      "Pas d'alcool",
+      "Pas de soleil"
+    ]
+  },
+  "le_conseil_bigsis": "Hydratez bien votre peau avant et après le traitement pour maximiser les résultats.",
+  "statistiques_consolidees": {
+    "nombre_etudes_pertinentes_retenues": 10,
+    "nombre_patients_total": 40000,
+    "niveau_de_preuve_global": "Fort"
+  },
+  "annexe_sources_retenues": [
+    {
+      "id": 1,
+      "titre": "Hyaluronic Acid Hybrid Cooperative Complexes Nearing 10 Years of Use: Update on Safety Assessment Based on Post-Marketing Surveillance Data.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40654100/",
+      "pmid": "40654100",
+      "raison_inclusion": "Évaluation de la sécurité basée sur des données de surveillance post-commercialisation."
+    },
+    {
+      "id": 2,
+      "titre": "Patient Satisfaction Using Hybrid Cooperative Complexes of Hyaluronic Acid for Neck Laxity: A Survey of Asian Populations.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40627798/",
+      "pmid": "40627798",
+      "raison_inclusion": "Étude sur l'efficacité et la satisfaction des patients concernant le relâchement cutané du cou."
+    },
+    {
+      "id": 3,
+      "titre": "Dual-Plane Treatment With Highly Concentrated Hybrid Cooperative Complexes of Hyaluronans for Facial Atrophic Acne Scars.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39365190/",
+      "pmid": "39365190",
+      "raison_inclusion": "Efficacité et sécurité des HCC pour le traitement des cicatrices d'acné."
+    },
+    {
+      "id": 4,
+      "titre": "Profhilo® Structura, Current Status and Future Perspectives: A Practical Review.",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39028477/",
+      "pmid": "39028477",
+      "raison_inclusion": "Revue pratique sur l'utilisation de Profhilo pour le remodelage facial."
+    },
+    {
+      "id": 5,
+      "titre": "Highly Concentrated Stabilized Hybrid Complexes of Hyaluronic Acid: Rheological and Biological Assessment of Compatibility with Adipose Tissue and Derived Stromal Cells towards Regenerative Medicine.",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38396698/",
+      "pmid": "38396698",
+      "raison_inclusion": "Évaluation de la compatibilité des HCC avec les tissus adipeux."
+    },
+    {
+      "id": 6,
+      "titre": "Hybrid cooperative complexes to decrease VAS score and enhance sexual function in women with vulvar lichen sclerosus.",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38305624/",
+      "pmid": "38305624",
+      "raison_inclusion": "Étude sur l'efficacité des HCC pour traiter le lichen scléreux vulvaire."
+    },
+    {
+      "id": 7,
+      "titre": "A split-face comparative performance evaluation of injectable hyaluronic acid-based preparations HCC and CPM-HA20G in healthy females.",
+      "annee": "2022",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/35699361/",
+      "pmid": "35699361",
+      "raison_inclusion": "Évaluation comparative de l'efficacité des HCC pour l'amélioration de la qualité de la peau."
+    },
+    {
+      "id": 8,
+      "titre": "The efficacy of injecting hybrid cooperative complexes of hyaluronic acid for the treatment of vulvar lichen sclerosus: A preliminary study.",
+      "annee": "2022",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/35094456/",
+      "pmid": "35094456",
+      "raison_inclusion": "Étude préliminaire sur l'efficacité des HCC pour le lichen scléreux vulvaire."
+    },
+    {
+      "id": 9,
+      "titre": "Safety Assessment of High- and Low-Molecular-Weight Hyaluronans (Profhilo®) as Derived from Worldwide Postmarketing Data.",
+      "annee": "2020",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/32685528/",
+      "pmid": "32685528",
+      "raison_inclusion": "Évaluation de la sécurité des HCC basée sur des données post-commercialisation."
+    },
+    {
+      "id": 10,
+      "titre": "Novel Hybrid Gels Made of High and Low Molecular Weight Hyaluronic Acid Induce Proliferation and Reduce Inflammation in an Osteoarthritis.",
+      "annee": "2019",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/31179322/",
+      "pmid": "31179322",
+      "raison_inclusion": "Étude sur les effets anti-inflammatoires des HCC dans l'arthrose."
+    }
+  ],
+  "_meta_topic": "Hybrid cooperative complexes hyaluronic acid OR Profhilo bio-remodeling",
+  "_meta_problem": "Loss of dermal hydration and elasticity",
+  "zones_visage": [
+    "cou"
+  ],
+  "_meta_sources_brutes_envoyees": [
+    "[PubMed] Hyaluronic Acid Hybrid Cooperative Complexes Nearing 10 Years of Use: Update on Safety Assessment Based on Post-Marketing Surveillance Data.",
+    "[PubMed] Patient Satisfaction Using Hybrid Cooperative Complexes of Hyaluronic Acid for Neck Laxity: A Survey of Asian Populations.",
+    "[PubMed] Dual-Plane Treatment With Highly Concentrated Hybrid Cooperative Complexes of Hyaluronans for Facial Atrophic Acne Scars.",
+    "[PubMed] Profhilo® Structura, Current Status and Future Perspectives: A Practical Review.",
+    "[PubMed] Highly Concentrated Stabilized Hybrid Complexes of Hyaluronic Acid: Rheological and Biological Assessment of Compatibility with Adipose Tissue and Derived Stromal Cells towards Regenerative Medicine.",
+    "[PubMed] Hybrid cooperative complexes to decrease VAS score and enhance sexual function in women with vulvar lichen sclerosus.",
+    "[PubMed] Injection Treatments for Vulvovaginal Atrophy of Menopause: A Systematic Review.",
+    "[PubMed] A split-face comparative performance evaluation of injectable hyaluronic acid-based preparations HCC and CPM-HA20G in healthy females.",
+    "[PubMed] Triple steps acne scar revision technique: A new combination therapeutic modality for atrophic acne scars.",
+    "[PubMed] The efficacy of injecting hybrid cooperative complexes of hyaluronic acid for the treatment of vulvar lichen sclerosus: A preliminary study.",
+    "[PubMed] Hyaluronan-Based Gel Promotes Human Dental Pulp Stem Cells Bone Differentiation by Activating YAP/TAZ Pathway.",
+    "[PubMed] Visible-light excitable Eu",
+    "[PubMed] Q-switched Nd-YAG laser alone and in combination with innovative hyaluronic acid gels improve keratinocytes wound healing in vitro.",
+    "[PubMed] Safety Assessment of High- and Low-Molecular-Weight Hyaluronans (Profhilo®) as Derived from Worldwide Postmarketing Data.",
+    "[PubMed] Novel Hybrid Gels Made of High and Low Molecular Weight Hyaluronic Acid Induce Proliferation and Reduce Inflammation in an Osteoarthritis "
+  ],
+  "_meta_stats": {
+    "sources_total": 15,
+    "pubmed_found_total": 20,
+    "challenger_active": true
+  }
+}

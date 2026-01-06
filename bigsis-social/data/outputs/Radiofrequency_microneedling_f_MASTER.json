@@ -1,0 +1,166 @@
+{
+  "nom_scientifique": "Radiofréquence microneedling (RFM)",
+  "nom_commercial_courant": "Morpheus8",
+  "titre_social": "Rajeunissement instantané avec la magie de la radiofréquence !",
+  "carte_identite": {
+    "ce_que_c_est": "Technique de rajeunissement cutané utilisant des micro-aiguilles pour délivrer de la radiofréquence dans les couches profondes de la peau.",
+    "comment_ca_marche": "La radiofréquence génère de la chaleur qui stimule la production de collagène et améliore la texture de la peau.",
+    "mode_application": "Traitement par micro-aiguilles avec radiofréquence.",
+    "zone_anatomique": "Visage, cou, décolleté."
+  },
+  "meta": {
+    "zones_concernees": [
+      "Visage",
+      "Cou",
+      "Décolleté"
+    ],
+    "problemes_traites": [
+      "Rides",
+      "Cicatrices d'acné",
+      "Laxité cutanée"
+    ]
+  },
+  "score_global": {
+    "note_efficacite_sur_10": 8,
+    "explication_efficacite_bref": "Efficace pour le rajeunissement et la réduction des cicatrices d'acné, avec des résultats significatifs observés.",
+    "note_securite_sur_10": 7,
+    "explication_securite_bref": "Risques d'effets secondaires mineurs, mais généralement bien toléré.",
+    "verdict_final": "Une option prometteuse pour le rajeunissement cutané avec un bon rapport efficacité/sécurité."
+  },
+  "alternative_bigsis": {
+    "titre": "Laser fractionné",
+    "pourquoi_c_est_mieux": "Le laser fractionné peut offrir des résultats plus rapides pour certaines cicatrices et un rajeunissement plus intense.",
+    "niveau_fiabilite": "Gold Standard",
+    "source_preuve_id": null
+  },
+  "synthese_efficacite": {
+    "ce_que_ca_fait_vraiment": "Améliore la texture de la peau, réduit les rides et les cicatrices d'acné, et stimule la production de collagène.",
+    "delai_resultat": "Résultats visibles après 1 à 3 mois.",
+    "duree_resultat": "Les effets peuvent durer jusqu'à 6 mois ou plus avec des soins appropriés."
+  },
+  "synthese_securite": {
+    "niveau_douleur_moyen": "Douleur légère à modérée, souvent décrite comme des picotements.",
+    "risques_courants": [
+      "Rougeur",
+      "Gonflement",
+      "Ecchymoses"
+    ],
+    "le_risque_qui_fait_peur": "Rougeur persistante ou hyperpigmentation."
+  },
+  "recuperation_sociale": {
+    "verdict_immediat": "Rougeur et légère enflure.",
+    "downtime_visage_nu": "3 à 5 jours avant de sortir sans maquillage.",
+    "downtime_maquillage": "1 à 2 jours avant de pouvoir se maquiller.",
+    "zoom_ready": "1 à 2 jours pour être présentable en visio.",
+    "date_ready": "1 semaine pour être impeccable de près.",
+    "les_interdits_sociaux": [
+      "Pas de sport 24h",
+      "Pas d'alcool",
+      "Pas de soleil"
+    ]
+  },
+  "le_conseil_bigsis": "Assurez-vous de suivre les recommandations post-traitement pour optimiser les résultats et minimiser les effets secondaires.",
+  "statistiques_consolidees": {
+    "nombre_etudes_pertinentes_retenues": 20,
+    "nombre_patients_total": 481,
+    "niveau_de_preuve_global": "Fort"
+  },
+  "annexe_sources_retenues": [
+    {
+      "id": 1,
+      "titre": "Combined Novel Microfocused Ultrasound and Microneedle Fractional Radiofrequency System for Multilayered Facial Rejuvenation: A Prospective, Randomized, and Split-Face Study.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40980871/",
+      "pmid": "40980871",
+      "raison_inclusion": "Étude sur l'efficacité et la sécurité de la radiofréquence microneedling pour le rajeunissement facial."
+    },
+    {
+      "id": 2,
+      "titre": "Recombinant Pure PDGF Improves Aesthetic Results and Patient Satisfaction Following RF Microneedling: A Prospective, Randomized, Controlled Clinical Trial.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40937942/",
+      "pmid": "40937942",
+      "raison_inclusion": "Évaluation de l'application de PDGF après RF microneedling."
+    },
+    {
+      "id": 3,
+      "titre": "A Scoping Review of Radiofrequency Microneedling: Clinical Application and Outcome Assessment.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40537669/",
+      "pmid": "40537669",
+      "raison_inclusion": "Revue sur les applications cliniques et les résultats du RF microneedling."
+    },
+    {
+      "id": 4,
+      "titre": "Noninsulated Microneedle Radiofrequency for Skin Rejuvenation: A Histological, Transcriptomic and Clinical Study.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40518713/",
+      "pmid": "40518713",
+      "raison_inclusion": "Étude sur les effets histologiques et cliniques du RF microneedling."
+    },
+    {
+      "id": 5,
+      "titre": "Comparison of the effects of fractional microneedle radiofrequency and microneedling on modulating the senescent fibroblast milieu in aged skin.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40419589/",
+      "pmid": "40419589",
+      "raison_inclusion": "Comparaison des effets du RF microneedling sur la peau âgée."
+    },
+    {
+      "id": 6,
+      "titre": "The Role of Fractional Radiofrequency in Long-term Acne Remission and Reduction of Acne Scar Load.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39817790/",
+      "pmid": "39817790",
+      "raison_inclusion": "Étude sur l'efficacité du RF microneedling pour les cicatrices d'acné."
+    },
+    {
+      "id": 7,
+      "titre": "Microneedling Radiofrequency Enhances Poly-L-Lactic Acid Penetration That Effectively Improves Facial Skin Laxity without Lipolysis.",
+      "annee": "2023",
+      "url": "https://www.semanticscholar.org/paper/f97695f160546569a31374b086ad1f58b35d3631",
+      "pmid": "S2ID-f97695f160546569a31374b086ad1f58b35d3631",
+      "raison_inclusion": "Étude sur l'amélioration de la laxité cutanée avec l'association de PLLA et RF microneedling."
+    },
+    {
+      "id": 8,
+      "titre": "Fractional Radiofrequency Microneedling as a Monotherapy in Acne Scar Management: A Systematic Review of Current Evidence.",
+      "annee": "2025",
+      "url": "https://www.semanticscholar.org/paper/1ec270cab9b36ee0d1bb49846057ee1b2b461398",
+      "pmid": "S2ID-1ec270cab9b36ee0d1bb49846057ee1b2b461398",
+      "raison_inclusion": "Revue systématique sur l'utilisation du RF microneedling pour les cicatrices d'acné."
+    }
+  ],
+  "_meta_topic": "Radiofrequency microneedling facial rejuvenation OR RF microneedling acne scars",
+  "_meta_problem": "Atrophic acne scars and texture irregularities",
+  "zones_visage": [
+    "cou"
+  ],
+  "_meta_sources_brutes_envoyees": [
+    "[PubMed] Combined Novel Microfocused Ultrasound and Microneedle Fractional Radiofrequency System for Multilayered Facial Rejuvenation: A Prospective, Randomized, and Split-Face Study.",
+    "[PubMed] Recombinant Pure PDGF Improves Aesthetic Results and Patient Satisfaction Following RF Microneedling: A Prospective, Randomized, Controlled Clinical Trial.",
+    "[PubMed] A Scoping Review of Radiofrequency Microneedling: Clinical Application and Outcome Assessment.",
+    "[PubMed] Noninsulated Microneedle Radiofrequency for Skin Rejuvenation: A Histological, Transcriptomic and Clinical Study.",
+    "[PubMed] Comparison of the effects of fractional microneedle radiofrequency and microneedling on modulating the senescent fibroblast milieu in aged skin.",
+    "[PubMed] Adipose Mesenchymal Stem Cell-Derived Exosomes Versus Platelet-Rich Plasma Treatment for Photoaged Facial Skin: An Investigator-Blinded, Split-Face, Non-Inferiority Trial.",
+    "[PubMed] Histological and clinical dose-response analysis of radiofrequency microneedling treatment for skin rejuvenation.",
+    "[PubMed] An Anatomical Approach to Radiofrequency-Assisted Facial Rejuvenation: Beyond the Treatment Gap.",
+    "[PubMed] The Role of Fractional Radiofrequency in Long-term Acne Remission and Reduction of Acne Scar Load.",
+    "[PubMed] Expert Roundtable on Skin Care Integration After Aesthetic Procedures: Consensus Recommendations.",
+    "[PubMed] Therapeutic Effectiveness of Microneedling Radio Frequency in Different Areas of Periorbital Static Wrinkles: A Self-Controlled Study.",
+    "[PubMed] A Randomized, Single-Center, Double-Blind, Controlled Case Study Evaluating Procedure Pairing of a Neurocosmetic Postprocedure Cream With Radiofrequency Microneedling for Facial Rejuvenation.",
+    "[PubMed] Real-World Experience Using a Multi-Modality System using Intense Pulsed Light, Radiofrequency Microneedling, High-Intensity Focused Ultrasound, or Thermal Radiofrequency, 808, HIFU for Skin Rejuvenation Treatment.",
+    "[PubMed] Microneedle fractional radiofrequency associated with drug delivery for facial atrophic acne scars and skin rejuvenation.",
+    "[PubMed] Paired Treatment Using Radiofrequency Microneedling and 755-nm Picosecond Laser With Fractionated Lens Array for Facial Rejuvenation.",
+    "[Semantic Scholar] Efficacy Assessment of a Pulsed-Type Bipolar Radiofrequency Microneedling Device for Treating Facial Acne Vulgaris Using a Skin-Color Imaging System: A Pilot Study",
+    "[Semantic Scholar] Radiofrequency and Radiofrequency Microneedling in Skin of Color: A Review of Usage, Safety, and Efficacy",
+    "[Semantic Scholar] Microneedling Radiofrequency Enhances Poly-L-Lactic Acid Penetration That Effectively Improves Facial Skin Laxity without Lipolysis",
+    "[Semantic Scholar] Microneedling radiofrequency with sublative radiofrequency versus microneedling radiofrequency with subcision: A randomized controlled study for scar resurfacing, skin rejuvenation and anti-aging",
+    "[Semantic Scholar] Fractional Radiofrequency Microneedling as a Monotherapy in Acne Scar Management: A Systematic Review of Current Evidence"
+  ],
+  "_meta_stats": {
+    "sources_total": 20,
+    "pubmed_found_total": 35,
+    "challenger_active": true
+  }
+}

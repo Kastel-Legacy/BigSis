@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Sis - Carousel Clean Mode (V10)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=DM+Sans:wght@400;500;700&display=swap');
+
+        :root {
+            --teal: #0B7A8F;
+            --plum: #6B5B73;
+            --red: #D64F4F;
+            --cream: #FBF7F0;
+            --warm-cream: #F0EDE5;
+            --peachy-coral: #F4A882;
+            --dark-text: #333;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* INPUT */
+        .input-container {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            text-align: center;
+            transition: opacity 0.5s ease;
+        }
+        .logo-header { font-family: 'Space Grotesk', sans-serif; font-weight: 900; font-size: 32px; color: var(--teal); margin-bottom: 20px; letter-spacing: -1px; }
+        textarea { width: 100%; height: 200px; padding: 15px; border: 2px solid #eee; border-radius: 12px; margin-bottom: 20px; background: #fafafa; resize: none; font-size: 11px; font-family: monospace;}
+        button.btn-generate { background: linear-gradient(135deg, var(--teal), var(--plum)); color: white; border: none; padding: 16px 40px; border-radius: 50px; cursor: pointer; font-weight: bold; font-family: 'Space Grotesk', sans-serif; font-size: 18px; }
+
+        /* PHONE */
+        .phone-mockup {
+            width: 400px; height: 800px;
+            background: #fff; border-radius: 45px;
+            box-shadow: 0 0 0 12px #333, 0 0 0 14px #555, 0 50px 100px rgba(0,0,0,0.5);
+            overflow: hidden; position: relative; display: none; flex-direction: column;
+        }
+        .phone-notch { height: 35px; background: #fff; width: 100%; display: flex; justify-content: center; align-items: center; z-index: 5; font-size: 11px; font-weight: bold; }
+
+        /* CAROUSEL */
+        .carousel-container { width: 100%; aspect-ratio: 4/5; background: var(--cream); position: relative; overflow: hidden; }
+        .slides-wrapper { display: flex; height: 100%; transition: transform 0.4s cubic-bezier(0.2, 1, 0.3, 1); }
+        .slide { min-width: 100%; height: 100%; padding: 35px; display: flex; flex-direction: column; position: relative; }
+
+        /* ELEMENTS */
+        .slide-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: rgba(0,0,0,0.4); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .tiny-logo { font-family: 'Space Grotesk', sans-serif; font-weight: 900; color: var(--teal); position: relative; display: inline-block; font-size: 12px; }
+        .tiny-logo::after { content: ''; position: absolute; top: 50%; left: 50%; width: 110%; height: 2px; background: var(--red); transform: translate(-50%, -50%) rotate(-20deg); }
+
+        .slide-content h3 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; color: var(--teal); margin-bottom: 20px; position: relative; padding-bottom: 10px; }
+        .slide-content h3::after { content: ''; position: absolute; bottom: 0; left: 0; width: 50px; height: 3px; background: var(--red); }
+        
+        .card-box { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        .info-label { font-size: 11px; color: #999; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+        .info-value { font-size: 15px; font-weight: 500; color: var(--dark-text); line-height: 1.4; }
+
+        /* COVER */
+        .slide-cover { background: linear-gradient(135deg, var(--teal) 0%, var(--plum) 100%); color: white; justify-content: center; text-align: center; padding: 40px; }
+        .cover-logo { width: 100px; height: 100px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); border-radius: 20px; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .bs-text { font-family: 'Space Grotesk', sans-serif; font-size: 50px; font-weight: 900; z-index: 1; }
+        .bs-strike { position: absolute; width: 70px; height: 6px; background: var(--red); border-radius: 3px; transform: rotate(-20deg); z-index: 2; box-shadow: 0 4px 10px rgba(214, 79, 79, 0.4); }
+        .cover-title { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; line-height: 1.2; margin-bottom: 10px; }
+        .cover-sub { font-size: 16px; font-weight: 700; background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; display: inline-block; margin-bottom: 5px; }
+
+        /* SCORE */
+        .score-display { display: flex; justify-content: space-around; margin: 20px 0; }
+        .score-circle { width: 90px; height: 90px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 6px solid; background: white; margin-bottom: 5px; }
+        .score-val { font-family: 'Space Grotesk'; font-size: 28px; font-weight: 900; line-height: 1; }
+        .score-label { font-size: 10px; margin-top: 5px; font-weight: 700; text-transform: uppercase; }
+        .score-ctx { font-size: 10px; font-weight: 700; text-align: center; }
+
+        /* NEW: SWAP SLIDE */
+        .slide-swap { background: linear-gradient(135deg, #FFF8F0 0%, #FFF 100%); }
+        .slide-swap h3 { color: var(--peachy-coral); }
+        .slide-swap h3::after { background: var(--teal); }
+        .swap-card { background: white; border-radius: 20px; padding: 25px; text-align: center; border: 2px dashed var(--peachy-coral); margin-bottom: 20px; }
+        .swap-icon { font-size: 30px; display: block; margin-bottom: 10px; }
+        .swap-title { font-family: 'Space Grotesk'; font-size: 20px; font-weight: 700; color: var(--teal); margin-bottom: 10px; }
+        .swap-desc { font-size: 14px; color: #555; line-height: 1.4; }
+        .swap-proof { font-size: 10px; color: #999; margin-top: 10px; font-style: italic; border-top: 1px solid #eee; padding-top: 5px; }
+
+        /* SAFETY */
+        .danger-box { background: #fff5f5; border: 2px solid var(--red); border-radius: 16px; padding: 20px; position: relative; margin-top: 10px; }
+        .danger-icon { position: absolute; top: -15px; left: 20px; background: var(--red); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+        .danger-text { color: #8a1f1f; font-weight: 500; font-size: 15px; margin-top: 5px; }
+
+        /* CONTROLS */
+        .controls { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: #fff; border-top: 1px solid #eee; }
+        .nav-btn { background: none; border: 2px solid var(--teal); color: var(--teal); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .pagination { display: flex; gap: 5px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #ddd; transition: 0.3s; }
+        .dot.active { background: var(--teal); width: 20px; border-radius: 4px; }
+
+        /* INSTAGRAM UI */
+        .insta-ui { padding: 15px; text-align: left; }
+        .insta-header { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .insta-avatar { width: 30px; height: 30px; background: linear-gradient(135deg, var(--teal), var(--plum)); border-radius: 50%; }
+
+        /* RELOAD BUTTON */
+        .reload-btn { position: absolute; bottom: 20px; right: 20px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 10px 20px; border-radius: 20px; cursor: pointer; font-size: 12px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="input-container" id="inputContainer">
+        <div class="logo-header">BIG SIS GENERATOR</div>
+        <textarea id="jsonInput" placeholder="Colle le JSON ici..."></textarea>
+        <br>
+        <button class="btn-generate" onclick="generateVisuals()">GÉNÉRER LE VISUEL ✨</button>
+    </div>
+
+    <div class="phone-mockup" id="phoneMockup">
+        <div class="phone-notch">12:00</div>
+        
+        <div class="carousel-container">
+            <div class="slides-wrapper" id="slidesWrapper"></div>
+        </div>
+
+        <div class="controls">
+            <button class="nav-btn" id="prevBtn" onclick="moveSlide(-1)">←</button>
+            <div class="pagination" id="pagination"></div>
+            <button class="nav-btn" id="nextBtn" onclick="moveSlide(1)">→</button>
+        </div>
+        
+        <div class="insta-ui">
+            <div class="insta-header">
+                <div class="insta-avatar"></div>
+                <div><div style="font-weight:bold; font-size:12px;">big.sis.official</div><div style="font-size:10px; color:#666;">Original Audio</div></div>
+            </div>
+            <div style="height:10px; width:60%; background:#f0f0f0; border-radius:5px;"></div>
+        </div>
+    </div>
+
+    <button class="reload-btn" id="reloadBtn" onclick="location.reload()">Nouveau</button>
+
+    <script>
+        let currentSlide = 0;
+        let totalSlides = 0;
+
+        function generateVisuals() {
+            try {
+                const raw = document.getElementById('jsonInput').value;
+                if(!raw) return;
+                const data = JSON.parse(raw);
+                document.getElementById('inputContainer').style.display = 'none';
+                document.getElementById('phoneMockup').style.display = 'flex';
+                document.getElementById('reloadBtn').style.display = 'block';
+                renderSlides(data);
+            } catch (e) { alert("Erreur JSON : " + e.message); }
+        }
+
+        function renderSlides(data) {
+            const wrapper = document.getElementById('slidesWrapper');
+            const pagination = document.getElementById('pagination');
+            wrapper.innerHTML = '';
+            pagination.innerHTML = '';
+            
+            // LOGIQUE V10 (DATA)
+            const titreAccroche = data.titre_social || "Titre Manquant";
+            const nomProduit = data.nom_commercial_courant || data.titre_officiel || "Produit";
+            const nomScience = data.nom_scientifique || "";
+            const swap = data.alternative_bigsis || null;
+            const social = data.recuperation_sociale || null;
+            const scores = data.score_global || { note_efficacite_sur_10: "?", note_securite_sur_10: "?" };
+
+            // 1. COVER
+            addSlide(wrapper, `
+                <div class="slide slide-cover">
+                    <div style="margin-top: auto; margin-bottom: auto;">
+                        <div class="cover-logo"><span class="bs-text">BS</span><div class="bs-strike"></div></div>
+                        <h1 class="cover-title">${titreAccroche}</h1>
+                        <div class="cover-sub">${nomProduit}</div>
+                        ${nomScience ? `<div style="font-size:12px; opacity:0.8; font-style:italic; margin-top:5px;">(${nomScience})</div>` : ''}
+                        <div style="margin-top:40px; font-family:'Space Grotesk'; font-weight:700; letter-spacing:3px; font-size:10px;">CUTTING THROUGH THE BS</div>
+                    </div>
+                    <div class="slide-footer" style="color: rgba(255,255,255,0.6);"><span>SWIPE FOR TRUTH →</span></div>
+                </div>
+            `);
+
+            // 2. ID CARD
+            addSlide(wrapper, `
+                <div class="slide slide-content">
+                    <h3>C'est quoi ?</h3>
+                    <div class="card-box">
+                        <div style="margin-bottom:15px"><div class="info-label">Définition</div><div class="info-value">${data.carte_identite.ce_que_c_est}</div></div>
+                        <div style="margin-bottom:15px"><div class="info-label">Mécanisme</div><div class="info-value">${data.carte_identite.comment_ca_marche}</div></div>
+                        <div><div class="info-label">Zone</div><div class="info-value">${data.carte_identite.zone_anatomique}</div></div>
+                    </div>
+                    <div class="slide-footer"><span class="tiny-logo">BS</span><span>La Base</span></div>
+                </div>
+            `);
+
+            // 3. SCORES
+            addSlide(wrapper, `
+                <div class="slide slide-content">
+                    <h3>Le Score Big Sis</h3>
+                    <div class="score-display">
+                        <div style="display:flex; flex-direction:column; align-items:center;">
+                            <div class="score-circle" style="border-color: var(--teal); color: var(--teal);">
+                                <div class="score-val">${scores.note_efficacite_sur_10}</div><div class="score-label">Efficacité</div>
+                            </div>
+                            <div class="score-ctx" style="color:var(--teal); margin-top:5px;">${scores.explication_efficacite_bref || ""}</div>
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:center;">
+                            <div class="score-circle" style="border-color: var(--red); color: var(--red);">
+                                <div class="score-val">${scores.note_securite_sur_10}</div><div class="score-label">Sécurité</div>
+                            </div>
+                            <div class="score-ctx" style="color:var(--red); margin-top:5px;">${scores.explication_securite_bref || ""}</div>
+                        </div>
+                    </div>
+                    <div class="card-box" style="background:var(--plum); color:white; margin-top:10px;">
+                        <div class="info-label" style="color:rgba(255,255,255,0.7)">VERDICT</div>
+                        <div style="font-size:16px; font-weight:500;">"${scores.verdict_final}"</div>
+                    </div>
+                    <div class="slide-footer"><span class="tiny-logo">BS</span><span>Le Verdict</span></div>
+                </div>
+            `);
+
+            // 4. EFFICACITÉ
+            addSlide(wrapper, `
+                <div class="slide slide-content">
+                    <h3>Ça marche vraiment ?</h3>
+                    <div class="card-box" style="border-left: 4px solid var(--teal);">
+                        <div class="info-label" style="color:var(--teal)">Réalité</div>
+                        <p class="info-value">${data.synthese_efficacite.ce_que_ca_fait_vraiment}</p>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="card-box"><div class="info-label">Délai</div><div class="info-value" style="font-size:13px;">${data.synthese_efficacite.delai_resultat}</div></div>
+                        <div class="card-box"><div class="info-label">Durée</div><div class="info-value" style="font-size:13px;">${data.synthese_efficacite.duree_resultat}</div></div>
+                    </div>
+                    <div class="slide-footer"><span class="tiny-logo">BS</span><span>Efficacité</span></div>
+                </div>
+            `);
+
+            // 5. SÉCURITÉ
+            let riskList = "";
+            if(data.synthese_securite.risques_courants) {
+                riskList = data.synthese_securite.risques_courants.map(r => `<li>${r}</li>`).join('');
+            }
+            addSlide(wrapper, `
+                <div class="slide slide-content">
+                    <h3 style="color: var(--red);">Ça fait mal ?</h3>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div class="card-box"><div class="info-label">Douleur</div><div class="info-value" style="font-size:13px;">${data.synthese_securite.niveau_douleur_moyen}</div></div>
+                        <div class="card-box"><div class="info-label">Downtime</div><div class="info-value" style="font-size:13px;">${data.synthese_securite.downtime_moyen}</div></div>
+                    </div>
+                    <div class="card-box">
+                        <div class="info-label">Risques Courants</div>
+                        <ul style="font-size: 13px; padding-left: 20px; color:#333;">${riskList}</ul>
+                    </div>
+                    ${data.synthese_securite.le_risque_qui_fait_peur ? `
+                    <div class="danger-box">
+                        <div class="danger-icon">!</div>
+                        <div style="margin-left:20px; color:#8a1f1f; font-weight:bold; font-size:12px; text-transform:uppercase;">Le Risque qui fait peur</div>
+                        <div class="danger-text">${data.synthese_securite.le_risque_qui_fait_peur}</div>
+                    </div>` : ''}
+                    <div class="slide-footer"><span class="tiny-logo">BS</span><span>Sécurité</span></div>
+                </div>
+            `);
+
+            // 6. SOCIAL RECOVERY (NOUVELLE SLIDE V10)
+            if (social) {
+                addSlide(wrapper, `
+                    <div class="slide slide-content">
+                        <h3>Vraie Vie (Social)</h3>
+                        <div class="card-box" style="background:#f8f9fa; border-left:4px solid var(--plum);">
+                            <div class="info-label" style="color:var(--plum);">VERDICT MIROIR</div>
+                            <div style="font-size:15px; font-weight:500;">${social.verdict_immediat}</div>
+                        </div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+                            <div class="card-box" style="text-align:center;">
+                                <div style="font-size:24px;">💻</div>
+                                <div class="info-label">ZOOM</div>
+                                <div style="font-weight:800; color:var(--teal);">${social.zoom_ready || "?"}</div>
+                            </div>
+                            <div class="card-box" style="text-align:center;">
+                                <div style="font-size:24px;">🥂</div>
+                                <div class="info-label">DATE</div>
+                                <div style="font-weight:800; color:var(--red);">${social.date_ready || "?"}</div>
+                            </div>
+                        </div>
+                        <div class="card-box" style="background:#fff0f0; border:1px solid #FFDada;">
+                            <div class="info-label" style="color:var(--red)">⛔ INTERDITS TEMPORAIRES</div>
+                            <div style="font-size:12px; margin-top:5px; line-height:1.4;">${(social.les_interdits_sociaux || []).join(', ')}</div>
+                        </div>
+                        <div class="slide-footer"><span class="tiny-logo">BS</span><span>Social Life</span></div>
+                    </div>
+                `);
+            }
+
+            // 7. SWAP (BONUS)
+            if (swap) {
+                addSlide(wrapper, `
+                    <div class="slide slide-content slide-swap">
+                        <h3>Le Swap Big Sis</h3>
+                        <div class="swap-card">
+                            <span class="swap-icon">🔄</span>
+                            <div class="swap-title">${swap.titre}</div>
+                            <div class="swap-desc">${swap.pourquoi_c_est_mieux}</div>
+                            ${swap.source_preuve_id ? `<div class="swap-proof">Preuve : Étude #${swap.source_preuve_id}</div>` : ''}
+                        </div>
+                        <div style="text-align:center; font-size:12px; color:#888; margin-top:20px;">La meilleure alternative scientifique.</div>
+                        <div class="slide-footer"><span class="tiny-logo">BS</span><span>Alternative</span></div>
+                    </div>
+                `);
+            }
+
+            // 8. CONSEIL
+            addSlide(wrapper, `
+                <div class="slide slide-content" style="justify-content:center; text-align:center;">
+                    <div style="font-size:60px; color:var(--red); opacity:0.2; font-family:serif;">“</div>
+                    <div style="font-size:20px; font-weight:500; color:var(--teal); line-height:1.5;">${data.le_conseil_bigsis}</div>
+                    <div style="margin-top:30px; font-weight:900; color:var(--plum);">— BIG SIS</div>
+                    <div class="slide-footer"><span class="tiny-logo">BS</span><span>Le Conseil</span></div>
+                </div>
+            `);
+
+            // 9. STATS
+            const sources = data.annexe_sources_retenues || [];
+            addSlide(wrapper, `
+                <div class="slide slide-content">
+                    <h3>Preuves & Science</h3>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
+                        <div class="card-box" style="text-align:center;"><div class="info-label">Études</div><div style="font-size:24px; font-weight:900;">${sources.length}</div></div>
+                        <div class="card-box" style="text-align:center;"><div class="info-label">Patients</div><div style="font-size:24px; font-weight:900;">${data.statistiques_consolidees.nombre_patients_total}</div></div>
+                    </div>
+                    <div class="card-box" style="text-align:center; background:var(--teal); color:white;">
+                        <div style="font-weight:bold; margin-bottom:5px;">NIVEAU DE PREUVE</div>
+                        <div style="font-family:'Space Grotesk'; font-size:24px;">${data.statistiques_consolidees.niveau_de_preuve_global}</div>
+                    </div>
+                    <div style="margin-top:auto; text-align:center;">
+                        <p style="font-weight:bold; color:var(--teal);">Abonne-toi pour plus de vérité.</p>
+                        <p style="font-size:12px; color:#999; margin-top:5px;">@big.sis.official</p>
+                    </div>
+                </div>
+            `);
+
+            // Setup
+            totalSlides = wrapper.children.length;
+            currentSlide = 0;
+            updateCarousel();
+            for(let i=0; i<totalSlides; i++) {
+                let dot = document.createElement('div');
+                dot.className = 'dot';
+                if(i===0) dot.classList.add('active');
+                pagination.appendChild(dot);
+            }
+        }
+
+        function addSlide(wrapper, html) {
+            const div = document.createElement('div');
+            div.className = 'slide';
+            div.innerHTML = html;
+            wrapper.appendChild(div);
+        }
+
+        function moveSlide(dir) {
+            currentSlide += dir;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+            updateCarousel();
+        }
+
+        function updateCarousel() {
+            document.getElementById('slidesWrapper').style.transform = `translateX(-${currentSlide * 100}%)`;
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, idx) => dot.classList.toggle('active', idx === currentSlide));
+            document.getElementById('prevBtn').disabled = (currentSlide === 0);
+            document.getElementById('nextBtn').disabled = (currentSlide === totalSlides - 1);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+{
+  "nom_scientifique": "Photothérapie LED",
+  "nom_commercial_courant": "Thérapie par lumière LED",
+  "titre_social": "Rajeunissement instantané avec la lumière LED !",
+  "carte_identite": {
+    "ce_que_c_est": "La photothérapie LED utilise des longueurs d'onde spécifiques de lumière pour traiter les signes du vieillissement cutané, tels que les rides et la texture de la peau.",
+    "comment_ca_marche": "Elle stimule la production de collagène et améliore la circulation sanguine, ce qui aide à réduire les rides et à améliorer l'apparence générale de la peau.",
+    "mode_application": "Application topique avec un appareil LED sur la peau.",
+    "zone_anatomique": "Visage"
+  },
+  "meta": {
+    "zones_concernees": [
+      "Visage",
+      "Cou"
+    ],
+    "problemes_traites": [
+      "Rides",
+      "Texture de la peau",
+      "Taches brunes"
+    ]
+  },
+  "score_global": {
+    "note_efficacite_sur_10": 8,
+    "explication_efficacite_bref": "Les études montrent une réduction significative des rides et une amélioration de la texture de la peau après plusieurs sessions.",
+    "note_securite_sur_10": 9,
+    "explication_securite_bref": "La photothérapie LED est généralement bien tolérée avec peu d'effets secondaires rapportés.",
+    "verdict_final": "Une méthode efficace et sûre pour le rajeunissement cutané, avec des résultats visibles après quelques séances."
+  },
+  "alternative_bigsis": {
+    "titre": "Laser Erbium YAG",
+    "pourquoi_c_est_mieux": "Le laser Erbium YAG offre des résultats plus rapides et plus marqués pour le rajeunissement cutané, bien qu'il puisse nécessiter un temps de récupération plus long.",
+    "niveau_fiabilite": "Gold Standard",
+    "source_preuve_id": 4
+  },
+  "synthese_efficacite": {
+    "ce_que_ca_fait_vraiment": "Réduit les rides, améliore la texture de la peau et diminue les taches brunes.",
+    "delai_resultat": "Résultats visibles après 4 à 8 semaines de traitement régulier.",
+    "duree_resultat": "Les effets peuvent durer plusieurs mois, nécessitant des séances d'entretien."
+  },
+  "synthese_securite": {
+    "niveau_douleur_moyen": "Aucun ou très léger inconfort.",
+    "risques_courants": [
+      "Rougeur",
+      "Légère irritation"
+    ],
+    "le_risque_qui_fait_peur": "Rougeur persistante après traitement."
+  },
+  "recuperation_sociale": {
+    "verdict_immediat": "Légère rougeur, généralement pas visible.",
+    "downtime_visage_nu": "Aucun temps d'arrêt nécessaire.",
+    "downtime_maquillage": "Peut se maquiller immédiatement après le traitement.",
+    "zoom_ready": "Immédiatement présentable.",
+    "date_ready": "Immédiatement impeccable.",
+    "les_interdits_sociaux": [
+      "Pas de soleil direct pendant 24h"
+    ]
+  },
+  "le_conseil_bigsis": "Pour de meilleurs résultats, combinez la photothérapie LED avec des soins topiques adaptés à votre type de peau.",
+  "statistiques_consolidees": {
+    "nombre_etudes_pertinentes_retenues": 6,
+    "nombre_patients_total": 150,
+    "niveau_de_preuve_global": "Fort"
+  },
+  "annexe_sources_retenues": [
+    {
+      "id": 1,
+      "titre": "Efficacy and safety of 570/590 Nm yellow light combined with red light and infrared LED in treating facial skin photoaging",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41091280/",
+      "pmid": "41091280",
+      "raison_inclusion": "Étude démontrant l'efficacité de la photothérapie LED sur le vieillissement cutané."
+    },
+    {
+      "id": 2,
+      "titre": "Role of photobiomodulation application frequency in facial rejuvenation",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40167796/",
+      "pmid": "40167796",
+      "raison_inclusion": "Analyse de l'impact de la fréquence d'application de la photothérapie LED sur le rajeunissement facial."
+    },
+    {
+      "id": 3,
+      "titre": "Exploring the Safety and Efficacy of Organic Light-Emitting Diode in Skin Rejuvenation and Wound Healing",
+      "annee": "2024",
+      "url": "https://www.semanticscholar.org/paper/b29d10634deee92937d6143d49bb50abb6fa8a91",
+      "pmid": "S2ID-b29d10634deee92937d6143d49bb50abb6fa8a91",
+      "raison_inclusion": "Étude sur l'efficacité des diodes électroluminescentes organiques pour le rajeunissement cutané."
+    },
+    {
+      "id": 4,
+      "titre": "A systematic review and meta-analysis of the comparison between lasers and other therapeutic modalities in skin rejuvenation",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40906045/",
+      "pmid": "40906045",
+      "raison_inclusion": "Revue systématique comparant l'efficacité des lasers et de la photothérapie LED."
+    },
+    {
+      "id": 5,
+      "titre": "The Comparison of the Efficacy and Safety of Fractional 1064 nm Nd:YAG Picosecond Laser and Fractional Q-Switched 1064-nm Nd:YAG Laser in the Improvement of Photoaging",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40589289/",
+      "pmid": "40589289",
+      "raison_inclusion": "Étude sur l'efficacité des lasers pour le photo-vieillissement, incluant des comparaisons avec la photothérapie LED."
+    },
+    {
+      "id": 6,
+      "titre": "Low Energy Ultrapulse CO",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40254943/",
+      "pmid": "40254943",
+      "raison_inclusion": "Évaluation de l'efficacité des traitements laser pour le rajeunissement cutané."
+    }
+  ],
+  "_meta_topic": "LED phototherapy facial rejuvenation OR low level light therapy wrinkles",
+  "_meta_problem": "Photoaging and inflammation",
+  "zones_visage": [
+    "cou"
+  ],
+  "_meta_sources_brutes_envoyees": [
+    "[PubMed] Efficacy and safety of 570/590 Nm yellow light combined with red light and infrared LED in treating facial skin photoaging: A Single-Center, randomized Controlled, exploratory study.",
+    "[PubMed] Comparison of the Efficacy of Low-Energy Delicate Pulsed Light and Q-Switched 1064 nm Nd:YAG Laser in the Treatment of Post-Acne Erythema: A Prospective Randomized Split-Face Study.",
+    "[PubMed] Efficacy of Intense Pulsed Light AOPT-LTL Technique in the Treatment of Melasma: An In Vivo and Clinical Study.",
+    "[PubMed] A systematic review and meta-analysis of the comparison between lasers and other therapeutic modalities in skin rejuvenation and resurfacing with a focus on RCTs.",
+    "[PubMed] Quantitative Evaluation of Successful Combination Therapy With Dye Laser and Long-Pulse Alexandrite Laser for Papulopustular Rosacea.",
+    "[PubMed] Clinical and histologic changes after 755-nm picosecond laser with a novel platinum focus lens array in the treatment of photo-aged skin.",
+    "[PubMed] Hypothetical Role of Multiwavelength Diode Laser (755, 808, and 1064 nm) in Addressing Bony Resorption in Facial Aging: A Clinical Commentary.",
+    "[PubMed] The Comparison of the Efficacy and Safety of Fractional 1064 nm Nd:YAG Picosecond Laser and Fractional Q-Switched 1064-nm Nd:YAG Laser in the Improvement of Photoaging: A Split-Face Study.",
+    "[PubMed] Nonablative Fractional 1927-nm Laser for Periorbital Rejuvenation: A Prospective, Double-Arm, Open-Label Trial.",
+    "[PubMed] Low Energy Ultrapulse CO",
+    "[PubMed] Evaluation of the safety and efficacy of the thulium 1927 laser in aesthetic health: an integrative review.",
+    "[PubMed] Role of photobiomodulation application frequency in facial rejuvenation: randomized, sham-controlled, double-blind, clinical trial.",
+    "[PubMed] Treatment of Solar Lentigines: A Systematic Review of Clinical Trials.",
+    "[Semantic Scholar] Design and realization of a dual-wavelength low level light therapy for acne and face rejuvenation treatment",
+    "[Semantic Scholar] Exploring the Safety and Efficacy of Organic Light-Emitting Diode in Skin Rejuvenation and Wound Healing",
+    "[Semantic Scholar] PHOTOTHERAPY IN ANTI-AGING MEDICINE: EXPANDING HORIZONS FROM SKIN HEALTH TO SYSTEMIC REJUVENATION"
+  ],
+  "_meta_stats": {
+    "sources_total": 16,
+    "pubmed_found_total": 35,
+    "challenger_active": true
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "nom_scientifique": "Acide hyaluronique",
+  "nom_commercial_courant": "VYC-20L",
+  "titre_social": "Rajeunissez votre regard avec des injections de volume !",
+  "carte_identite": {
+    "ce_que_c_est": "Injections d'acide hyaluronique pour corriger le creux des tempes.",
+    "comment_ca_marche": "L'acide hyaluronique attire l'eau et comble les zones de volume perdu, redonnant ainsi du contour au visage.",
+    "mode_application": "Injection.",
+    "zone_anatomique": "Tempe."
+  },
+  "meta": {
+    "zones_concernees": [
+      "Tempe"
+    ],
+    "problemes_traites": [
+      "Creux temporaux",
+      "Vieillissement facial"
+    ]
+  },
+  "score_global": {
+    "note_efficacite_sur_10": 8,
+    "explication_efficacite_bref": "Les études montrent une amélioration significative de l'apparence des tempes avec un haut taux de satisfaction des patients.",
+    "note_securite_sur_10": 7,
+    "explication_securite_bref": "Les effets secondaires sont généralement légers, mais des complications graves peuvent survenir.",
+    "verdict_final": "Les injections d'acide hyaluronique pour les tempes sont efficaces et généralement sûres, mais nécessitent une expertise pour minimiser les risques."
+  },
+  "alternative_bigsis": {
+    "titre": "Greffe de graisse autologue",
+    "pourquoi_c_est_mieux": "La greffe de graisse peut offrir des résultats plus durables et moins de risques de complications vasculaires.",
+    "niveau_fiabilite": "Consensus Médical",
+    "source_preuve_id": null
+  },
+  "synthese_efficacite": {
+    "ce_que_ca_fait_vraiment": "Améliore le volume des tempes et l'apparence générale du visage, avec des résultats visibles dès 3 mois.",
+    "delai_resultat": "Résultats visibles après 1 à 3 mois.",
+    "duree_resultat": "Durée des effets de 6 à 12 mois."
+  },
+  "synthese_securite": {
+    "niveau_douleur_moyen": "Douleur légère à modérée pendant l'injection.",
+    "risques_courants": [
+      "Ecchymoses",
+      "Oedème",
+      "Douleur au site d'injection"
+    ],
+    "le_risque_qui_fait_peur": "Complications graves comme la nécrose tissulaire ou la perte de vision."
+  },
+  "recuperation_sociale": {
+    "verdict_immediat": "Rougeur et léger gonflement.",
+    "downtime_visage_nu": "1 à 3 jours avant de sortir sans maquillage.",
+    "downtime_maquillage": "24 heures avant de pouvoir se maquiller.",
+    "zoom_ready": "1 à 2 jours pour être présentable en visio.",
+    "date_ready": "1 semaine pour être impeccable de près.",
+    "les_interdits_sociaux": [
+      "Pas de sport 24h",
+      "Pas d'alcool",
+      "Pas de soleil"
+    ]
+  },
+  "le_conseil_bigsis": "Choisissez un praticien expérimenté pour minimiser les risques et maximiser les résultats.",
+  "statistiques_consolidees": {
+    "nombre_etudes_pertinentes_retenues": 10,
+    "nombre_patients_total": 881,
+    "niveau_de_preuve_global": "Fort"
+  },
+  "annexe_sources_retenues": [
+    {
+      "id": 1,
+      "titre": "Nonsurgical Temple Volumization with Soft-Tissue Fillers: A Systematic Review of the Literature",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40325223/",
+      "pmid": "40325223",
+      "raison_inclusion": "Revue systématique sur l'utilisation des fillers pour le volume des tempes."
+    },
+    {
+      "id": 2,
+      "titre": "Improvement in Temple Hollowing with VYC-20L Hyaluronic Acid Filler: A Multicenter Randomized Controlled Trial of Safety and Effectiveness",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39808069/",
+      "pmid": "39808069",
+      "raison_inclusion": "Essai contrôlé randomisé sur l'efficacité et la sécurité du VYC-20L."
+    },
+    {
+      "id": 3,
+      "titre": "Recommendations on Ultrasound-Guided Hyaluronic Acid Soft Tissue Augmentation of the Upper Face in Asians",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39740068/",
+      "pmid": "39740068",
+      "raison_inclusion": "Recommandations pour l'utilisation de l'échographie dans les injections de fillers."
+    },
+    {
+      "id": 4,
+      "titre": "Singular entry point technique for forehead and temple filler augmentation: Anatomical and clinical perspectives",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38837504/",
+      "pmid": "38837504",
+      "raison_inclusion": "Technique d'injection unique pour réduire la douleur et les effets secondaires."
+    },
+    {
+      "id": 5,
+      "titre": "Dizziness and Pain After Temporal Augmentation With Hyaluronic Acid",
+      "annee": "2023",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37336475/",
+      "pmid": "37336475",
+      "raison_inclusion": "Étude de cas sur des complications après augmentation des tempes."
+    },
+    {
+      "id": 6,
+      "titre": "Temple augmentation by injecting a hyaluronic acid filler between the superficial and deep temporal fasciae",
+      "annee": "2022",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/35435310/",
+      "pmid": "35435310",
+      "raison_inclusion": "Étude sur l'injection de fillers entre les fascias temporaux."
+    },
+    {
+      "id": 7,
+      "titre": "The Suitability of a Large Particle Hyaluronic Acid Filler for the Treatment of Temporal Hollowing",
+      "annee": "2023",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37712833/",
+      "pmid": "37712833",
+      "raison_inclusion": "Efficacité d'un filler à grande particule pour le traitement des creux temporaux."
+    },
+    {
+      "id": 8,
+      "titre": "Treacherous territory: Temple fillers and tissue necrosis",
+      "annee": "2024",
+      "url": "https://www.semanticscholar.org/paper/aaa056136208562f1ff8b93af6648d80113bbd13",
+      "pmid": "S2ID-aaa056136208562f1ff8b93af6648d80113bbd13",
+      "raison_inclusion": "Discussion des complications graves liées aux fillers temporaux."
+    },
+    {
+      "id": 9,
+      "titre": "Efficacy, Safety, and Longevity of Hyaluronic Acid Filler Injection in Treating Temple Hollowness by Sonographic Identifying 17 Soft Tissue Layers",
+      "annee": "2024",
+      "url": "https://www.semanticscholar.org/paper/9c208d392a2f87547853f0a7e335f3eaeb280e62",
+      "pmid": "S2ID-9c208d392a2f87547853f0a7e335f3eaeb280e62",
+      "raison_inclusion": "Évaluation des effets des injections d'acide hyaluronique dans les tempes."
+    },
+    {
+      "id": 10,
+      "titre": "Ultrasound to Improve the Anatomic Approach to the Temple and a Retrospective Study on the Efficacy of Large-Volume Autologous Fat Grafting",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37220395/",
+      "pmid": "37220395",
+      "raison_inclusion": "Étude sur l'approche anatomique et l'efficacité de la greffe de graisse."
+    }
+  ],
+  "_meta_topic": "Temporal hollowing filler hyaluronic acid OR temple augmentation injections",
+  "_meta_problem": "Temporal hollowing and skeletal appearance",
+  "zones_visage": [
+    "frontotemporal"
+  ],
+  "_meta_sources_brutes_envoyees": [
+    "[PubMed] Nonsurgical Temple Volumization with Soft-Tissue Fillers: A Systematic Review of the Literature.",
+    "[PubMed] Improvement in Temple Hollowing with VYC-20L Hyaluronic Acid Filler: A Multicenter Randomized Controlled Trial of Safety and Effectiveness.",
+    "[PubMed] Recommendations on Ultrasound-Guided Hyaluronic Acid Soft Tissue Augmentation of the Upper Face in Asians.",
+    "[PubMed] Intracorporeal evaluation of hyaluronic acid fillers with varied rheological properties and correlations with aesthetic outcomes.",
+    "[PubMed] Ligament Suspensionplasty With Suture Tape Augmentation​ for Basal Thumb Arthritis.",
+    "[PubMed] Singular entry point technique for forehead and temple filler augmentation: Anatomical and clinical perspectives.",
+    "[PubMed] Anatomy of the temporal region to guide filler injections.",
+    "[PubMed] The Suitability of a Large Particle Hyaluronic Acid Filler for the Treatment of Temporal Hollowing.",
+    "[PubMed] Dizziness and Pain After Temporal Augmentation With Hyaluronic Acid.",
+    "[PubMed] Ultrasound to Improve the Anatomic Approach to the Temple and a Retrospective Study on the Efficacy of Large-Volume Autologous Fat Grafting.",
+    "[PubMed] The Deep Temporal Arteries: Anatomical Study with Application to Augmentations Procedures of the Temple.",
+    "[PubMed] Temple augmentation by injecting a hyaluronic acid filler between the superficial and deep temporal fasciae.",
+    "[PubMed] Clinical Application of Stromal Vascular Fraction Gel in Temple Augmentation Using Deep Injection and Shallow Pave Filling.",
+    "[PubMed] LIN28a induced metabolic and redox regulation promotes cardiac cell survival in the heart after ischemic injury.",
+    "[Semantic Scholar] Efficacy, Safety, and Longevity of Hyaluronic Acid Filler Injection in Treating Temple Hollowness by Sonographic Identifying 17 Soft Tissue Layers",
+    "[Semantic Scholar] Treacherous territory: Temple fillers and tissue necrosis",
+    "[Semantic Scholar] Asian Facial Contouring and Augmentation: tips and tricks."
+  ],
+  "_meta_stats": {
+    "sources_total": 17,
+    "pubmed_found_total": 34,
+    "challenger_active": true
+  }
+}

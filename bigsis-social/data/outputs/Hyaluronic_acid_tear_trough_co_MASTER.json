@@ -1,0 +1,177 @@
+{
+  "nom_scientifique": "Acide hyaluronique",
+  "nom_commercial_courant": "TEOSYAL® PureSense Redensity 2",
+  "titre_social": "Le secret d'un regard éclatant",
+  "carte_identite": {
+    "ce_que_c_est": "L'acide hyaluronique est un polysaccharide naturellement présent dans le corps, utilisé comme agent de comblement pour corriger les déformations du contour des yeux, notamment les cernes et les creux sous les yeux.",
+    "comment_ca_marche": "Il agit en attirant l'eau dans les tissus, augmentant ainsi le volume et l'hydratation de la peau, ce qui réduit l'apparence des cernes et des creux.",
+    "mode_application": "Injection sous-cutanée dans la zone du contour des yeux.",
+    "zone_anatomique": "Région péri-orbitaire (sous les yeux)."
+  },
+  "meta": {
+    "zones_concernees": [
+      "Contour des yeux",
+      "Visage"
+    ],
+    "problemes_traites": [
+      "Cernes",
+      "Creux sous les yeux"
+    ]
+  },
+  "score_global": {
+    "note_efficacite_sur_10": 8,
+    "explication_efficacite_bref": "Les études montrent une satisfaction élevée des patients et une amélioration significative de l'apparence des cernes.",
+    "note_securite_sur_10": 7,
+    "explication_securite_bref": "Les effets secondaires sont généralement légers et temporaires, bien que des complications rares puissent survenir.",
+    "verdict_final": "L'acide hyaluronique est une option efficace et relativement sûre pour le traitement des cernes, avec un bon taux de satisfaction des patients."
+  },
+  "alternative_bigsis": {
+    "titre": "Chirurgie de blépharoplastie",
+    "pourquoi_c_est_mieux": "La blépharoplastie offre des résultats plus durables et peut traiter des problèmes plus complexes, mais elle est invasive et nécessite un temps de récupération plus long.",
+    "niveau_fiabilite": "Gold Standard",
+    "source_preuve_id": null
+  },
+  "synthese_efficacite": {
+    "ce_que_ca_fait_vraiment": "L'acide hyaluronique corrige efficacement les déformations du contour des yeux, avec une amélioration visible et une satisfaction élevée des patients.",
+    "delai_resultat": "Les résultats sont visibles immédiatement après l'injection.",
+    "duree_resultat": "Les effets peuvent durer jusqu'à 12 mois, selon le produit et la technique utilisée."
+  },
+  "synthese_securite": {
+    "niveau_douleur_moyen": "Douleur légère à modérée, souvent décrite comme une piqûre.",
+    "risques_courants": [
+      "Ecchymoses",
+      "Oedème"
+    ],
+    "le_risque_qui_fait_peur": "Le risque de l'effet Tyndall (décoloration de la peau) est préoccupant mais rare."
+  },
+  "recuperation_sociale": {
+    "verdict_immediat": "Légère rougeur et gonflement possibles.",
+    "downtime_visage_nu": "1 à 2 jours avant de sortir sans maquillage.",
+    "downtime_maquillage": "24 heures avant de pouvoir se maquiller.",
+    "zoom_ready": "Prêt pour une visio en 1 à 2 jours.",
+    "date_ready": "Impeccable en 1 semaine.",
+    "les_interdits_sociaux": [
+      "Pas de sport 24h",
+      "Pas d'alcool",
+      "Pas de soleil"
+    ]
+  },
+  "le_conseil_bigsis": "Choisissez un praticien expérimenté pour minimiser les risques et maximiser les résultats.",
+  "statistiques_consolidees": {
+    "nombre_etudes_pertinentes_retenues": 10,
+    "nombre_patients_total": 2556,
+    "niveau_de_preuve_global": "Fort"
+  },
+  "annexe_sources_retenues": [
+    {
+      "id": 1,
+      "titre": "Real-World Evidence on the Routine Use, Efficacy, and Safety of a Hyaluronic Acid-Based Dermal Filler in the Periorbital Region",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40442496/",
+      "pmid": "40442496",
+      "raison_inclusion": "Étude prospective démontrant l'efficacité et la sécurité de l'acide hyaluronique dans la région péri-orbitaire."
+    },
+    {
+      "id": 2,
+      "titre": "The Efficacy and Safety of Hyaluronic Acid Injection in Tear Trough Deformity: A Systematic Review and Meta-analysis",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37684413/",
+      "pmid": "37684413",
+      "raison_inclusion": "Méta-analyse fournissant des données quantitatives sur l'efficacité et les complications des injections d'acide hyaluronique."
+    },
+    {
+      "id": 3,
+      "titre": "Quantitative Evaluation of Improvement of Tear Trough With a Non-Cross-Linked Sodium Hyaluronic Compound: A Three-Dimensional and MRI Analysis",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39807689/",
+      "pmid": "39807689",
+      "raison_inclusion": "Évaluation quantitative de l'amélioration des cernes avec un composé d'acide hyaluronique non réticulé."
+    },
+    {
+      "id": 4,
+      "titre": "A Prospective, Multicenter, Evaluator-Blind, Randomized, Controlled Study of Belotero Balance (+), a Hyaluronic Acid Filler With Lidocaine, for Correction of Infraorbital Hollowing in Adults",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38377391/",
+      "pmid": "38377391",
+      "raison_inclusion": "Étude contrôlée démontrant l'efficacité et la sécurité de Belotero Balance pour corriger les creux infra-orbitaires."
+    },
+    {
+      "id": 5,
+      "titre": "Novel Treatment Protocol for Combined Tear Trough Ligament Stretching and Injection",
+      "annee": "2023",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/36912918/",
+      "pmid": "36912918",
+      "raison_inclusion": "Protocole de traitement innovant pour améliorer les résultats des injections d'acide hyaluronique."
+    },
+    {
+      "id": 6,
+      "titre": "Static and Dynamic Filler-Associated Tear Trough Deformities: Manifestations and Treatment Algorithm",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38727846/",
+      "pmid": "38727846",
+      "raison_inclusion": "Analyse des déformations associées aux fillers et des algorithmes de traitement."
+    },
+    {
+      "id": 7,
+      "titre": "Lower Eyelid Dark Circles (Tear Trough and Lid-Cheek Junction): A Stepwise Assessment Framework",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38489829/",
+      "pmid": "38489829",
+      "raison_inclusion": "Cadre d'évaluation pour les cernes sous les yeux, utile pour les praticiens."
+    },
+    {
+      "id": 8,
+      "titre": "Filler-based correction of tear trough depressions and eye bags in Japanese patients: A classification system and treatment algorithm",
+      "annee": "2023",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/36208029/",
+      "pmid": "36208029",
+      "raison_inclusion": "Système de classification et algorithme de traitement pour les dépressions du contour des yeux."
+    },
+    {
+      "id": 9,
+      "titre": "Hyaluronic Acid Injection Strategy of Infraorbital and Midfacial Rejuvenation for Women in Southeast China",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40858736/",
+      "pmid": "40858736",
+      "raison_inclusion": "Stratégie d'injection d'acide hyaluronique pour le rajeunissement infra-orbitaire."
+    },
+    {
+      "id": 10,
+      "titre": "Analysis of the efficacy of blunt separation combined with uncrosslinked sodium hyaluronate composite solution for the treatment of tear trough deformity in Asians",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38130178/",
+      "pmid": "38130178",
+      "raison_inclusion": "Analyse de l'efficacité d'une technique combinée pour traiter les déformations du contour des yeux."
+    }
+  ],
+  "_meta_topic": "Hyaluronic acid tear trough correction OR under eye filler safety",
+  "_meta_problem": "Infraorbital hollowing and dark circles",
+  "zones_visage": [
+    "yeux"
+  ],
+  "_meta_sources_brutes_envoyees": [
+    "[PubMed] Reply to: Comment to: Hyaluronic Acid Injection Strategy of Infraorbital and Midfacial Rejuvenation for Women in Southeast China.",
+    "[PubMed] Comment to: Hyaluronic Acid Injection Strategy of Infraorbital and Midfacial Rejuvenation for Women in Southeast China.",
+    "[PubMed] Real-World Evidence on the Routine Use, Efficacy, and Safety of a Hyaluronic Acid-Based Dermal Filler in the Periorbital Region.",
+    "[PubMed] Response to the Letter to the Editor Regarding the Article: \"Non-Surgical Novel Technique for Correction of Palpebromalar Groove (Tear Valley Deformity) and Extended Area: The Matador Stab\".",
+    "[PubMed] Quantitative Evaluation of Improvement of Tear Trough With a Non-Cross-Linked Sodium Hyaluronic Compound: A Three-Dimensional and MRI Analysis.",
+    "[PubMed] Response to: Correction of Tear Trough Deformity with Minced Orbital Fat Grafts During Transconjunctival Lower Blepharoplasty.",
+    "[PubMed] Comment to: Correction of Tear Trough Deformity with Minced Orbital Fat Grafts During Transconjunctival Lower Blepharoplasty.",
+    "[PubMed] Static and Dynamic Filler-Associated Tear Trough Deformities: Manifestations and Treatment Algorithm.",
+    "[PubMed] Lower Eyelid Dark Circles (Tear Trough and Lid-Cheek Junction): A Stepwise Assessment Framework.",
+    "[PubMed] A Prospective, Multicenter, Evaluator-Blind, Randomized, Controlled Study of Belotero Balance (+), a Hyaluronic Acid Filler With Lidocaine, for Correction of Infraorbital Hollowing in Adults.",
+    "[PubMed] Prospective comparative clinical study: Efficacy evaluation of collagen combined with hyaluronic acid injections for tear trough deformity.",
+    "[PubMed] Analysis of the efficacy of blunt separation combined with uncrosslinked sodium hyaluronate composite solution for the treatment of tear trough deformity in Asians.",
+    "[PubMed] The Efficacy and Safety of Hyaluronic Acid Injection in Tear Trough Deformity: A Systematic Review and Meta-analysis.",
+    "[PubMed] Novel Treatment Protocol for Combined Tear Trough Ligament Stretching and Injection.",
+    "[PubMed] Filler-based correction of tear trough depressions and eye bags in Japanese patients: A classification system and treatment algorithm.",
+    "[Semantic Scholar] Tear Trough Deformity Refinement by an Innovative Hyaluronic Acid Injectable Filler",
+    "[Semantic Scholar] Surgical and Non-Surgical Approach for Tear Trough Correction: Fat Repositioning Versus Hyaluronic Acid Fillers",
+    "[Semantic Scholar] Real-World Evidence on the Routine Use, Efficacy, and Safety of a Hyaluronic Acid-Based Dermal Filler in the Periorbital Region"
+  ],
+  "_meta_stats": {
+    "sources_total": 18,
+    "pubmed_found_total": 35,
+    "challenger_active": true
+  }
+}

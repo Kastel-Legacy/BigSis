@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIGSIS Insta Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-teal: #0B7A8F;
+            --rich-plum: #6B5B73;
+            --alert-red: #D64F4F;
+            --warm-cream: #FBF7F0;
+            --white: #FFFFFF;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--warm-cream);
+            color: #1f1f1f;
+            margin: 0;
+            padding: 30px 15px 60px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app {
+            max-width: 1080px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .app-header {
+            text-align: center;
+        }
+
+        .app-header h1 {
+            margin: 0;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            letter-spacing: -0.5px;
+        }
+
+        .app-header p {
+            margin: 6px 0 0;
+            color: #555;
+            font-size: 15px;
+        }
+
+        .uploader {
+            background: var(--white);
+            border: 2px dashed var(--deep-teal);
+            border-radius: 18px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .uploader.dragover {
+            border-color: var(--rich-plum);
+            background: rgba(11, 122, 143, 0.08);
+        }
+
+        .uploader p {
+            margin: 0;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .uploader button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            border: none;
+            background: linear-gradient(135deg, var(--deep-teal), var(--rich-plum));
+            color: var(--white);
+            border-radius: 999px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .workspace {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .phone-frame {
+            width: 320px;
+            background: #111;
+            border-radius: 36px;
+            padding: 18px 14px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.18);
+            position: relative;
+        }
+
+        .phone-notch {
+            width: 50%;
+            height: 26px;
+            background: #000;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            margin: 0 auto 12px;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 480px;
+            background: #000;
+            border-radius: 26px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slides-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.35s ease;
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-inner {
+            width: 100%;
+            height: 100%;
+            padding: 24px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .cover-slide {
+            background: linear-gradient(135deg, var(--deep-teal), var(--rich-plum));
+            color: var(--white);
+            text-align: center;
+        }
+
+        .cover-slide h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            margin: 10px 0 6px;
+        }
+
+        .cover-slide p {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .tagline {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+            opacity: 0.75;
+        }
+
+        .logo-bs {
+            width: 120px;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .info-slide {
+            background: var(--warm-cream);
+        }
+
+        .info-slide h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .info-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+            font-size: 14px;
+        }
+
+        .info-card strong {
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--deep-teal);
+        }
+
+        .scores-slide {
+            background: var(--white);
+        }
+
+        .score-grid {
+            display: flex;
+            gap: 16px;
+        }
+
+        .score-card {
+            flex: 1;
+            background: #F5F5F5;
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .score-card .label {
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #666;
+        }
+
+        .score-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .score-good { color: #5AA469; }
+        .score-warn { color: #EA8C3F; }
+
+        .verdict-box {
+            margin-top: auto;
+            background: var(--warm-cream);
+            border: 1px dashed var(--rich-plum);
+            border-radius: 18px;
+            padding: 14px;
+            font-size: 14px;
+        }
+
+        .reality-slide {
+            background: var(--rich-plum);
+            color: var(--white);
+        }
+
+        .reality-slide h2 {
+            margin: 0;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .reality-list p {
+            margin: 6px 0;
+            font-size: 14px;
+        }
+
+        .risk-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .risk-tag {
+            background: rgba(214, 79, 79, 0.15);
+            color: var(--alert-red);
+            border: 1px solid rgba(214, 79, 79, 0.4);
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .advice-slide {
+            background: var(--warm-cream);
+            border: 3px solid var(--deep-teal);
+            border-radius: 28px;
+        }
+
+        .quote {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            line-height: 1.4;
+        }
+
+        .sources {
+            margin-top: auto;
+            font-size: 12px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .nav-controls button {
+            border: none;
+            background: linear-gradient(135deg, var(--deep-teal), var(--rich-plum));
+            color: var(--white);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            box-shadow: 0 10px 20px rgba(11,122,143,0.2);
+        }
+
+        .dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .dot.active {
+            background: var(--deep-teal);
+        }
+
+        .meta-panel {
+            flex: 1;
+            min-width: 260px;
+            background: var(--white);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .meta-panel h3 {
+            margin: 0 0 10px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .meta-panel pre {
+            background: #f4f4f4;
+            padding: 12px;
+            border-radius: 12px;
+            max-height: 400px;
+            overflow: auto;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .phone-frame { width: 100%; max-width: 320px; }
+            .meta-panel { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="app-header">
+            <h1>BIGSIS Insta Viewer</h1>
+            <p>Glisse ton fichier JSON pour générer un carrousel Instagram 4:5 en live.</p>
+        </div>
+
+        <div class="uploader" id="drop-zone">
+            <p>Glisse-dépose un fichier JSON ou</p>
+            <button id="browse-btn">Sélectionner un fichier</button>
+            <input type="file" id="file-input" accept="application/json" hidden>
+        </div>
+
+        <div class="workspace">
+            <div class="phone-frame">
+                <div class="phone-notch"></div>
+                <div class="phone-screen">
+                    <div class="slides-track" id="slides-track"></div>
+                </div>
+                <div class="nav-controls">
+                    <button id="prev-btn" aria-label="Slide précédente">‹</button>
+                    <div class="dots" id="dots"></div>
+                    <button id="next-btn" aria-label="Slide suivante">›</button>
+                </div>
+            </div>
+
+            <div class="meta-panel">
+                <h3>Données chargées</h3>
+                <pre id="json-preview">{\n  "status": "En attente de fichier..."\n}</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const browseBtn = document.getElementById('browse-btn');
+        const fileInput = document.getElementById('file-input');
+        const slidesTrack = document.getElementById('slides-track');
+        const dotsContainer = document.getElementById('dots');
+        const jsonPreview = document.getElementById('json-preview');
+
+        let currentSlide = 0;
+        let totalSlides = 5;
+        let lastData = null;
+
+        const sampleData = {
+            "titre_social": "Lifte ton front sans scalpel",
+            "titre_officiel": "Toxine botulique type A - Rides frontales",
+            "carte_identite": {
+                "ce_que_c_est": "Micro-injections de toxine botulique ciblant l'activité musculaire frontale.",
+                "comment_ca_marche": "Bloque la libération d'acétylcholine pour détendre les muscles responsables des rides dynamiques.",
+                "zone_anatomique": "Front, rides du lion, queue du sourcil"
+            },
+            "score_global": {
+                "note_efficacite_sur_10": 8,
+                "note_securite_sur_10": 7
+            },
+            "synthese_efficacite": {
+                "ce_que_ca_fait_vraiment": "Lisse les rides dynamiques, redonne une courbe sourcilière plus reposée.",
+                "delai_resultat": "Résultat visible en 3-5 jours, plein effet en 10 jours."
+            },
+            "synthese_securite": {
+                "niveau_douleur_moyen": "2/10 (micro piqûres rapides)",
+                "downtime_moyen": "Aucun, reprise immédiate",
+                "risques_principaux": ["Ptose sourcilière", "Asymétrie temporaire", "Céphalées légères"]
+            },
+            "le_conseil_bigsis": "Planifie ton injection 2 semaines avant un événement pour passer la période de stabilisation.",
+            "verdict_final": "Gold-standard pour lisser sans alourdir l'expression.",
+            "sources_total": 12
+        };
+
+        function escapeHTML(str = "") {
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function updateSlides(data) {
+            lastData = data;
+            const slides = [
+                renderCoverSlide(data),
+                renderInfoSlide(data),
+                renderScoresSlide(data),
+                renderRealitySlide(data),
+                renderAdviceSlide(data)
+            ];
+
+            slidesTrack.innerHTML = slides.map(html => `<div class="slide"><div class="slide-inner">${html}</div></div>`).join("");
+            totalSlides = slides.length;
+            renderDots();
+            goToSlide(0);
+            jsonPreview.textContent = JSON.stringify(data, null, 2);
+        }
+
+        function renderDots() {
+            dotsContainer.innerHTML = "";
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement("span");
+                dot.className = "dot" + (i === currentSlide ? " active" : "");
+                dot.addEventListener("click", () => goToSlide(i));
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        function goToSlide(index) {
+            currentSlide = (index + totalSlides) % totalSlides;
+            slidesTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+            [...dotsContainer.children].forEach((dot, idx) => {
+                dot.classList.toggle("active", idx === currentSlide);
+            });
+        }
+
+        function renderCoverSlide(data) {
+            return `
+                <div class="cover-slide">
+                    <svg viewBox="0 0 100 100" class="logo-bs">
+                        <text x="50" y="75" font-family="Space Grotesk" font-weight="900" font-size="80" text-anchor="middle" fill="white">BS</text>
+                        <line x1="20" y1="80" x2="80" y2="20" stroke="#D64F4F" stroke-width="8" stroke-linecap="round" />
+                    </svg>
+                    <div class="tagline">Cutting through the BS</div>
+                    <h1>${escapeHTML(data.titre_social || "Titre social à définir")}</h1>
+                    <p>${escapeHTML(data.titre_officiel || "Titre médical officiel")}</p>
+                </div>
+            `;
+        }
+
+        function renderInfoSlide(data) {
+            const identite = data.carte_identite || {};
+            return `
+                <div class="info-slide">
+                    <h2>💡 C'est quoi ?</h2>
+                    <div class="info-card">
+                        <div>
+                            <strong>Ce que c'est</strong>
+                            <p>${escapeHTML(identite.ce_que_c_est || "Non renseigné")}</p>
+                        </div>
+                        <div>
+                            <strong>Comment ça marche</strong>
+                            <p>${escapeHTML(identite.comment_ca_marche || "Non renseigné")}</p>
+                        </div>
+                        <div>
+                            <strong>Zone anatomique</strong>
+                            <p>${escapeHTML(identite.zone_anatomique || "Non renseigné")}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderScoresSlide(data) {
+            const scores = data.score_global || {};
+            const eff = Number(scores.note_efficacite_sur_10 ?? 0);
+            const sec = Number(scores.note_securite_sur_10 ?? 0);
+            const verdict = data.verdict_final || "Verdict en attente.";
+            const effClass = eff >= 7 ? "score-good" : "score-warn";
+            const secClass = sec >= 7 ? "score-good" : "score-warn";
+
+            return `
+                <div class="scores-slide">
+                    <h2 style="font-family: 'Space Grotesk', sans-serif; margin:0;">📊 Scores croisés</h2>
+                    <div class="score-grid">
+                        <div class="score-card">
+                            <span class="label">Efficacité</span>
+                            <span class="score-value ${effClass}">${isNaN(eff) ? "-" : eff}</span>
+                            <small>/10</small>
+                        </div>
+                        <div class="score-card">
+                            <span class="label">Sécurité</span>
+                            <span class="score-value ${secClass}">${isNaN(sec) ? "-" : sec}</span>
+                            <small>/10</small>
+                        </div>
+                    </div>
+                    <div class="verdict-box">
+                        ${escapeHTML(verdict)}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRealitySlide(data) {
+            const safety = data.synthese_securite || {};
+            const risques = Array.isArray(safety.risques_principaux) ? safety.risques_principaux : [];
+            return `
+                <div class="reality-slide">
+                    <h2>🛡️ La Réalité</h2>
+                    <div class="reality-list">
+                        <p><strong>Douleur :</strong> ${escapeHTML(safety.niveau_douleur_moyen || "N/A")}</p>
+                        <p><strong>Downtime :</strong> ${escapeHTML(safety.downtime_moyen || "N/A")}</p>
+                        <p><strong>Risques principaux :</strong></p>
+                        <div class="risk-tags">
+                            ${risques.length ? risques.map(r => `<span class="risk-tag">${escapeHTML(r)}</span>`).join("") : '<span class="risk-tag">Aucun risque majeur renseigné</span>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdviceSlide(data) {
+            const sources = data.sources_total ?? (Array.isArray(data.annexe_sources_retenues) ? data.annexe_sources_retenues.length : "N/A");
+            return `
+                <div class="advice-slide">
+                    <div class="quote">“${escapeHTML(data.le_conseil_bigsis || "Ajoute ton conseil BigSis ici.")}”</div>
+                    <div class="sources">Sources : ${escapeHTML(String(sources))} études analysées</div>
+                </div>
+            `;
+        }
+
+        function handleFile(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = event => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    updateSlides(data);
+                } catch (error) {
+                    alert("Impossible de lire ce JSON. Vérifie la syntaxe.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        async function loadRemoteFile(path) {
+            try {
+                const response = await fetch(path);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const data = await response.json();
+                updateSlides(data);
+            } catch (error) {
+                alert(`Impossible de charger ${path} (${error.message}).`);
+            }
+        }
+
+        browseBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+        dropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            handleFile(file);
+        });
+
+        document.getElementById('prev-btn').addEventListener('click', () => goToSlide(currentSlide - 1));
+        document.getElementById('next-btn').addEventListener('click', () => goToSlide(currentSlide + 1));
+
+        const params = new URLSearchParams(window.location.search);
+        const autoFile = params.get("file");
+        if (autoFile) {
+            loadRemoteFile(autoFile);
+        } else {
+            updateSlides(sampleData);
+        }
+    </script>
+</body>
+</html>

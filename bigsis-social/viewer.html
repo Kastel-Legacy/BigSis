@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIG SIS - Fiche Officielle (V10)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;900&family=DM+Sans:wght@400;500;700&display=swap');
+
+        :root {
+            /* --- TA PALETTE OFFICIELLE --- */
+            --deep-teal: #0B7A8F;
+            --rich-plum: #6B5B73;
+            --alert-red: #D64F4F;
+            --warm-cream: #FBF7F0;
+            --soft-sage: #A8C2AC;
+            --peachy-coral: #F4A882;
+            --success-green: #5AA469;
+            --text-dark: #333333;
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--warm-cream);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 450px; width: 100%; }
+
+        /* --- LOGO HEADER --- */
+        .app-header { text-align: center; margin-bottom: 25px; margin-top: 20px; }
+        .logo-svg { width: 220px; height: auto; display: block; margin: 0 auto; }
+
+        /* INPUT AREA */
+        .input-area { background: var(--white); padding: 20px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        textarea { width: 100%; height: 80px; border: 1px solid #E0E0E0; border-radius: 8px; padding: 10px; font-family: monospace; box-sizing: border-box; background: #FAFAFA; resize: none;}
+        button { 
+            background: linear-gradient(135deg, var(--deep-teal), var(--rich-plum)); 
+            color: var(--white); border: none; padding: 12px; width: 100%; border-radius: 8px; 
+            cursor: pointer; margin-top: 12px; font-weight: 700; font-size: 14px; 
+            box-shadow: 0 4px 10px rgba(11, 122, 143, 0.2); transition: transform 0.1s;
+        }
+        button:hover { transform: translateY(-1px); }
+
+        /* --- MASTER CARD DESIGN --- */
+        .master-card { 
+            background: var(--white); 
+            border-radius: 24px; 
+            box-shadow: 0 10px 30px rgba(107, 91, 115, 0.1); 
+            overflow: hidden; 
+            margin-bottom: 30px; 
+            position: relative;
+        }
+        
+        /* HEADER DEGRADÉ */
+        .header { 
+            background: linear-gradient(135deg, var(--deep-teal) 0%, var(--rich-plum) 100%); 
+            padding: 30px 25px 25px 25px; 
+            color: var(--white); 
+        }
+        
+        .zones-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .z-tag { 
+            background: rgba(255,255,255,0.15); 
+            font-size: 10px; padding: 5px 12px; border-radius: 20px; 
+            font-weight: 700; text-transform: uppercase; letter-spacing: 1px; 
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        h1 { 
+            margin: 0 0 5px 0; 
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px; 
+            letter-spacing: -0.5px; 
+            font-weight: 700; 
+            line-height: 1.1;
+        }
+        .h1-sub { font-size:13px; opacity:0.8; font-weight:400; margin-bottom:15px; display:block; font-style:italic;}
+
+        /* BLOC DÉFINITION */
+        .id-card { 
+            background: rgba(255,255,255,0.1); 
+            padding: 15px; 
+            border-radius: 16px; 
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2); 
+            margin-bottom: 30px; 
+        }
+        .id-row { display: flex; margin-bottom: 8px; font-size: 13px; line-height: 1.4; color: white; align-items: flex-start;}
+        .id-row:last-child { margin-bottom: 0; }
+        .id-icon { margin-right: 10px; font-size: 14px; margin-top: 2px; }
+        .id-content { opacity: 0.95; }
+        .id-label { font-weight: 700; opacity: 0.7; font-size: 9px; text-transform: uppercase; display: block; margin-bottom: 3px; letter-spacing: 1px;}
+
+        /* SCORES ROW */
+        .scores-row { display: flex; gap: 15px; margin-bottom: -55px; position: relative; z-index: 10; padding: 0 5px;}
+        .score-box { 
+            flex: 1; background: var(--white); padding: 15px; border-radius: 16px; 
+            text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.08); 
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .score-val { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; display: block; line-height: 1; margin-bottom: 5px;}
+        .score-lbl { font-size: 10px; text-transform: uppercase; color: #888; font-weight: 700; display: block; letter-spacing: 0.5px;}
+        .score-ctx { font-size: 9px; color: var(--deep-teal); font-weight: 700; margin-top: 5px; line-height: 1.2; }
+        
+        /* BODY CONTENT */
+        .body-content { padding: 70px 25px 30px 25px; }
+
+        /* --- STYLES AJOUTÉS POUR V10 (En respectant la charte) --- */
+        
+        /* SWAP BOX */
+        .swap-box {
+            background: linear-gradient(135deg, #FFF8F0 0%, #FFFFFF 100%);
+            border: 2px dashed var(--peachy-coral);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 0 0 30px 0;
+            position: relative;
+        }
+        .swap-badge {
+            position: absolute; top: -10px; left: 20px;
+            background: var(--peachy-coral); color: white;
+            font-size: 9px; font-weight: 800; text-transform: uppercase;
+            padding: 4px 10px; border-radius: 12px; letter-spacing: 1px;
+        }
+        .swap-title {
+            color: var(--rich-plum); font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px; font-weight: 700; margin: 5px 0 8px 0;
+        }
+        .swap-desc { font-size: 13px; color: #555; line-height: 1.5; margin: 0; }
+        .swap-proof { font-size: 10px; color: #999; margin-top: 8px; font-style: italic; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 5px; }
+
+        /* SOCIAL RECOVERY BOX */
+        .social-box {
+            margin-top: 30px; margin-bottom: 30px;
+            background: white; padding: 20px; border-radius: 16px; 
+            border: 1px solid #eee;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+        }
+        .social-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; text-align: center;
+        }
+        .social-item {
+            background: #F9F9F9; padding: 10px 5px; border-radius: 8px;
+        }
+        .social-icon { font-size: 18px; display: block; margin-bottom: 5px; }
+        .social-lbl { font-size: 9px; font-weight: 700; color: #999; display: block; text-transform: uppercase; }
+        .social-val { font-size: 11px; font-weight: 700; color: var(--deep-teal); display: block; line-height: 1.2; }
+        .social-red { color: var(--alert-red); }
+
+        h3 { 
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            color: var(--deep-teal); 
+            margin: 35px 0 15px 0; 
+            display: flex; align-items: center; gap: 10px; 
+            font-weight: 700;
+            border-bottom: 2px solid var(--soft-sage);
+            padding-bottom: 8px;
+        }
+
+        h4-custom {
+            margin: 0 0 15px 0; color: var(--rich-plum); 
+            font-family: 'Space Grotesk'; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
+            display: block;
+        }
+
+        .text-block { font-size: 15px; line-height: 1.7; color: var(--text-dark); font-weight: 400;}
+        strong { font-weight: 700; color: var(--rich-plum); }
+
+        .timeline-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .time-item { 
+            background: #F0F7F4; 
+            padding: 15px; border-radius: 12px; text-align: center; 
+            border: 1px solid var(--soft-sage);
+        }
+        .t-val { display: block; font-weight: 700; color: var(--deep-teal); font-size: 14px; line-height: 1.4; margin-bottom: 4px;}
+        .t-lbl { font-size: 9px; color: var(--rich-plum); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
+
+        .risk-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .risk-tag { 
+            background: #FFF5F5; 
+            color: var(--alert-red); 
+            border: 1px solid #FFDada; 
+            padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap:6px;
+        }
+
+        .danger-box {
+            background: #FFF5F5;
+            border: 2px solid var(--alert-red);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .danger-icon { font-size: 20px; line-height: 1; }
+        .danger-content strong { color: var(--alert-red); text-transform: uppercase; font-size: 10px; letter-spacing: 1px; display: block; margin-bottom: 4px; font-weight: 800; }
+        .danger-content span { color: #8a1f1f; font-size: 13px; font-weight: 500; line-height: 1.4; }
+
+        .advice { 
+            background: #FFF8F3; 
+            border-radius: 16px; 
+            padding: 25px; 
+            margin-top: 40px; 
+            position: relative; 
+            border-left: 4px solid var(--peachy-coral);
+        }
+        .advice-emoji { position: absolute; top: -15px; left: 20px; background: var(--peachy-coral); color: white; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 16px; box-shadow: 0 4px 8px rgba(244, 168, 130, 0.4); }
+        .advice p { margin: 0; font-size: 15px; color: var(--rich-plum); line-height: 1.6; font-style: italic; font-weight: 500; }
+
+        .sources-section { 
+            background: #F5F5F5; 
+            padding: 30px 25px; 
+            color: #666; 
+            font-size: 12px; 
+            border-top: 1px solid #EEE;
+        }
+        .sources-header { 
+            text-transform: uppercase; 
+            font-weight: 800; 
+            margin-bottom: 15px; 
+            color: var(--rich-plum); 
+            letter-spacing: 1px; 
+            font-size: 11px;
+        }
+        .source-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #E0E0E0; line-height: 1.4;}
+        .source-item:last-child { border: none; margin-bottom: 0;}
+        .s-link { color: var(--deep-teal); text-decoration: none; font-weight: 700; font-size: 10px; display: inline-block; margin-top: 2px;}
+        .s-link:hover { text-decoration: underline; }
+        
+        .stat-line {
+            margin-top: 20px; padding-top: 15px; border-top: 2px dashed #DDD; 
+            display: flex; justify-content: space-between; color: #888; font-weight: 700; font-size: 11px; text-transform: uppercase;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="app-header">
+        <svg class="logo-svg" viewBox="0 0 300 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#0B7A8F"/>
+                    <stop offset="100%" style="stop-color:#6B5B73"/>
+                </linearGradient>
+            </defs>
+            <rect x="55" y="5" width="50" height="50" rx="10" fill="url(#iconGradient)"/>
+            <text x="80" y="40" font-family="Arial Black, Arial, sans-serif" font-size="22" font-weight="900" fill="white" text-anchor="middle">BS</text>
+            <line x1="62" y1="45" x2="98" y2="15" stroke="#D64F4F" stroke-width="4" stroke-linecap="round"/>
+            <text x="115" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#0B7A8F" letter-spacing="1">BIG SIS</text>
+            <text x="115" y="48" font-family="Arial, sans-serif" font-size="7" fill="#6B5B73" letter-spacing="1">CUTTING THROUGH THE BS</text>
+        </svg>
+    </div>
+
+    <div class="input-area" id="inputArea">
+        <textarea id="jsonInput" placeholder="Colle le JSON Master ici..."></textarea>
+        <button onclick="render()">Générer la Fiche</button>
+    </div>
+
+    <div id="renderZone"></div>
+</div>
+
+<script>
+    function render() {
+        try {
+            const raw = document.getElementById('jsonInput').value;
+            if(!raw) return;
+            let data = JSON.parse(raw);
+            if (Array.isArray(data)) data = data[0];
+
+            const zone = document.getElementById('renderZone');
+            
+            // --- GESTION DES CHAMPS V9/V10 ---
+            const mainTitle = data.nom_commercial_courant || data.titre_officiel || "Titre";
+            const subTitle = data.nom_scientifique || "";
+            
+            // Raccourcis
+            const ci = data.carte_identite || {}; 
+            const eff = data.synthese_efficacite || {};
+            const sec = data.synthese_securite || {};
+            const social = data.recuperation_sociale || null;
+            const meta = data.meta || { zones_concernees: [] };
+            const stats = data.statistiques_consolidees || {};
+            const sources = data.annexe_sources_retenues || [];
+            const swap = data.alternative_bigsis || null;
+            const scores = data.score_global || {};
+
+            // Couleurs
+            const effVal = scores.note_efficacite_sur_10 || "?";
+            const effColor = effVal >= 8 ? 'var(--success-green)' : (effVal >= 5 ? 'var(--peachy-coral)' : 'var(--alert-red)');
+            const secVal = scores.note_securite_sur_10 || "?";
+            const secColor = secVal >= 7 ? 'var(--success-green)' : (secVal >= 5 ? 'var(--peachy-coral)' : 'var(--alert-red)');
+
+            zone.innerHTML = `
+                <div class="master-card">
+                    <div class="header">
+                        <div class="zones-tags">
+                            ${meta.zones_concernees ? meta.zones_concernees.map(z => `<span class="z-tag">${z}</span>`).join('') : ''}
+                        </div>
+                        
+                        <h1>${mainTitle}</h1>
+                        ${subTitle ? `<span class="h1-sub">(${subTitle})</span>` : ''}
+                        
+                        ${ci.ce_que_c_est ? `
+                        <div class="id-card">
+                            <div class="id-row">
+                                <div class="id-icon">💡</div>
+                                <div class="id-content">
+                                    <span class="id-label">C'est quoi ?</span>
+                                    ${ci.ce_que_c_est}
+                                </div>
+                            </div>
+                            <div class="id-row">
+                                <div class="id-icon">⚙️</div>
+                                <div class="id-content">
+                                    <span class="id-label">Mécanisme</span>
+                                    ${ci.comment_ca_marche}
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        <div class="scores-row">
+                            <div class="score-box">
+                                <span class="score-val" style="color:${effColor}">${effVal}</span>
+                                <span class="score-lbl">Efficacité</span>
+                                <div class="score-ctx" style="color:${effColor}">${scores.explication_efficacite_bref || ""}</div>
+                            </div>
+                            <div class="score-box">
+                                <span class="score-val" style="color:${secColor}">${secVal}</span>
+                                <span class="score-lbl">Sécurité</span>
+                                <div class="score-ctx" style="color:${secColor}">${scores.explication_securite_bref || ""}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="body-content">
+                        ${swap ? `
+                        <div class="swap-box">
+                            <div class="swap-badge">Le Conseil Sœur ✨</div>
+                            <div class="swap-title">
+                                <span>🔄</span> ${swap.titre}
+                            </div>
+                            <p class="swap-desc">
+                                <strong>Pourquoi ?</strong> ${swap.pourquoi_c_est_mieux}
+                            </p>
+                            ${swap.source_preuve_id ? `
+                            <div class="swap-proof">
+                                Preuve : Étude #${swap.source_preuve_id}
+                            </div>` : ''}
+                        </div>
+                        ` : ''}
+
+                        <h3>🚀 La Promesse</h3>
+                        <p class="text-block">${eff.ce_que_ca_fait_vraiment || "Données non disponibles"}</p>
+                        
+                        <div class="timeline-grid">
+                            <div class="time-item">
+                                <span class="t-val">${eff.delai_resultat || "?"}</span>
+                                <span class="t-lbl">Premiers effets</span>
+                            </div>
+                            <div class="time-item">
+                                <span class="t-val">${eff.duree_resultat || "?"}</span>
+                                <span class="t-lbl">Durée totale</span>
+                            </div>
+                        </div>
+
+                        <h3>🛡️ Sécurité & Risques</h3>
+                        <p class="text-block">
+                            <strong>Douleur :</strong> ${sec.niveau_douleur_moyen || "?"}<br>
+                            <strong>Récupération Médicale :</strong> ${sec.downtime_moyen || "?"}
+                        </p>
+                        <div class="risk-list">
+                            ${sec.risques_courants ? sec.risques_courants.map(r => `<div class="risk-tag">⚠️ ${r}</div>`).join('') : ''}
+                        </div>
+
+                        ${sec.le_risque_qui_fait_peur ? `
+                        <div class="danger-box">
+                            <div class="danger-icon">⚠️</div>
+                            <div class="danger-content">
+                                <strong>Le risque qui fait peur</strong>
+                                <span>${sec.le_risque_qui_fait_peur}</span>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        ${social ? `
+                        <div class="social-box">
+                            <h4-custom>📅 Récupération Sociale (Vraie Vie)</h4-custom>
+                            
+                            <p style="font-style:italic; color:#666; margin-bottom:15px; font-size:13px; line-height:1.4;">
+                                <strong>Immédiat :</strong> ${social.verdict_immediat}
+                            </p>
+
+                            <div class="social-grid">
+                                <div class="social-item">
+                                    <span class="social-icon">🫣</span>
+                                    <span class="social-lbl">Sortir (Nu)</span>
+                                    <span class="social-val">${social.downtime_visage_nu || "?"}</span>
+                                </div>
+                                <div class="social-item">
+                                    <span class="social-icon">💻</span>
+                                    <span class="social-lbl">Zoom Ready</span>
+                                    <span class="social-val">${social.zoom_ready || "?"}</span>
+                                </div>
+                                <div class="social-item">
+                                    <span class="social-icon">🥂</span>
+                                    <span class="social-lbl">Date Ready</span>
+                                    <span class="social-val social-red">${social.date_ready || "?"}</span>
+                                </div>
+                            </div>
+
+                            <div style="font-size:12px; background:#fff0f0; padding:10px; border-radius:8px; border:1px solid #FFDada;">
+                                <strong style="color:var(--alert-red); display:block; margin-bottom:4px;">⛔ Interdits temporaires :</strong>
+                                ${(social.les_interdits_sociaux || []).join(', ')}
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        <div class="advice">
+                            <div class="advice-emoji">💬</div>
+                            <p>"${data.le_conseil_bigsis || ""}"</p>
+                            <span class="advice-author">— Big Sis</span>
+                        </div>
+                    </div>
+
+                    <div class="sources-section">
+                        <div class="sources-header">📚 Preuves Scientifiques</div>
+                        ${sources.length > 0 ? sources.map(s => `
+                            <div class="source-item">
+                                <strong>${s.annee || ""}</strong> • ${s.titre}<br>
+                                ${s.raison_inclusion ? `<span class="s-reason">Validation : ${s.raison_inclusion}</span>` : ''}
+                                <br><a href="${s.url}" target="_blank" class="s-link">LIRE L'ÉTUDE ↗</a>
+                            </div>
+                        `).join('') : '<p>Aucune source pertinente retenue.</p>'}
+                        
+                        <div class="stat-line">
+                            <span>👥 ${stats.nombre_patients_total || "?"} Patients</span>
+                            <span>📊 Preuve : ${stats.niveau_de_preuve_global || "?"}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('inputArea').style.display = 'none';
+        } catch (e) { 
+            alert("Erreur de lecture du JSON : " + e.message); 
+            console.error(e); 
+        }
+    }
+
+    async function loadFromQueryParam() {
+        const params = new URLSearchParams(window.location.search);
+        const encoded = params.get("file");
+        const file = encoded ? decodeURIComponent(encoded) : null;
+        if (!file) return;
+        try {
+            const response = await fetch(file);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            document.getElementById('jsonInput').value = JSON.stringify(data, null, 2);
+            render();
+        } catch (error) {
+            console.error("Impossible de charger le fichier depuis l'URL :", error);
+            alert("Impossible de charger la fiche : " + error.message);
+        }
+    }
+
+    window.addEventListener("DOMContentLoaded", loadFromQueryParam);
+</script>
+
+</body>
+</html>

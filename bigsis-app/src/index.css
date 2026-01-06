@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;900&family=DM+Sans:wght@400;500;700&display=swap');
+
+:root {
+  /* --- TA PALETTE OFFICIELLE --- */
+  --deep-teal: #0B7A8F;
+  --rich-plum: #6B5B73;
+  --alert-red: #D64F4F;
+  --warm-cream: #FBF7F0;
+  --soft-sage: #A8C2AC;
+  --peachy-coral: #F4A882;
+  --success-green: #5AA469;
+  --text-dark: #333333;
+  --white: #FFFFFF;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: var(--warm-cream);
+  color: var(--text-dark);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Common Classes */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+button {
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+button:active {
+  transform: translateY(1px);
+}

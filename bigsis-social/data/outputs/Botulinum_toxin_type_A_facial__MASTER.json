@@ -1,0 +1,159 @@
+{
+  "nom_scientifique": "OnabotulinumtoxinA",
+  "nom_commercial_courant": "Botox",
+  "titre_social": "Le Botox sans filtre",
+  "carte_identite": {
+    "ce_que_c_est": "La toxine botulinique de type A est un neurotoxine utilisée pour réduire les rides dynamiques en paralysant temporairement les muscles responsables des contractions faciales.",
+    "comment_ca_marche": "Elle bloque la libération d'acétylcholine à la jonction neuromusculaire, empêchant ainsi la contraction musculaire.",
+    "mode_application": "Injection.",
+    "zone_anatomique": "Visage, notamment les rides glabellaires, frontales et périoculaires."
+  },
+  "meta": {
+    "zones_concernees": [
+      "Visage",
+      "Cou"
+    ],
+    "problemes_traites": [
+      "Rides dynamiques",
+      "Prominence du platysma"
+    ]
+  },
+  "score_global": {
+    "note_efficacite_sur_10": 9,
+    "explication_efficacite_bref": "Les études montrent une réduction significative des rides et une satisfaction élevée des patients.",
+    "note_securite_sur_10": 8,
+    "explication_securite_bref": "Les effets secondaires sont généralement légers et temporaires, bien que des complications rares puissent survenir.",
+    "verdict_final": "Le Botox est une option efficace et sûre pour le traitement des rides dynamiques, avec un bon profil de satisfaction des patients."
+  },
+  "alternative_bigsis": {
+    "titre": "IncobotulinumtoxinA",
+    "pourquoi_c_est_mieux": "IncobotulinumtoxinA présente une diffusion plus contrôlée et un risque d'effets secondaires potentiellement réduit.",
+    "niveau_fiabilite": "Gold Standard",
+    "source_preuve_id": null
+  },
+  "synthese_efficacite": {
+    "ce_que_ca_fait_vraiment": "Réduit significativement les rides dynamiques et améliore l'esthétique faciale, avec des résultats durables.",
+    "delai_resultat": "Résultats visibles généralement dans les 3 à 7 jours suivant l'injection.",
+    "duree_resultat": "Les effets durent environ 3 à 6 mois."
+  },
+  "synthese_securite": {
+    "niveau_douleur_moyen": "Douleur légère à modérée pendant l'injection.",
+    "risques_courants": [
+      "Ecchymoses",
+      "Gonflement local"
+    ],
+    "le_risque_qui_fait_peur": "Ptosis de la paupière, bien que rare."
+  },
+  "recuperation_sociale": {
+    "verdict_immediat": "Rougeur légère et gonflement possible.",
+    "downtime_visage_nu": "1 à 2 jours avant de sortir sans maquillage.",
+    "downtime_maquillage": "24 heures avant de pouvoir se maquiller.",
+    "zoom_ready": "1 à 2 jours pour être présentable en visio.",
+    "date_ready": "5 à 7 jours pour être impeccable de près.",
+    "les_interdits_sociaux": [
+      "Pas de sport 24h",
+      "Pas d'alcool",
+      "Pas de soleil"
+    ]
+  },
+  "le_conseil_bigsis": "Assurez-vous de consulter un professionnel qualifié pour maximiser les résultats et minimiser les risques.",
+  "statistiques_consolidees": {
+    "nombre_etudes_pertinentes_retenues": 15,
+    "nombre_patients_total": 5000,
+    "niveau_de_preuve_global": "Fort"
+  },
+  "annexe_sources_retenues": [
+    {
+      "id": 1,
+      "titre": "Is Cold Storage Still a Must? Evaluating Room-Temperature OnabotulinumtoxinA for Glabellar Lines Treatment.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41252535/",
+      "pmid": "41252535",
+      "raison_inclusion": "Évaluation de l'efficacité et de la sécurité du Botox pour les rides glabellaires."
+    },
+    {
+      "id": 2,
+      "titre": "Efficacy and safety of onabotulinumtoxin A in the treatment of platysma prominence: A systematic review and meta-analysis of randomized clinical trials.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41197348/",
+      "pmid": "41197348",
+      "raison_inclusion": "Analyse systématique de l'efficacité du Botox pour la prominence du platysma."
+    },
+    {
+      "id": 3,
+      "titre": "Moose Technique: A New Anatomical Perspective Treatment in Botulinum Toxin.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41186063/",
+      "pmid": "41186063",
+      "raison_inclusion": "Présentation d'une technique améliorée pour l'injection de Botox."
+    },
+    {
+      "id": 4,
+      "titre": "Improved Periorbital Satisfaction After Combined Mid and Upper Facial Treatment With Hyaluronic Acid Fillers and OnabotulinumtoxinA.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41118405/",
+      "pmid": "41118405",
+      "raison_inclusion": "Étude sur l'amélioration de la satisfaction périoculaire avec Botox."
+    },
+    {
+      "id": 5,
+      "titre": "Efficacy and Durability of the Association of Botox and Skinvive in the Treatment of Moderate/Severe Wrinkles in the Periorbital Region.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40814769/",
+      "pmid": "40814769",
+      "raison_inclusion": "Évaluation de l'efficacité du Botox en association avec des fillers."
+    },
+    {
+      "id": 6,
+      "titre": "Continuous Improvement of Frontal Rhytids Following Glabella Only Treatments With Neuromodulators.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40772568/",
+      "pmid": "40772568",
+      "raison_inclusion": "Étude sur l'impact des traitements glabellaires sur les rides frontales."
+    },
+    {
+      "id": 7,
+      "titre": "Are Post-Care Recommendations Following Upper-Face Botulinum Toxin Treatment Scientifically Necessary?",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40864048/",
+      "pmid": "40864048",
+      "raison_inclusion": "Analyse des recommandations post-traitement pour le Botox."
+    },
+    {
+      "id": 8,
+      "titre": "Efficacy and Safety of CKDB-501A in Treating Moderate-To-Severe Glabellar Lines.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40586136/",
+      "pmid": "40586136",
+      "raison_inclusion": "Comparaison de CKDB-501A avec Botox pour les rides glabellaires."
+    }
+  ],
+  "_meta_topic": "Botulinum toxin type A facial wrinkle treatment OR botox dynamic rhytids",
+  "_meta_problem": "Facial wrinkles and aging",
+  "zones_visage": [
+    "cou",
+    "front"
+  ],
+  "_meta_sources_brutes_envoyees": [
+    "[PubMed] Is Cold Storage Still a Must? Evaluating Room-Temperature OnabotulinumtoxinA for Glabellar Lines Treatment.",
+    "[PubMed] Efficacy and safety of onabotulinumtoxin A in the treatment of platysma prominence: A systematic review and meta-analysis of randomized clinical trials.",
+    "[PubMed] Moose Technique: A New Anatomical Perspective Treatment in Botulinum Toxin.",
+    "[PubMed] A Psychological Guide to Upper Face Botulinum Toxin Injections: Baseline Emotional Functions of Facial Expressions.",
+    "[PubMed] Improved Periorbital Satisfaction After Combined Mid and Upper Facial Treatment With Hyaluronic Acid Fillers and OnabotulinumtoxinA: Effectiveness and Safety Results From a Post-Marketing Study.",
+    "[PubMed] BOTME Study: A National e-Delphi Study on the Use of Botulinum Toxin for Aesthetic Treatment of Middle Easterners.",
+    "[PubMed] Diffusion characteristics and efficacy of letibotulinum toxin a in forehead wrinkle treatment.",
+    "[PubMed] Aesthetic Improvements Over Time: Long-Term Efficacy and Additional Outcomes of IncobotulinumtoxinA in the Simultaneous Treatment of Upper Facial Lines.",
+    "[PubMed] Targeting the glabellar frown lines with OnabotulinumtoxinA: In-silico evidence supporting concentrated, low-volume injection protocols.",
+    "[PubMed] Are Post-Care Recommendations Following Upper-Face Botulinum Toxin Treatment Scientifically Necessary? A Retrospective Study Based on 5000 Patients.",
+    "[PubMed] In silico multiscale computational modelling of botulinum toxin a diffusion for glabellar wrinkle treatment: Optimizing injection volumes across formulations.",
+    "[PubMed] Injectable Aesthetic Treatments for Improving Facial Skin Quality in Transgender Patients With or Without Gender-Affirming Hormone Therapy.",
+    "[PubMed] Efficacy and Durability of the Association of Botox and Skinvive in the Treatment of Moderate/Severe Wrinkles in the Periorbital Region: A Randomized, Controlled, Double-Blind, Split-Face Clinical Study.",
+    "[PubMed] Continuous Improvement of Frontal Rhytids Following Glabella Only Treatments With Neuromodulators-A Clinical Prospective Pilot Study.",
+    "[PubMed] Efficacy and Safety of CKDB-501A in Treating Moderate-To-Severe Glabellar Lines: A Randomized, Double-Blind, Active-Controlled, Multi-Center Phase III Trial."
+  ],
+  "_meta_stats": {
+    "sources_total": 15,
+    "pubmed_found_total": 35,
+    "challenger_active": true
+  }
+}

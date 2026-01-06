@@ -1,0 +1,174 @@
+{
+  "nom_scientifique": "Polydioxanone (PDO)",
+  "nom_commercial_courant": "PDO Threads",
+  "titre_social": "Lifting sans chirurgie : Les fils PDO",
+  "carte_identite": {
+    "ce_que_c_est": "Les fils PDO sont des sutures résorbables utilisées pour le lifting facial non chirurgical.",
+    "comment_ca_marche": "Ils stimulent la production de collagène et provoquent une contraction des tissus, offrant un effet liftant.",
+    "mode_application": "Insertion sous-cutanée par des aiguilles fines.",
+    "zone_anatomique": "Visage, cou."
+  },
+  "meta": {
+    "zones_concernees": [
+      "Visage",
+      "Cou"
+    ],
+    "problemes_traites": [
+      "Relâchement cutané",
+      "Rides et ridules"
+    ]
+  },
+  "score_global": {
+    "note_efficacite_sur_10": 7,
+    "explication_efficacite_bref": "Efficacité modérée à élevée selon les études, mais manque de données à long terme.",
+    "note_securite_sur_10": 8,
+    "explication_securite_bref": "Complications généralement légères, mais des risques existent.",
+    "verdict_final": "Une option prometteuse pour le lifting facial, mais nécessite une évaluation prudente."
+  },
+  "alternative_bigsis": {
+    "titre": "Lifting chirurgical (Rhytidectomie)",
+    "pourquoi_c_est_mieux": "Le lifting chirurgical offre des résultats plus durables et prévisibles.",
+    "niveau_fiabilite": "Gold Standard",
+    "source_preuve_id": null
+  },
+  "synthese_efficacite": {
+    "ce_que_ca_fait_vraiment": "Améliore le contour du visage et réduit les rides, avec une satisfaction élevée des patients.",
+    "delai_resultat": "Résultats visibles immédiatement, optimisés après quelques mois.",
+    "duree_resultat": "Environ 6 à 12 mois selon le type de fil et la technique utilisée."
+  },
+  "synthese_securite": {
+    "niveau_douleur_moyen": "Douleur légère à modérée pendant la procédure.",
+    "risques_courants": [
+      "Ecchymoses",
+      "Gonflement"
+    ],
+    "le_risque_qui_fait_peur": "Infection ou déplacement des fils."
+  },
+  "recuperation_sociale": {
+    "verdict_immediat": "Légère rougeur et gonflement possibles.",
+    "downtime_visage_nu": "1 à 2 jours avant de sortir sans maquillage.",
+    "downtime_maquillage": "Environ 5 à 7 jours avant de pouvoir se maquiller.",
+    "zoom_ready": "Prêt en 2 à 3 jours pour des appels vidéo.",
+    "date_ready": "Impeccable en 1 à 2 semaines pour un dîner.",
+    "les_interdits_sociaux": [
+      "Pas de sport 24h",
+      "Pas d'alcool",
+      "Pas de soleil"
+    ]
+  },
+  "le_conseil_bigsis": "Choisissez un praticien expérimenté pour minimiser les risques et maximiser les résultats.",
+  "statistiques_consolidees": {
+    "nombre_etudes_pertinentes_retenues": 10,
+    "nombre_patients_total": "Estimation de 100+ patients dans les études",
+    "niveau_de_preuve_global": "Moyen"
+  },
+  "annexe_sources_retenues": [
+    {
+      "id": 1,
+      "titre": "Enduring outcomes of minimally invasive approaches for facial rejuvenation.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40249527/",
+      "pmid": "40249527",
+      "raison_inclusion": "Évaluation des résultats à long terme des techniques de rajeunissement facial, incluant les fils PDO."
+    },
+    {
+      "id": 2,
+      "titre": "A Pilot One and Two-Year Prospective, Blinded Clinical Evaluation of Efficacy, and Safety of Combined Treatment With Crosslinked Hyaluronic Acid Dermal Filler and Barbed Polydioxanone Suspension Threads for Mid-Face Contour Enhancement.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39692727/",
+      "pmid": "39692727",
+      "raison_inclusion": "Étude sur l'efficacité et la sécurité des fils PDO combinés avec des fillers."
+    },
+    {
+      "id": 3,
+      "titre": "Update on Absorbable Facial Thread Lifts.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39662017/",
+      "pmid": "39662017",
+      "raison_inclusion": "Revue des fils absorbables et de leur efficacité à court terme."
+    },
+    {
+      "id": 4,
+      "titre": "Reverse and antegrade vector thread lifting techniques: Correcting nasolabial and marionette lines.",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39107950/",
+      "pmid": "39107950",
+      "raison_inclusion": "Évaluation des techniques de lifting pour corriger les plis nasogéniens."
+    },
+    {
+      "id": 5,
+      "titre": "Revolutionizing thread lifting: Evolution and techniques in facial rejuvenation.",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38679891/",
+      "pmid": "38679891",
+      "raison_inclusion": "Exploration des matériaux de lifting et de leur efficacité."
+    },
+    {
+      "id": 6,
+      "titre": "Advanced Facial Rejuvenation: Synergistic Effects of Lower Blepharoplasty and Ultrasound Guided Mid-Face Lift Using Polydioxanone (PDO) Threads.",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38519570/",
+      "pmid": "38519570",
+      "raison_inclusion": "Étude sur l'utilisation des fils PDO en combinaison avec d'autres procédures."
+    },
+    {
+      "id": 7,
+      "titre": "What are filling (volumizing) threads?",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38514895/",
+      "pmid": "38514895",
+      "raison_inclusion": "Analyse des fils volumisants et de leur application."
+    },
+    {
+      "id": 8,
+      "titre": "Horizontal necklines correction with absorbable braided polydioxanone threads: Case series.",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/38444188/",
+      "pmid": "38444188",
+      "raison_inclusion": "Étude de cas sur l'utilisation des fils PDO pour corriger les rides du cou."
+    },
+    {
+      "id": 9,
+      "titre": "Minimally Invasive Techniques for Facial Rejuvenation Utilizing Polydioxanone Threads.",
+      "annee": "2023",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/37169412/",
+      "pmid": "37169412",
+      "raison_inclusion": "Examen des techniques de rajeunissement facial utilisant des fils PDO."
+    },
+    {
+      "id": 10,
+      "titre": "Retrospective study of the absorbable braided polydioxanone threads' usefulness in the aged lower eyelids' rejuvenation.",
+      "annee": "2022",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/35866335/",
+      "pmid": "35866335",
+      "raison_inclusion": "Étude sur l'efficacité des fils PDO pour le rajeunissement des paupières inférieures."
+    }
+  ],
+  "_meta_topic": "PDO thread lift facial rejuvenation OR polydioxanone threads lifting",
+  "_meta_problem": "Mild facial ptosis and contour lifting",
+  "zones_visage": [
+    "cou"
+  ],
+  "_meta_sources_brutes_envoyees": [
+    "[PubMed] Enduring outcomes of minimally ınvasive approaches for facial rejuvenation.",
+    "[PubMed] A Pilot One and Two-Year Prospective, Blinded Clinical Evaluation of Efficacy, and Safety of Combined Treatment With Crosslinked Hyaluronic Acid Dermal Filler and Barbed Polydioxanone Suspension Threads for Mid-Face Contour Enhancement.",
+    "[PubMed] Update on Absorbable Facial Thread Lifts.",
+    "[PubMed] Reverse and antegrade vector thread lifting techniques: Correcting nasolabial and marionette lines.",
+    "[PubMed] Revolutionizing thread lifting: Evolution and techniques in facial rejuvenation.",
+    "[PubMed] Advanced Facial Rejuvenation: Synergistic Effects of Lower Blepharoplasty and Ultrasound Guided Mid-Face Lift Using Polydioxanone (PDO) Threads.",
+    "[PubMed] What are filling (volumizing) threads?",
+    "[PubMed] Horizontal necklines correction with absorbable braided polydioxanone threads: Case series.",
+    "[PubMed] Ultrasound-guided thread lifting for the prevention of parotid gland and diagnosing parotid duct complications.",
+    "[PubMed] Minimally Invasive Techniques for Facial Rejuvenation Utilizing Polydioxanone Threads.",
+    "[PubMed] Eyebrow lifting using multidirectional absorbable thread.",
+    "[PubMed] Using PDO threads: A scarcely studied rejuvenation technique. Case report and systematic review.",
+    "[PubMed] Minimally Invasive Techniques for Facial Rejuvenation Utilizing Polydioxanone Threads.",
+    "[PubMed] Brow gliding: A new non-surgical concept for almond upturned eyes.",
+    "[PubMed] Retrospective study of the absorbable braided polydioxanone threads' usefulness in the aged lower eyelids' rejuvenation."
+  ],
+  "_meta_stats": {
+    "sources_total": 15,
+    "pubmed_found_total": 33,
+    "challenger_active": true
+  }
+}

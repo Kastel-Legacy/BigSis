@@ -1,0 +1,61 @@
+rules:
+  # --- FOREHEAD ---
+  - id: "R_FRONT_DYN_01"
+    description: "Suggest Botox for dynamic forehead wrinkles"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "front"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "expression"
+    outputs:
+      - type: "suggestion"
+        key: "toxine_botulique"
+        detail: "La toxine botulique est souvent discutée pour les rides dynamiques du front."
+        weight: 1.0
+      - type: "warning"
+        key: "ptosis_risk"
+        detail: "Zone délicate : risque de ptosis (chute du sourcil) si mal dosé."
+        weight: 0.8
+
+  - id: "R_FRONT_STAT_01"
+    description: "Deep static forehead wrinkles"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "front"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "statique"
+    outputs:
+      - type: "suggestion"
+        key: "consultation_advanced"
+        detail: "Pour les rides marquées au repos, le Botox seul peut ne pas suffire (combinaison possible)."
+        weight: 0.9
+
+  # --- GLABELLE (Lion) ---
+  - id: "R_GLAB_DYN_01"
+    description: "Glabella dynamic wrinkles"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "glabelle"
+    outputs:
+      - type: "suggestion"
+        key: "toxine_botulique"
+        detail: "Zone de prédilection pour la toxine botulique (rides du lion)."
+        weight: 1.0
+
+  # --- PREGNANCY EXCLUSION ---
+  - id: "R_SAFETY_PREG"
+    description: "Contraindication for pregnancy"
+    conditions:
+      - field: "pregnancy"
+        operator: "eq"
+        value: true
+    outputs:
+      - type: "contraindication"
+        key: "pregnancy_stop"
+        detail: "Les procédures esthétiques injectables sont contre-indiquées pendant la grossesse."
+        weight: 10.0

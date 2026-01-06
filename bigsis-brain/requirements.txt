@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+python-dotenv
+requests
+openai>=1.0.0
+typing-extensions
+pydantic
+asyncpg
+sqlalchemy
+alembic
+pgvector
+PyYAML
+pypdf
+tqdm
+fpdf
+psycopg2-binary

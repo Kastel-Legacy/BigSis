@@ -1,0 +1,179 @@
+{
+  "nom_scientifique": "Acide hyaluronique",
+  "nom_commercial_courant": "Juvederm, Restylane, Saypha",
+  "titre_social": "Des lèvres pulpeuses, naturellement !",
+  "carte_identite": {
+    "ce_que_c_est": "L'acide hyaluronique est un polysaccharide naturellement présent dans le corps, utilisé comme agent de comblement pour augmenter le volume des lèvres et définir le contour.",
+    "comment_ca_marche": "Il attire et retient l'eau dans les tissus, augmentant ainsi le volume et l'hydratation des lèvres.",
+    "mode_application": "Injection intradermique.",
+    "zone_anatomique": "Lèvres et contour vermillon."
+  },
+  "meta": {
+    "zones_concernees": [
+      "Lèvres",
+      "Vermillon"
+    ],
+    "problemes_traites": [
+      "Volume des lèvres",
+      "Définition du contour des lèvres"
+    ]
+  },
+  "score_global": {
+    "note_efficacite_sur_10": 8,
+    "explication_efficacite_bref": "Les études montrent une amélioration significative de l'esthétique des lèvres avec une satisfaction élevée des patients.",
+    "note_securite_sur_10": 7,
+    "explication_securite_bref": "Les effets secondaires sont généralement mineurs, mais des complications peuvent survenir.",
+    "verdict_final": "L'acide hyaluronique est une option efficace et relativement sûre pour l'augmentation des lèvres."
+  },
+  "alternative_bigsis": {
+    "titre": "Lipotransfert autologue (CELT)",
+    "pourquoi_c_est_mieux": "Le lipotransfert offre des résultats plus durables et naturels sans les risques associés aux produits de comblement synthétiques.",
+    "niveau_fiabilite": "Consensus Médical",
+    "source_preuve_id": 40389732
+  },
+  "synthese_efficacite": {
+    "ce_que_ca_fait_vraiment": "Améliore le volume, la définition et l'hydratation des lèvres, avec des résultats visibles immédiatement après l'injection.",
+    "delai_resultat": "Résultats visibles immédiatement après le traitement.",
+    "duree_resultat": "Les effets durent généralement de 6 à 12 mois."
+  },
+  "synthese_securite": {
+    "niveau_douleur_moyen": "Douleur légère à modérée pendant l'injection.",
+    "risques_courants": [
+      "Oedème",
+      "Ecchymoses",
+      "Rougeur"
+    ],
+    "le_risque_qui_fait_peur": "Occlusion vasculaire, bien que rare."
+  },
+  "recuperation_sociale": {
+    "verdict_immediat": "Légère rougeur et gonflement.",
+    "downtime_visage_nu": "1 à 2 jours avant de sortir sans maquillage.",
+    "downtime_maquillage": "24 heures avant de pouvoir se maquiller.",
+    "zoom_ready": "1 à 2 jours pour être présentable en visio.",
+    "date_ready": "3 à 5 jours pour être impeccable de près.",
+    "les_interdits_sociaux": [
+      "Pas de sport 24h",
+      "Pas d'alcool",
+      "Pas de soleil"
+    ]
+  },
+  "le_conseil_bigsis": "Choisissez un praticien expérimenté pour minimiser les risques et maximiser les résultats esthétiques.",
+  "statistiques_consolidees": {
+    "nombre_etudes_pertinentes_retenues": 10,
+    "nombre_patients_total": 114,
+    "niveau_de_preuve_global": "Fort"
+  },
+  "annexe_sources_retenues": [
+    {
+      "id": 1,
+      "titre": "Efficacy and Tolerability of a Topical Peptide-Hyaluronic Acid Lip Treatment Using a Novel Delivery System in Subjects With and Without Prior Lip Augmentation",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41273141/",
+      "pmid": "41273141",
+      "raison_inclusion": "Démontre l'efficacité d'un traitement topique à base d'acide hyaluronique pour l'augmentation des lèvres."
+    },
+    {
+      "id": 2,
+      "titre": "Aesthetic Treatment of the Lips With Hyaluronic Acid Filler: The Multi Vector Lip Technique",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40931930/",
+      "pmid": "40931930",
+      "raison_inclusion": "Analyse une technique d'injection innovante pour l'augmentation des lèvres."
+    },
+    {
+      "id": 3,
+      "titre": "Effectiveness and Safety of RHA3 vs a Comparator Product for Lip Augmentation",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40659364/",
+      "pmid": "40659364",
+      "raison_inclusion": "Évalue l'efficacité et la sécurité d'un produit de comblement pour les lèvres."
+    },
+    {
+      "id": 4,
+      "titre": "Subject-Reported Satisfaction After Cell-Enriched Lipotransfer (CELT) for Lip Augmentation",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40389732/",
+      "pmid": "40389732",
+      "raison_inclusion": "Compare la satisfaction des patients après augmentation des lèvres par lipotransfert."
+    },
+    {
+      "id": 5,
+      "titre": "Single and dual-wavelength considerations of photobiomodulation therapy in the management of side effects related to hyaluronic acid fillers in lip augmentation",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39967370/",
+      "pmid": "39967370",
+      "raison_inclusion": "Étudie les effets secondaires des injections d'acide hyaluronique et leur gestion."
+    },
+    {
+      "id": 6,
+      "titre": "Late Facial Edema After Lip Filling With Hyaluronic Acid: Possible Association With the Use of Ozempic",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39190785/",
+      "pmid": "39190785",
+      "raison_inclusion": "Rapporte un cas d'oedème tardif après injection d'acide hyaluronique."
+    },
+    {
+      "id": 7,
+      "titre": "Lip Augmentation With Saypha LIPS Lidocaine: A Postmarket, Prospective, Open-Label, Randomized Clinical Study",
+      "annee": "2024",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39167667/",
+      "pmid": "39167667",
+      "raison_inclusion": "Évalue l'efficacité et la sécurité d'un produit de comblement pour les lèvres."
+    },
+    {
+      "id": 8,
+      "titre": "Comparative 3D Analysis of Lip Rejuvenation: Investigating Effects Before and After Soft-Tissue Filler Compared with Controls",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39313661/",
+      "pmid": "39313661",
+      "raison_inclusion": "Analyse les changements morphologiques des lèvres après augmentation par comblement."
+    },
+    {
+      "id": 9,
+      "titre": "Deep Labial Fat Filler Technique for Effective Lip Eversion",
+      "annee": "2025",
+      "url": "https://www.semanticscholar.org/paper/58518c4d848ad0bea7e565b8b28bc44e3dbccc32",
+      "pmid": "S2ID-58518c4d848ad0bea7e565b8b28bc44e3dbccc32",
+      "raison_inclusion": "Propose une technique d'injection pour améliorer l'éversion des lèvres."
+    },
+    {
+      "id": 10,
+      "titre": "Innovative Classification of M-Shaped Lips for Enhanced Refill Outcomes: A Case Series",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40419439/",
+      "pmid": "40419439",
+      "raison_inclusion": "Présente une classification pour améliorer les résultats des traitements des lèvres."
+    }
+  ],
+  "_meta_topic": "Hyaluronic acid lip augmentation OR lip filler vermilion border definition",
+  "_meta_problem": "Lip volume loss and asymmetry",
+  "zones_visage": [
+    "levres"
+  ],
+  "_meta_sources_brutes_envoyees": [
+    "[PubMed] Efficacy and Tolerability of a Topical Peptide-Hyaluronic Acid Lip Treatment Using a Novel Delivery System in Subjects With and Without Prior Lip Augmentation.",
+    "[PubMed] Aesthetic Treatment of the Lips With Hyaluronic Acid Filler: The Multi Vector Lip Technique.",
+    "[PubMed] Achieving Functional and Aesthetic Harmony Through a Fully Digital Workflow for Lateral Agenesis Rehabilitation: A 12-Month Follow-Up.",
+    "[PubMed] Effectiveness and Safety of RHA3 vs a Comparator Product for Lip Augmentation: A Randomized, Controlled, Prospective, Multicenter Clinical Study.",
+    "[PubMed] Lip Reduction.",
+    "[PubMed] Innovative Classification of M-Shaped Lips for Enhanced Refill Outcomes: A Case Series.",
+    "[PubMed] Subject-Reported Satisfaction After Cell-Enriched Lipotransfer (CELT) for Lip Augmentation.",
+    "[PubMed] Single and dual-wavelength considerations of photobiomodulation therapy in the management of side effects related to hyaluronic acid fillers in lip augmentation.",
+    "[PubMed] Lip Filler Versus \"Lip Flip\": Longitudinal Public Interest and a Brief Review of Literature.",
+    "[PubMed] Upper Lip Single-Point Technique for Lip Reshaping: A Safe, Minimalistic Approach in Over 500 Patients-A Retrospective Study.",
+    "[PubMed] The \"4.3,\" A New Filler Lips Technique.",
+    "[PubMed] Effectiveness and Safety of IPN-20-SENSE LIDOCAINE for Lip Volume Augmentation and/or Redefinition (SMILE Study): A Non-inferiority Randomized Double-Blinded Controlled Study.",
+    "[PubMed] Comparative 3D Analysis of Lip Rejuvenation: Investigating Effects Before and After Soft-Tissue Filler Compared with Controls.",
+    "[PubMed] Late Facial Edema After Lip Filling With Hyaluronic Acid: Possible Association With the Use of Ozempic.",
+    "[PubMed] Lip Augmentation With Saypha LIPS Lidocaine: A Postmarket, Prospective, Open-Label, Randomized Clinical Study To Evaluate Its Efficacy and Short- and Long-term Safety.",
+    "[Semantic Scholar] Efficacy and Tolerability of a Topical Peptide‐Hyaluronic Acid Lip Treatment Using a Novel Delivery System in Subjects With and Without Prior Lip Augmentation",
+    "[Semantic Scholar] Comparing the Effects of Different Injection Techniques Used in Lip Augmentation on Filler Migration and Patient Satisfaction",
+    "[Semantic Scholar] Hyaluronic filler for lip augmentation and scar correction in cleft lip Egyptian patients",
+    "[Semantic Scholar] Deep Labial Fat Filler Technique for Effective Lip Eversion."
+  ],
+  "_meta_stats": {
+    "sources_total": 19,
+    "pubmed_found_total": 35,
+    "challenger_active": true
+  }
+}

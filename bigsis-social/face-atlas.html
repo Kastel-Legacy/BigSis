@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIG SIS - Face Atlas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* --- CHARTE GRAPHIQUE BIG SIS --- */
+            --deep-teal: #0B7A8F;
+            --rich-plum: #6B5B73;
+            --alert-red: #D64F4F;
+            --warm-cream: #FBF7F0;
+            --white: #FFFFFF;
+            --text-dark: #333333;
+            
+            --font-head: 'Space Grotesk', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            font-family: var(--font-body);
+            background-color: var(--warm-cream);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- NAVBAR BRANDÉE --- */
+        .navbar {
+            background: linear-gradient(135deg, rgba(11,122,143,0.9), rgba(107,91,115,0.9));
+            padding: 18px 50px;
+            color: white;
+            display: flex; align-items: center; justify-content: flex-start;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.15);
+            backdrop-filter: blur(4px);
+        }
+
+        .brand {
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 24px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            display: flex; align-items: center; gap: 14px;
+            animation: fadeInLeft 0.6s ease-out;
+        }
+        /* Petit Logo Carré avec la barre rouge */
+        .logo-box {
+            background: linear-gradient(135deg, var(--deep-teal), var(--rich-plum)); 
+            padding: 5px 10px; 
+            border-radius: 6px; 
+            position: relative;
+            font-weight: 700;
+            color: white;
+            overflow: hidden;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+        }
+        .logo-box::after {
+            content:''; position: absolute; 
+            top: 50%; left: 50%; 
+            transform: translate(-50%, -50%) rotate(-20deg);
+            width: 90%; height: 3px; 
+            background: linear-gradient(90deg, transparent 0%, var(--alert-red) 25%, var(--alert-red) 75%, transparent 100%);
+            animation: navSlash 1.4s ease-out forwards;
+        }
+
+        @keyframes navSlash {
+            from { width: 0; opacity: 0; }
+            to { width: 90%; opacity: 1; }
+        }
+
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* --- LAYOUT --- */
+        .atlas-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            gap: 50px;
+            align-items: start;
+        }
+
+        /* --- FACE PANEL (Gauche) --- */
+        .face-wrapper {
+            position: sticky;
+            top: 100px;
+            background: white;
+            padding: 20px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(11, 122, 143, 0.08);
+            text-align: center;
+            border: 1px solid rgba(11, 122, 143, 0.1);
+        }
+
+        .face-wrapper h2 {
+            font-family: var(--font-head);
+            color: var(--deep-teal);
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .instruction {
+            font-size: 14px;
+            color: var(--rich-plum);
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .face-visual {
+            position: relative;
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+            aspect-ratio: 400 / 550;
+        }
+        .face-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 18px;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.05));
+        }
+        .hitbox-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ZONES INTERACTIVES */
+        .hitbox {
+            fill: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        /* Effet Blush au survol */
+        .hitbox:hover {
+            fill: rgba(214, 79, 79, 0.15);
+            filter: blur(4px);
+        }
+        .hitbox.active {
+            fill: rgba(183, 110, 121, 0.25);
+            stroke: var(--deep-teal);
+            stroke-width: 1;
+            stroke-dasharray: 4;
+            filter: none;
+        }
+
+        /* --- RESULTS PANEL (Droite) --- */
+        .results-panel { padding-top: 10px; }
+
+        .filter-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 30px; border-bottom: 2px solid rgba(11, 122, 143, 0.1); padding-bottom: 15px;
+            flex-wrap: wrap; gap: 15px;
+        }
+        
+        .zone-title {
+            font-family: var(--font-head); font-size: 28px; color: var(--rich-plum); margin: 0;
+        }
+
+        .search-input {
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            font-family: var(--font-body);
+            background: white;
+        }
+
+        .btn-reset {
+            background: white; border: 1px solid var(--deep-teal); color: var(--deep-teal);
+            padding: 8px 16px; border-radius: 30px; font-weight: 700; cursor: pointer;
+            font-family: var(--font-body); transition: 0.2s;
+        }
+        .btn-reset:hover, .btn-reset.active { background: var(--deep-teal); color: white; }
+
+        .cards-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;
+        }
+        
+        .problem-panel {
+            background: rgba(255,255,255,0.9);
+            border: 1px solid rgba(11, 122, 143, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+        }
+        .problem-panel h3 {
+            margin: 0 0 5px 0;
+            font-family: var(--font-head);
+            color: var(--deep-teal);
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+        .problem-panel p {
+            margin: 4px 0 12px 0;
+            font-size: 13px;
+            color: #6B5B73;
+        }
+        .problem-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .problem-chip {
+            border: 1px solid var(--deep-teal);
+            background: white;
+            color: var(--deep-teal);
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: 0.15s ease;
+        }
+        .problem-chip:hover {
+            background: rgba(11, 122, 143, 0.08);
+        }
+        .problem-chip.active {
+            background: var(--deep-teal);
+            color: white;
+        }
+
+        /* --- CARTE STYLE BIG SIS --- */
+        .card {
+            background: white; border-radius: 16px; padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid transparent;
+            transition: transform 0.2s; position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        .card:hover { transform: translateY(-3px); border-color: var(--deep-teal); }
+        
+        /* Barre dégradée en haut */
+        .card::before {
+            content:''; position: absolute; top:0; left:0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, var(--deep-teal), var(--rich-plum));
+        }
+
+        .card h3 {
+            font-family: var(--font-head); color: var(--deep-teal); margin: 10px 0; font-size: 18px;
+        }
+        
+        .badges { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        .badge { font-size: 10px; text-transform: uppercase; background: #f4f4f4; padding: 4px 8px; border-radius: 4px; color: #666; font-weight: 700; }
+        .badge.zone-badge { background: rgba(107, 91, 115, 0.1); color: var(--rich-plum); }
+
+        .score-row {
+            display: flex; gap: 15px; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px;
+        }
+        .score { display: flex; flex-direction: column; align-items: center; }
+        .score-val { font-family: var(--font-head); font-size: 20px; font-weight: 700; color: var(--text-dark); }
+        .score-lbl { font-size: 10px; text-transform: uppercase; color: #999; }
+
+        .btn-link {
+            text-decoration: none; color: var(--deep-teal); font-weight: 700; font-size: 13px;
+            margin-top: auto; display: inline-flex; align-items: center; gap: 5px;
+        }
+        .btn-link:hover { text-decoration: underline; }
+
+        .empty-state { text-align: center; color: #999; padding: 40px; grid-column: 1/-1; }
+
+        @media(max-width: 900px) {
+            .atlas-container { grid-template-columns: 1fr; }
+            .face-wrapper { position: relative; top: 0; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand">
+            <div class="logo-box">BS</div>
+            <div>BIG SIS</div>
+        </div>
+    </nav>
+
+    <div class="atlas-container">
+        
+        <aside class="face-wrapper">
+            <h2>Analyse Faciale</h2>
+            <div class="face-visual">
+                <img src="visage.png" alt="Visage Big Sis" class="face-image">
+                <svg class="hitbox-overlay" viewBox="0 0 400 550" preserveAspectRatio="xMidYMid meet">
+                    <g class="hitbox-layer" style="fill:transparent; cursor:pointer;">
+                        <!-- Front & Cheveux -->
+                        <path class="hitbox" data-zone="front" d="M105,145 Q210,105 315,145 L315,220 Q210,205 105,220 Z" />
+                        
+                        <!-- Yeux & Sourcils -->
+                        <path class="hitbox" data-zone="yeux" d="M105,220 Q125,240 140,260 Q150,285 160,310 L260,310 Q270,285 280,260 Q295,240 315,220 Q210,205 105,220 Z" />
+                        
+                        <!-- Joue gauche -->
+                        <path class="hitbox" data-zone="joues" d="M105,280 Q85,320 92,370 Q110,405 135,420 L165,385 Q150,345 140,300 Z" />
+                        
+                        <!-- Joue droite -->
+                        <path class="hitbox" data-zone="joues" d="M315,280 Q335,320 328,370 Q310,405 285,420 L255,385 Q270,345 280,300 Z" />
+                        
+                        <!-- Nez -->
+                        <path class="hitbox" data-zone="nez" d="M195,245 L225,245 L235,365 Q210,380 185,365 Z" />
+                        
+                        <!-- Bouche & Lèvres -->
+                        <path class="hitbox" data-zone="levres" d="M165,391 L255,391 L250,446 Q210,461 170,446 Z" />
+                        
+                        <!-- Menton -->
+                        <path class="hitbox" data-zone="menton" d="M178,440 Q210,460 242,440 L230,485 Q210,495 190,485 Z" />
+                        
+                        <!-- Mâchoire gauche -->
+                        <path class="hitbox" data-zone="machoire" d="M105,280 Q85,320 92,370 Q105,420 140,460 L170,420 Q145,375 128,330 Z" />
+                        
+                        <!-- Mâchoire droite -->
+                        <path class="hitbox" data-zone="machoire" d="M315,280 Q335,320 328,370 Q315,420 280,460 L250,420 Q275,375 292,330 Z" />
+                        
+                        <!-- Cou & décolleté -->
+                        <path class="hitbox" data-zone="cou" d="M172,475 Q212,500 252,475 L292,570 Q212,595 132,570 Z" />
+                    </g>
+                </svg>
+            </div>
+            <p class="instruction" id="zone-label">Sélectionne une zone</p>
+        </aside>
+
+        <main class="results-panel">
+            <div class="filter-bar">
+                <h2 class="zone-title" id="zone-display">Vue Globale</h2>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="search-input" class="search-input" placeholder="Rechercher..." disabled>
+                    <button class="btn-reset" id="btn-reset" style="display:none;">Tout voir</button>
+                </div>
+            </div>
+
+            <section id="problem-panel" class="problem-panel" style="display:none;">
+                <h3>Problématiques ciblées</h3>
+                <p id="problem-info">Sélectionne une zone pour afficher les problématiques.</p>
+                <div id="problem-list" class="problem-chips"></div>
+            </section>
+            <div id="cards-container" class="cards-grid"></div>
+            <div id="empty-state" class="empty-state" style="display:none;">
+                Sélectionne une partie du visage pour voir les solutions.
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const ATLAS_URL = "data/atlas-index.json";
+        const ZONE_LABELS = {
+            front: "Le front",
+            yeux: "Regard & cernes",
+            joues: "Pommettes",
+            nez: "Nez",
+            levres: "Lèvres",
+            menton: "Menton",
+            machoire: "Ovale du visage",
+            cou: "Cou & décolleté"
+        };
+
+        const PROBLEM_LABELS = {
+            "Facial wrinkles and aging": "Rides",
+            "Perioral rhytids and photoaging": "Rides autour de la bouche",
+            "Jawline blurring and lower face laxity": "Relâchement / ovale flou",
+            "Lip volume loss and asymmetry": "Perte de volume lèvres",
+            "Infraorbital hollowing and dark circles": "Cernes marqués",
+            "Loss of dermal hydration and elasticity": "Peau déshydratée",
+            "Photoaging and inflammation": "Peau abîmée par le soleil",
+            "Mild facial ptosis and contour lifting": "Besoin d effet lift",
+            "Atrophic acne scars and texture irregularities": "Cicatrices / acné",
+            "Temporal hollowing and skeletal appearance": "Tempes creusées"
+        };
+
+        const container = document.getElementById('cards-container');
+        const emptyState = document.getElementById('empty-state');
+        const searchInput = document.getElementById('search-input');
+        const btnReset = document.getElementById('btn-reset');
+        const zoneDisplay = document.getElementById('zone-display');
+        const zoneLabel = document.getElementById('zone-label');
+        const problemPanel = document.getElementById('problem-panel');
+        const problemInfo = document.getElementById('problem-info');
+        const problemList = document.getElementById('problem-list');
+        const hitboxes = document.querySelectorAll('.hitbox');
+
+        let atlasItems = [];
+        let activeZone = null;
+        let activeProblem = null;
+        let showAll = true;
+
+        async function loadAtlas() {
+            try {
+                const response = await fetch(ATLAS_URL);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const payload = await response.json();
+                atlasItems = payload.items || [];
+                renderCards();
+            } catch (error) {
+                emptyState.style.display = 'block';
+                emptyState.textContent = "Erreur de chargement des données.";
+            }
+        }
+
+        function filterItems() {
+            let base = showAll ? atlasItems : atlasItems.filter(item => (item.zones || []).includes(activeZone));
+            if (activeProblem) {
+                base = base.filter(item => getProblemLabel(item) === activeProblem);
+            }
+            const term = (searchInput.value || '').toLowerCase().trim();
+            if (term && !searchInput.disabled) {
+                base = base.filter(item => {
+                    const text = [
+                        item.titre_officiel, 
+                        item.titre_social, 
+                        item.resume, 
+                        (item.zones || []).join(' ')
+                    ].join(' ').toLowerCase();
+                    return text.includes(term);
+                });
+            }
+            return base;
+        }
+
+        function scoreColor(value) {
+            const num = Number(value);
+            if (Number.isNaN(num)) return '#333';
+            if (num >= 8) return '#5AA469';
+            if (num >= 6) return '#EA8C3F';
+            return '#D64F4F';
+        }
+
+        function renderCards() {
+            const data = filterItems();
+            container.innerHTML = '';
+
+            if (!showAll && activeZone && !activeProblem) {
+                const hasProblems = getProblemsForZone(activeZone).length > 0;
+                emptyState.style.display = 'block';
+                emptyState.textContent = hasProblems
+                    ? "Choisis une problématique pour afficher les procédures ciblées."
+                    : "Aucune problématique n'est définie pour cette zone pour l'instant.";
+                return;
+            }
+
+            if (!showAll && !activeZone) {
+                emptyState.style.display = 'block';
+                emptyState.textContent = "Sélectionne une zone.";
+                return;
+            }
+
+            if (!data.length) {
+                emptyState.style.display = 'block';
+                emptyState.textContent = activeZone ? "Aucune fiche pour cette zone." : "Aucune fiche trouvée.";
+                return;
+            }
+            emptyState.style.display = 'none';
+
+            data.forEach(item => {
+                const title = item.titre_officiel || item.nom_scientifique || "Sans titre";
+                const desc = item.resume || "Pas de description.";
+                const eff = item.score_efficacite ?? '-';
+                const sec = item.score_securite ?? '-';
+                const effColor = scoreColor(eff);
+                const secColor = scoreColor(sec);
+                const link = item.file ? `viewer.html?file=${item.file}` : '#';
+                const problemLabel = getProblemLabel(item);
+                
+                const zoneBadge = (item.zones || [])[0] ? `<span class="badge zone-badge">${ZONE_LABELS[item.zones[0]] || item.zones[0]}</span>` : '';
+                
+                container.innerHTML += `
+                    <article class="card">
+                        <div class="badges">
+                            ${zoneBadge}
+                            <span class="badge">${problemLabel}</span>
+                        </div>
+                        <h3>${title}</h3>
+                        <div class="score-row">
+                            <div class="score">
+                                <span class="score-val" style="color:${effColor}">${eff}</span>
+                                <span class="score-lbl">Efficacité</span>
+                            </div>
+                            <div class="score">
+                                <span class="score-val" style="color:${secColor}">${sec}</span>
+                                <span class="score-lbl">Sécurité</span>
+                            </div>
+                        </div>
+                        <p style="font-size:14px; color:#666; line-height:1.5; flex-grow:1;">${desc}</p>
+                        <a href="${link}" class="btn-link">Voir la fiche →</a>
+                    </article>
+                `;
+            });
+        }
+
+        function getProblemLabel(item) {
+            const raw = item?.problem_source;
+            if (!raw) return "Problématique non précisée";
+            return PROBLEM_LABELS[raw] || raw;
+        }
+
+        function getProblemsForZone(zone) {
+            const problems = new Set();
+            atlasItems.forEach(item => {
+                if ((item.zones || []).includes(zone)) {
+                    problems.add(getProblemLabel(item));
+                }
+            });
+            return Array.from(problems).sort((a, b) => a.localeCompare(b));
+        }
+
+        function renderProblemChips() {
+            if (!activeZone) {
+                problemPanel.style.display = 'none';
+                problemList.innerHTML = '';
+                problemInfo.textContent = "Sélectionne une zone pour afficher les problématiques.";
+                return;
+            }
+
+            const problems = getProblemsForZone(activeZone);
+            problemPanel.style.display = 'block';
+            problemList.innerHTML = '';
+
+            if (!problems.length) {
+                problemInfo.textContent = "Aucune problématique identifiée pour cette zone.";
+                return;
+            }
+
+            problemInfo.textContent = "Choisis une problématique pour voir les procédures proposées.";
+
+            problems.forEach(label => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'problem-chip';
+                if (label === activeProblem) {
+                    btn.classList.add('active');
+                }
+                btn.textContent = label;
+                btn.addEventListener('click', () => handleProblemSelection(label));
+                problemList.appendChild(btn);
+            });
+        }
+
+        function handleProblemSelection(label) {
+            activeProblem = (activeProblem === label) ? null : label;
+            renderProblemChips();
+            updateSearchAvailability();
+            renderCards();
+        }
+
+        function updateSearchAvailability() {
+            const allowSearch = !!(activeZone && activeProblem);
+            if (!allowSearch) {
+                searchInput.value = '';
+            }
+            searchInput.disabled = !allowSearch;
+        }
+
+        hitboxes.forEach(box => {
+            box.addEventListener('click', (e) => {
+                const z = e.target.dataset.zone;
+                const isSame = (activeZone === z);
+
+                hitboxes.forEach(h => h.classList.remove('active'));
+
+                if(isSame) {
+                    activeZone = null;
+                    activeProblem = null;
+                    showAll = true;
+                    zoneDisplay.textContent = "Vue Globale";
+                    zoneLabel.textContent = "Sélectionne une zone";
+                    btnReset.style.display = 'none';
+                    renderProblemChips();
+                } else {
+                    activeZone = z;
+                    activeProblem = null;
+                    showAll = false;
+                    document.querySelectorAll(`.hitbox[data-zone="${z}"]`).forEach(h => h.classList.add('active'));
+                    zoneDisplay.textContent = ZONE_LABELS[z] || z;
+                    zoneLabel.textContent = ZONE_LABELS[z];
+                    btnReset.style.display = 'block';
+                    renderProblemChips();
+                }
+                updateSearchAvailability();
+                renderCards();
+            });
+
+            box.addEventListener('mouseenter', e => {
+                if(!activeZone) zoneLabel.textContent = ZONE_LABELS[e.target.dataset.zone];
+            });
+            box.addEventListener('mouseleave', () => {
+                if(!activeZone) zoneLabel.textContent = "Sélectionne une zone";
+            });
+        });
+
+        btnReset.addEventListener('click', () => {
+            activeZone = null;
+            activeProblem = null;
+            showAll = true;
+            hitboxes.forEach(h => h.classList.remove('active'));
+            zoneDisplay.textContent = "Vue Globale";
+            btnReset.style.display = 'none';
+            searchInput.disabled = true; searchInput.value = '';
+            renderProblemChips();
+            renderCards();
+        });
+
+        searchInput.addEventListener('input', renderCards);
+        loadAtlas();
+
+    </script>
+</body>
+</html>

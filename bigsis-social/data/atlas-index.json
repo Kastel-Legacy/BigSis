@@ -1,0 +1,167 @@
+{
+  "generated_at": "2025-12-14T16:45:26.001330Z",
+  "items": [
+    {
+      "id": "botulinum_toxin_type_a_facial__master",
+      "file": "data/outputs/Botulinum_toxin_type_A_facial__MASTER.json",
+      "titre_social": "Le Botox sans filtre",
+      "titre_officiel": "OnabotulinumtoxinA",
+      "topic_source": "Botulinum toxin type A facial wrinkle treatment OR botox dynamic rhytids",
+      "problem_source": "Facial wrinkles and aging",
+      "zones": [
+        "cou",
+        "front"
+      ],
+      "score_efficacite": 9,
+      "score_securite": 8,
+      "verdict_final": "Le Botox est une option efficace et sûre pour le traitement des rides dynamiques, avec un bon profil de satisfaction des patients.",
+      "resume": "Réduit significativement les rides dynamiques et améliore l'esthétique faciale, avec des résultats durables.",
+      "sources_total": 15
+    },
+    {
+      "id": "fractional_co2_laser_facial_re_master",
+      "file": "data/outputs/Fractional_CO2_laser_facial_re_MASTER.json",
+      "titre_social": "Rajeunissement instantané avec le Laser CO2 !",
+      "titre_officiel": "Laser CO2 fractionné",
+      "topic_source": "Fractional CO2 laser facial rejuvenation OR ablative laser perioral wrinkles",
+      "problem_source": "Perioral rhytids and photoaging",
+      "zones": [
+        "levres"
+      ],
+      "score_efficacite": 8,
+      "score_securite": 7,
+      "verdict_final": "Un traitement efficace pour le rajeunissement cutané, avec un bon rapport bénéfice/risque.",
+      "resume": "Améliore significativement l'apparence des rides et la texture de la peau, avec des résultats visibles après quelques semaines.",
+      "sources_total": 15
+    },
+    {
+      "id": "hyaluronic_acid_jawline_contou_master",
+      "file": "data/outputs/Hyaluronic_acid_jawline_contou_MASTER.json",
+      "titre_social": "Redéfinissez votre mâchoire avec l'acide hyaluronique !",
+      "titre_officiel": "Acide hyaluronique",
+      "topic_source": "Hyaluronic acid jawline contouring OR chin filler harmonization",
+      "problem_source": "Jawline blurring and lower face laxity",
+      "zones": [
+        "machoire",
+        "menton"
+      ],
+      "score_efficacite": 8,
+      "score_securite": 7,
+      "verdict_final": "L'acide hyaluronique est une option efficace pour le remodelage de la mâchoire, mais nécessite une administration prudente.",
+      "resume": "Améliore la définition de la mâchoire et du menton, avec des résultats visibles dès la première séance.",
+      "sources_total": 19
+    },
+    {
+      "id": "hyaluronic_acid_lip_augmentati_master",
+      "file": "data/outputs/Hyaluronic_acid_lip_augmentati_MASTER.json",
+      "titre_social": "Des lèvres pulpeuses, naturellement !",
+      "titre_officiel": "Acide hyaluronique",
+      "topic_source": "Hyaluronic acid lip augmentation OR lip filler vermilion border definition",
+      "problem_source": "Lip volume loss and asymmetry",
+      "zones": [
+        "levres"
+      ],
+      "score_efficacite": 8,
+      "score_securite": 7,
+      "verdict_final": "L'acide hyaluronique est une option efficace et relativement sûre pour l'augmentation des lèvres.",
+      "resume": "Améliore le volume, la définition et l'hydratation des lèvres, avec des résultats visibles immédiatement après l'injection.",
+      "sources_total": 19
+    },
+    {
+      "id": "hyaluronic_acid_tear_trough_co_master",
+      "file": "data/outputs/Hyaluronic_acid_tear_trough_co_MASTER.json",
+      "titre_social": "Le secret d'un regard éclatant",
+      "titre_officiel": "Acide hyaluronique",
+      "topic_source": "Hyaluronic acid tear trough correction OR under eye filler safety",
+      "problem_source": "Infraorbital hollowing and dark circles",
+      "zones": [
+        "yeux"
+      ],
+      "score_efficacite": 8,
+      "score_securite": 7,
+      "verdict_final": "L'acide hyaluronique est une option efficace et relativement sûre pour le traitement des cernes, avec un bon taux de satisfaction des patients.",
+      "resume": "L'acide hyaluronique corrige efficacement les déformations du contour des yeux, avec une amélioration visible et une satisfaction élevée des patients.",
+      "sources_total": 18
+    },
+    {
+      "id": "hybrid_cooperative_complexes_h_master",
+      "file": "data/outputs/Hybrid_cooperative_complexes_h_MASTER.json",
+      "titre_social": "Le Profhilo, l'hydratation ultime !",
+      "titre_officiel": "Hybrid Cooperative Complex Hyaluronic Acid (HCC HA)",
+      "topic_source": "Hybrid cooperative complexes hyaluronic acid OR Profhilo bio-remodeling",
+      "problem_source": "Loss of dermal hydration and elasticity",
+      "zones": [
+        "cou"
+      ],
+      "score_efficacite": 8,
+      "score_securite": 9,
+      "verdict_final": "Profhilo est une option efficace et sûre pour le remodelage et l'hydratation de la peau.",
+      "resume": "Améliore la fermeté, la texture et l'hydratation de la peau, avec des résultats visibles après quelques semaines.",
+      "sources_total": 15
+    },
+    {
+      "id": "led_phototherapy_facial_rejuve_master",
+      "file": "data/outputs/LED_phototherapy_facial_rejuve_MASTER.json",
+      "titre_social": "Rajeunissement instantané avec la lumière LED !",
+      "titre_officiel": "Photothérapie LED",
+      "topic_source": "LED phototherapy facial rejuvenation OR low level light therapy wrinkles",
+      "problem_source": "Photoaging and inflammation",
+      "zones": [
+        "cou"
+      ],
+      "score_efficacite": 8,
+      "score_securite": 9,
+      "verdict_final": "Une méthode efficace et sûre pour le rajeunissement cutané, avec des résultats visibles après quelques séances.",
+      "resume": "Réduit les rides, améliore la texture de la peau et diminue les taches brunes.",
+      "sources_total": 16
+    },
+    {
+      "id": "pdo_thread_lift_facial_rejuven_master",
+      "file": "data/outputs/PDO_thread_lift_facial_rejuven_MASTER.json",
+      "titre_social": "Lifting sans chirurgie : Les fils PDO",
+      "titre_officiel": "Polydioxanone (PDO)",
+      "topic_source": "PDO thread lift facial rejuvenation OR polydioxanone threads lifting",
+      "problem_source": "Mild facial ptosis and contour lifting",
+      "zones": [
+        "cou"
+      ],
+      "score_efficacite": 7,
+      "score_securite": 8,
+      "verdict_final": "Une option prometteuse pour le lifting facial, mais nécessite une évaluation prudente.",
+      "resume": "Améliore le contour du visage et réduit les rides, avec une satisfaction élevée des patients.",
+      "sources_total": 15
+    },
+    {
+      "id": "radiofrequency_microneedling_f_master",
+      "file": "data/outputs/Radiofrequency_microneedling_f_MASTER.json",
+      "titre_social": "Rajeunissement instantané avec la magie de la radiofréquence !",
+      "titre_officiel": "Radiofréquence microneedling (RFM)",
+      "topic_source": "Radiofrequency microneedling facial rejuvenation OR RF microneedling acne scars",
+      "problem_source": "Atrophic acne scars and texture irregularities",
+      "zones": [
+        "cou"
+      ],
+      "score_efficacite": 8,
+      "score_securite": 7,
+      "verdict_final": "Une option prometteuse pour le rajeunissement cutané avec un bon rapport efficacité/sécurité.",
+      "resume": "Améliore la texture de la peau, réduit les rides et les cicatrices d'acné, et stimule la production de collagène.",
+      "sources_total": 20
+    },
+    {
+      "id": "temporal_hollowing_filler_hyal_master",
+      "file": "data/outputs/Temporal_hollowing_filler_hyal_MASTER.json",
+      "titre_social": "Rajeunissez votre regard avec des injections de volume !",
+      "titre_officiel": "Acide hyaluronique",
+      "topic_source": "Temporal hollowing filler hyaluronic acid OR temple augmentation injections",
+      "problem_source": "Temporal hollowing and skeletal appearance",
+      "zones": [
+        "frontotemporal"
+      ],
+      "score_efficacite": 8,
+      "score_securite": 7,
+      "verdict_final": "Les injections d'acide hyaluronique pour les tempes sont efficaces et généralement sûres, mais nécessitent une expertise pour minimiser les risques.",
+      "resume": "Améliore le volume des tempes et l'apparence générale du visage, avec des résultats visibles dès 3 mois.",
+      "sources_total": 17
+    }
+  ]
+}
