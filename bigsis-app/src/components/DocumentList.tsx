@@ -41,22 +41,94 @@ const DocumentList: React.FC = () => {
         return () => clearInterval(interval);
     }, []);
 
-    const handleDelete = async (id: string) => { // id strings
-        if (!confirm("Are you sure you want to delete this document?")) return;
+    const [deleteConfirmationId, setDeleteConfirmationId] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
+    const confirmDelete = (id: string) => {
+        setDeleteConfirmationId(id);
+    };
+
+    const cancelDelete = () => {
+        setDeleteConfirmationId(null);
+    };
+
+    const executeDelete = async () => {
+        if (!deleteConfirmationId) return;
+        setIsDeleting(true);
         try {
-            const response = await fetch(`${API_URL}/knowledge/documents/${id}`, {
+            const response = await fetch(`${API_URL}/knowledge/documents/${deleteConfirmationId}`, {
                 method: 'DELETE'
             });
             if (response.ok) {
-                setDocuments(documents.filter(doc => doc.id !== id));
+                setDocuments(documents.filter(doc => doc.id !== deleteConfirmationId));
+                setDeleteConfirmationId(null);
             } else {
                 alert("Deletion error");
             }
         } catch (error) {
             alert("Server connection error");
+        } finally {
+            setIsDeleting(false);
         }
     };
+
+    // ... (rest of render until delete button)
+
+    <button
+        onClick={() => confirmDelete(doc.id)}
+        className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
+        title="Delete Document"
+    >
+        <Trash2 size={16} />
+    </button>
+    // ...
+
+    {/* Delete Confirmation Modal */ }
+    {
+        deleteConfirmationId && (
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+                <div className="bg-gray-900 border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+                    <div className="flex items-center gap-4 mb-6 text-red-400">
+                        <div className="p-3 bg-red-500/10 rounded-full">
+                            <AlertCircle size={24} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-white">Delete Document?</h3>
+                            <p className="text-sm text-gray-400">This action cannot be undone.</p>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-3 justify-end">
+                        <button
+                            onClick={cancelDelete}
+                            disabled={isDeleting}
+                            className="px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={executeDelete}
+                            disabled={isDeleting}
+                            className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                        >
+                            {isDeleting ? (
+                                <>
+                                    <Loader2 size={14} className="animate-spin" />
+                                    Deleting...
+                                </>
+                            ) : (
+                                <>
+                                    <Trash2 size={14} />
+                                    Delete Forever
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
 
     const handleView = async (id: string) => { // id string
         setViewLoading(true);
@@ -172,7 +244,7 @@ const DocumentList: React.FC = () => {
                                                     {viewLoading ? <Loader2 size={16} className="animate-spin" /> : <Eye size={16} />}
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDelete(doc.id)}
+                                                    onClick={() => confirmDelete(doc.id)}
                                                     className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
                                                     title="Delete Document"
                                                 >
@@ -187,6 +259,50 @@ const DocumentList: React.FC = () => {
                     </div>
                 )}
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteConfirmationId && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <div className="bg-gray-900 border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="flex items-center gap-4 mb-6 text-red-400">
+                            <div className="p-3 bg-red-500/10 rounded-full">
+                                <AlertCircle size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-white">Delete Document?</h3>
+                                <p className="text-sm text-gray-400">This action cannot be undone.</p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={cancelDelete}
+                                disabled={isDeleting}
+                                className="px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={executeDelete}
+                                disabled={isDeleting}
+                                className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                            >
+                                {isDeleting ? (
+                                    <>
+                                        <Loader2 size={14} className="animate-spin" />
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Trash2 size={14} />
+                                        Delete Forever
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Document Preview Modal */}
             {selectedDoc && (

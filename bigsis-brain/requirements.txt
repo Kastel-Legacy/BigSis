@@ -17,4 +17,5 @@ psycopg2-binary
 python-multipart
 langchain
 langchain-community
+langchain-text-splitters
 tiktoken

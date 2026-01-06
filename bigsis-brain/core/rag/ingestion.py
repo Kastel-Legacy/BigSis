@@ -2,7 +2,8 @@ from sqlalchemy.future import select
 from core.db.database import AsyncSessionLocal
 from core.db.models import Source, Document, DocumentVersion, Chunk
 from core.rag.embeddings import get_embedding
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from datetime import datetime
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 import hashlib
 
 async def ingest_document(title: str, content: str, metadata: dict):

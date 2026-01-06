@@ -131,14 +131,13 @@ async def ingest_pubmed_results(query: str):
             "source": "pubmed",
             "pmid": doc['pmid'],
             "year": doc['annee'],
-            "link": doc['lien']
+            "url": doc['lien'] # Use 'url' key for ingestion.py
         }
         
         # Ingest
         await ingest_document(
             title=doc['titre'],
             content=content,
-            url=doc['lien'],
             metadata=metadata
         )
         count += 1
