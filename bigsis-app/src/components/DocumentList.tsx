@@ -35,6 +35,8 @@ const DocumentList: React.FC = () => {
 
     useEffect(() => {
         fetchDocuments();
+        const interval = setInterval(fetchDocuments, 5000);
+        return () => clearInterval(interval);
     }, []);
 
     const handleDelete = async (id: number) => {
