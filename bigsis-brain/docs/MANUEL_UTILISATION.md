@@ -1,4 +1,4 @@
-# 📚 Manuel d'Utilisation - BigSis Brain
+tu# 📚 Manuel d'Utilisation - BigSis Brain
 
 ## Introduction
 Ce module est le "cerveau" de l'IA. Il ne possède pas d'interface graphique utilisateur (GUI), mais expose des points d'entrée (API) pour les autres modules (`bigsis-app`, `bigsis-social`).

@@ -7,6 +7,7 @@ class AnalyzeRequest(BaseModel):
     wrinkle_type: str # "expression", "statique"
     age_range: Optional[str] = None
     pregnancy: Optional[bool] = False
+    language: str = 'fr'
     
 class AnalyzeResponse(BaseModel):
     summary: str

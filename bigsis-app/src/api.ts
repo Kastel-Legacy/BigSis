@@ -8,6 +8,7 @@ export interface AnalyzeRequest {
   wrinkle_type: string;
   age_range?: string;
   pregnancy?: boolean;
+  language?: string;
 }
 
 export interface EvidenceItem {

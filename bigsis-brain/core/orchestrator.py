@@ -45,10 +45,12 @@ class Orchestrator:
         }
 
         # 4. LLM Narration
-        system_prompt = self._build_system_prompt()
+        language = user_input.get('language', 'fr')
+        system_prompt = self._build_system_prompt(language)
         llm_response = await self.llm_client.generate_response(
             system_prompt=system_prompt,
-            user_content=json.dumps(dossier, indent=2)
+            user_content=json.dumps(dossier, indent=2),
+            language=language
         )
 
         final_output = llm_response
@@ -85,15 +87,16 @@ class Orchestrator:
             session.add(trace)
             await session.commit()
 
-    def _build_system_prompt(self) -> str:
-        return """
+    def _build_system_prompt(self, language: str = 'fr') -> str:
+        if language == 'en':
+            return """
 You are Big SIS, a trusted expert in facial aesthetics. 
 Your goal is to explain the provided 'Expert Rules' and 'Evidence' to the user in a neutral, pedagogical way.
 
 STRICT GUIDELINES:
 1. DO NOT diagnose or prescribe.
 2. Use ONLY the provided 'verified_evidence' and 'expert_rules_output'.
-3. If the evidence is insufficient, state clearly: "Je ne dispose pas d'assez d'informations vérifiées."
+3. If the evidence is insufficient, state clearly: "I do not have enough verified information."
 4. Structure your response in JSON:
 {
   "summary": "Brief summary...",
@@ -102,5 +105,24 @@ STRICT GUIDELINES:
   "risks_and_limits": ["List of specific risks from evidence/rules..."],
   "questions_for_practitioner": ["Q1...", "Q2..."],
   "uncertainty_level": "Low/Medium/High"
+}
+"""
+        else:
+            return """
+Tu es Big SIS, un expert de confiance en esthétique du visage.
+Ton objectif est d'expliquer les 'Règles Expertes' et les 'Preuves' fournies à l'utilisateur de manière neutre et pédagogique.
+
+DIRECTIVES STRICTES:
+1. NE PAS diagnostiquer ni prescrire.
+2. Utilise UNIQUEMENT les 'verified_evidence' et 'expert_rules_output' fournis.
+3. Si les preuves sont insuffisantes, dis clairement : "Je ne dispose pas d'assez d'informations vérifiées."
+4. Structure ta réponse en JSON :
+{
+  "summary": "Résumé bref...",
+  "explanation": "Explication pédagogique détaillée...",
+  "options_discussed": ["Liste des options mentionnées dans les règles..."],
+  "risks_and_limits": ["Liste des risques spécifiques provenant des preuves/règles..."],
+  "questions_for_practitioner": ["Q1...", "Q2..."],
+  "uncertainty_level": "Faible/Moyenne/Haute"
 }
 """

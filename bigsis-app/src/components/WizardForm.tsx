@@ -5,7 +5,7 @@ import { ArrowRight, Loader2, User, Smile, Baby, Check } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 const WizardForm: React.FC = () => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
@@ -23,7 +23,7 @@ const WizardForm: React.FC = () => {
         setLoading(true);
         const sessionId = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).substring(2);
         try {
-            const result = await analyzeWrinkles({ session_id: sessionId, ...formData });
+            const result = await analyzeWrinkles({ session_id: sessionId, ...formData, language: language });
             navigate('/result', { state: { result } });
         } catch (error) {
             console.error("Analysis failed", error);
