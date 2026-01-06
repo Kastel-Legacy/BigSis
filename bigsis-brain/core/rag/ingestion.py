@@ -1,61 +1,79 @@
-import hashlib
-from typing import List, Optional
-from core.db.database import AsyncSessionLocal
-from core.db.models import SourceDocument, EvidenceChunk
-from core.rag.embeddings import get_embedding
 from sqlalchemy.future import select
+from core.db.database import AsyncSessionLocal
+from core.db.models import Source, Document, DocumentVersion, Chunk
+from core.llm.embeddings import get_embedding
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+import hashlib
 
-async def ingest_document(title: str, content: str, url: str = None, metadata: dict = None):
+async def ingest_document(title: str, content: str, metadata: dict):
     """
-    Ingests a raw text document, chunks it, embeds it, and saves to DB.
+    Ingests a document into the V2 Database Schema:
+    Source -> Document -> DocumentVersion -> Chunks
     """
-    content_hash = hashlib.md5(content.encode("utf-8")).hexdigest()
-    
     async with AsyncSessionLocal() as session:
-        # Check duplicate
-        result = await session.execute(select(SourceDocument).where(SourceDocument.content_hash == content_hash))
-        if result.scalars().first():
-            print(f"Document '{title}' already exists.")
-            return
+        # 1. Start Transaction
+        async with session.begin():
+            # 2. Get or Create Source
+            source_name = metadata.get("source", "Unknown")
+            result = await session.execute(select(Source).where(Source.name == source_name))
+            source_obj = result.scalars().first()
+            if not source_obj:
+                source_obj = Source(name=source_name, source_type="internal")
+                session.add(source_obj)
+                await session.flush() # get ID
 
-        # Create Document
-        doc = SourceDocument(
-            title=title,
-            url=url,
-            content_hash=content_hash,
-            metadata_json=metadata if metadata else {},
-            is_published=True
-        )
-        session.add(doc)
-        await session.flush() # get ID
+            # 3. Get or Create Document (by external_id)
+            # Use filename or title as pseudo-external-id for now if not provided
+            ext_id = metadata.get("filename") or metadata.get("url") or hashlib.md5(title.encode()).hexdigest()
+            ext_type = "file" if metadata.get("filename") else ("url" if metadata.get("url") else "internal")
 
-        # Chunking (Naive splitting for V1)
-        chunks = split_text(content, chunk_size=500, overlap=50)
-        
-        evidence_chunks = []
-        for i, chunk_text in enumerate(chunks):
-            embedding = await get_embedding(chunk_text)
-            evidence_chunks.append(EvidenceChunk(
-                document_id=doc.id,
-                content_text=chunk_text,
-                chunk_index=i,
-                embedding=embedding
-            ))
-        
-        session.add_all(evidence_chunks)
-        await session.commit()
-        print(f"Ingested '{title}' with {len(evidence_chunks)} chunks.")
+            result = await session.execute(select(Document).where(Document.external_id == ext_id))
+            doc_obj = result.scalars().first()
+            
+            if not doc_obj:
+                doc_obj = Document(
+                    source_id=source_obj.id,
+                    external_type=ext_type,
+                    external_id=ext_id,
+                    title=title,
+                    doc_type="paper" # Default
+                )
+                session.add(doc_obj)
+                await session.flush()
 
-def split_text(text: str, chunk_size: int = 500, overlap: int = 50) -> List[str]:
-    # Simple character splitter for now. 
-    # TODO: Use recursive splitter or sentence splitter later.
-    chunks = []
-    start = 0
-    text_len = len(text)
-    
-    while start < text_len:
-        end = min(start + chunk_size, text_len)
-        chunks.append(text[start:end])
-        start += (chunk_size - overlap)
-        
-    return chunks
+            # 4. Create Document Version (Always new version for V1 simplicity? Or increment?)
+            # For this impl, we'll check if a version exists and increment
+            result = await session.execute(
+                select(DocumentVersion).where(DocumentVersion.document_id == doc_obj.id).order_by(DocumentVersion.version_no.desc())
+            )
+            latest_version = result.scalars().first()
+            new_version_no = (latest_version.version_no + 1) if latest_version else 1
+            
+            content_hash = hashlib.sha256(content.encode()).hexdigest()
+            
+            version_obj = DocumentVersion(
+                document_id=doc_obj.id,
+                version_no=new_version_no,
+                status="published", # Auto-publish for now
+                content_hash=content_hash,
+                extracted_text=content
+            )
+            session.add(version_obj)
+            await session.flush()
+
+            # 5. Chunking
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+            chunks_text = text_splitter.split_text(content)
+
+            for i, chunk_text in enumerate(chunks_text):
+                embedding = await get_embedding(chunk_text)
+                chunk_obj = Chunk(
+                    document_version_id=version_obj.id,
+                    chunk_no=i+1,
+                    text=chunk_text,
+                    text_hash=hashlib.sha256(chunk_text.encode()).hexdigest(),
+                    embedding=embedding
+                )
+                session.add(chunk_obj)
+
+            print(f"Ingested {title} (v{new_version_no}) with {len(chunks_text)} chunks.")
