@@ -55,14 +55,17 @@ class Orchestrator:
         # Inject evidence into the response so the UI can show it
         final_output["evidence_used"] = evidence_items
 
-        # 5. Audit Logging
-        await self._log_decision(
-            session_id=session_id,
-            input_data=user_input,
-            rules_triggered=triggered_rules_ids, 
-            evidence=[e['chunk_id'] for e in evidence_items],
-            final_output=final_output
-        )
+        # 5. Audit Logging (Fail-safe)
+        try:
+            await self._log_decision(
+                session_id=session_id,
+                input_data=user_input,
+                rules_triggered=triggered_rules_ids, 
+                evidence=[e['chunk_id'] for e in evidence_items],
+                final_output=final_output
+            )
+        except Exception as e:
+            logger.error(f"Failed to log decision trace (non-blocking): {e}")
 
         return final_output
 
