@@ -72,16 +72,7 @@ const DocumentList: React.FC = () => {
         }
     };
 
-    // ... (rest of render until delete button)
 
-    <button
-        onClick={() => confirmDelete(doc.id)}
-        className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
-        title="Delete Document"
-    >
-        <Trash2 size={16} />
-    </button>
-    // ...
 
     {/* Delete Confirmation Modal */ }
     {
