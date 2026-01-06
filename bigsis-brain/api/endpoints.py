@@ -8,7 +8,7 @@ from core.utils.pdf import extract_text_from_pdf
 from core.rag.ingestion import ingest_document
 from core.pubmed import ingest_pubmed_results
 from core.db.database import AsyncSessionLocal
-from core.db.models import SourceDocument, EvidenceChunk
+from core.db.models import Source, Document, DocumentVersion, Chunk
 from sqlalchemy.future import select
 from sqlalchemy import delete, func
 from core.social_agent import SocialAgent
@@ -98,46 +98,42 @@ async def trigger_pubmed_ingestion(request: PubMedRequest, background_tasks: Bac
 @router.get("/knowledge/documents")
 async def list_documents():
     """
-    List all ingested documents with metadata.
+    List all ingested documents (showing latest version info).
     """
     async with AsyncSessionLocal() as session:
-        # Query docs and count chunks
-        # This is a bit complex in async SQLAlchemy, keeping it simple for V1:
-        # Just fetch docs and let's assume we want to show basic info.
-        # Ideally we'd do a join to count chunks.
-        
-        stmt = select(SourceDocument).order_by(SourceDocument.created_at.desc())
+        stmt = select(Document).order_by(Document.created_at.desc())
         result = await session.execute(stmt)
         docs = result.scalars().all()
         
         output = []
         for doc in docs:
-            # We can do a separate query or lazy load if configured, 
-            # but for list view let's just return doc info
+            # For V1 compat, we return basic info. 
+            # Ideally we join with latest version to get status etc.
             output.append({
-                "id": doc.id,
+                "id": str(doc.id), # UUID to string
                 "title": doc.title,
                 "created_at": doc.created_at,
-                "version": doc.version,
-                "metadata": doc.metadata_json,
-                # "chunk_count": ... (omitted for speed in V1)
+                "metadata": {"type": doc.external_type, "source_id": str(doc.source_id)}
             })
             
         return output
 
 @router.delete("/knowledge/documents/{doc_id}")
-async def delete_document(doc_id: int):
+async def delete_document(doc_id: str): # UUID string
     """
-    Delete a document and its associated chunks.
+    Delete a document and provided (cascade deletes versions/chunks).
     """
     async with AsyncSessionLocal() as session:
         try:
-            # 1. Delete Chunks
-            await session.execute(delete(EvidenceChunk).where(EvidenceChunk.document_id == doc_id))
+            # Cascade delete handle by SQLAlchemy rel
+            stmt = select(Document).where(Document.id == doc_id)
+            result = await session.execute(stmt)
+            doc = result.scalars().first()
             
-            # 2. Delete Document
-            await session.execute(delete(SourceDocument).where(SourceDocument.id == doc_id))
-            
+            if not doc:
+                 raise HTTPException(status_code=404, detail="Document not found")
+
+            await session.delete(doc)
             await session.commit()
             return {"status": "success", "message": f"Document {doc_id} deleted"}
         except Exception as e:
@@ -145,26 +141,35 @@ async def delete_document(doc_id: int):
             raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/knowledge/documents/{doc_id}")
-async def get_document(doc_id: int):
+async def get_document(doc_id: str): # UUID string
     """
-    Get a single document and its chunks (content).
+    Get a single document and its chunks (content of latest version).
     """
     async with AsyncSessionLocal() as session:
         # Fetch Document
-        result = await session.execute(select(SourceDocument).where(SourceDocument.id == doc_id))
+        result = await session.execute(select(Document).where(Document.id == doc_id))
         doc = result.scalars().first()
         
         if not doc:
             raise HTTPException(status_code=404, detail="Document not found")
             
-        # Fetch Chunks
-        result_chunks = await session.execute(select(EvidenceChunk).where(EvidenceChunk.document_id == doc_id).order_by(EvidenceChunk.chunk_index))
-        chunks = result_chunks.scalars().all()
+        # Fetch Latest Version
+        result_ver = await session.execute(
+            select(DocumentVersion).where(DocumentVersion.document_id == doc.id).order_by(DocumentVersion.version_no.desc())
+        )
+        version = result_ver.scalars().first()
+        
+        chunks_data = []
+        if version:
+             # Fetch Chunks of that version
+            result_chunks = await session.execute(select(Chunk).where(Chunk.document_version_id == version.id).order_by(Chunk.chunk_no))
+            chunks = result_chunks.scalars().all()
+            chunks_data = [{"index": c.chunk_no, "text": c.text} for c in chunks]
         
         return {
-            "id": doc.id,
+            "id": str(doc.id),
             "title": doc.title,
             "created_at": doc.created_at,
-            "metadata": doc.metadata_json,
-            "chunks": [{"index": c.chunk_index, "text": c.content_text} for c in chunks]
+            "metadata": {"type": doc.external_type},
+            "chunks": chunks_data
         }
