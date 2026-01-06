@@ -12,17 +12,30 @@ class LLMClient:
         self.model = model
 
     async def generate_response(self, system_prompt: str, user_content: str, json_mode: bool = True) -> dict:
-            if not self.api_key or self.api_key.startswith("sk-placeholder"):
-                logger.warning("Using MOCK LLM response due to missing/placeholder API key.")
-                mock_response = {
-                    "summary": "This is a MOCK response because no valid OpenAI API key was found.",
-                    "explanation": "To get real AI analysis, please provide a valid OPENAI_API_KEY in the .env file.",
-                    "options_discussed": ["Consultation Dermatologue", "Injections (Mock)"],
-                    "risks_and_limits": ["Rougeurs temporaires", "Eviter aspirine"],
-                    "questions_for_practitioner": ["Quelles sont les alternatives ?", "Combien de temps durent les effets ?"],
-                    "uncertainty_level": "High (Mock)"
-                }
-                return mock_response
+        if not self.api_key or self.api_key.startswith("sk-placeholder"):
+            logger.warning("Using MOCK LLM response due to missing/placeholder API key.")
+            mock_response = {
+                "summary": "This is a MOCK response because no valid OpenAI API key was found.",
+                "explanation": "To get real AI analysis, please provide a valid OPENAI_API_KEY in the .env file.",
+                "options_discussed": ["Consultation Dermatologue", "Injections (Mock)"],
+                "risks_and_limits": ["Rougeurs temporaires", "Eviter aspirine"],
+                "questions_for_practitioner": ["Quelles sont les alternatives ?", "Combien de temps durent les effets ?"],
+                "uncertainty_level": "High (Mock)"
+            }
+            return mock_response
+
+        try:
+            kwargs = {
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_content}
+                ],
+                "temperature": 0.1,
+            }
+            
+            if json_mode:
+                kwargs["response_format"] = {"type": "json_object"}
 
             response = await self.client.chat.completions.create(**kwargs)
             content = response.choices[0].message.content

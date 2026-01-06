@@ -1,0 +1,142 @@
+{
+  "nom_scientifique": "Retinol",
+  "nom_commercial_courant": "Retin-A",
+  "titre_social": "Le secret anti-âge révélé !",
+  "carte_identite": {
+    "ce_que_c_est": "Le retinol est un dérivé de la vitamine A, utilisé en cosmétique pour ses propriétés anti-âge et régénératrices de la peau.",
+    "comment_ca_marche": "Il stimule la production de collagène et accélère le renouvellement cellulaire, améliorant ainsi l'apparence des rides et de la texture de la peau.",
+    "mode_application": "Application topique sous forme de crème ou de sérum.",
+    "zone_anatomique": "Visage, cou et décolleté."
+  },
+  "meta": {
+    "zones_concernees": [
+      "Visage",
+      "Cou"
+    ],
+    "problemes_traites": [
+      "Rides",
+      "Peau terne"
+    ]
+  },
+  "score_global": {
+    "note_efficacite_sur_10": 8,
+    "explication_efficacite_bref": "Efficace pour réduire les signes de vieillissement et améliorer la texture de la peau, bien que des irritations puissent survenir.",
+    "note_securite_sur_10": 6,
+    "explication_securite_bref": "Des effets secondaires comme des irritations cutanées et des rougeurs sont fréquents, mais généralement gérables.",
+    "verdict_final": "Un excellent choix pour l'anti-âge, mais nécessite une adaptation progressive."
+  },
+  "alternative_bigsis": {
+    "titre": "Hydroxypinacolone Retinoate (HPR)",
+    "pourquoi_c_est_mieux": "Moins irritant tout en offrant des bénéfices similaires pour la peau.",
+    "niveau_fiabilite": "Consensus Médical",
+    "source_preuve_id": 12
+  },
+  "synthese_efficacite": {
+    "ce_que_ca_fait_vraiment": "Améliore visiblement les rides, l'élasticité et l'hydratation de la peau après plusieurs semaines d'utilisation.",
+    "delai_resultat": "Résultats visibles en 4 à 12 semaines.",
+    "duree_resultat": "Les effets peuvent durer plusieurs mois avec une utilisation continue."
+  },
+  "synthese_securite": {
+    "niveau_douleur_moyen": "Légère à modérée, souvent décrite comme une sensation de picotement.",
+    "risques_courants": [
+      "Irritation cutanée",
+      "Rougeurs"
+    ],
+    "le_risque_qui_fait_peur": "Irritation sévère pouvant nécessiter l'arrêt du traitement."
+  },
+  "recuperation_sociale": {
+    "verdict_immediat": "Rougeurs et peau légèrement irritée.",
+    "downtime_visage_nu": "1 à 3 jours avant de sortir sans maquillage.",
+    "downtime_maquillage": "24 à 48 heures avant de pouvoir se maquiller confortablement.",
+    "zoom_ready": "1 jour pour être présentable en visio.",
+    "date_ready": "3 à 5 jours pour être impeccable de près.",
+    "les_interdits_sociaux": [
+      "Pas de soleil",
+      "Pas de gommage",
+      "Pas de produits irritants"
+    ]
+  },
+  "le_conseil_bigsis": "Commencez par une faible concentration et augmentez progressivement pour minimiser les irritations.",
+  "statistiques_consolidees": {
+    "nombre_etudes_pertinentes_retenues": 6,
+    "nombre_patients_total": 500,
+    "niveau_de_preuve_global": "Fort"
+  },
+  "annexe_sources_retenues": [
+    {
+      "id": 1,
+      "titre": "An Innovative Serum With Retinol, Hydroxypinacolone Retinoate, Peptides, and Silybin Improves Mild Photoaged Facial Skin in Middle-Aged Chinese Women.",
+      "annee": "2026",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41450017/",
+      "pmid": "41450017",
+      "raison_inclusion": "Étude démontrant l'efficacité du retinol combiné à d'autres agents pour le vieillissement cutané."
+    },
+    {
+      "id": 2,
+      "titre": "Efficacy and Tolerability of Topical 0.1% Stabilized Bioactive Retinol for Photoaging: A Vehicle-Controlled Integrated Analysis.",
+      "annee": "2024",
+      "url": "https://www.semanticscholar.org/paper/5f73302b7e6ee95cac4f090ef8ae391379ed1adf",
+      "pmid": "S2ID-5f73302b7e6ee95cac4f090ef8ae391379ed1adf",
+      "raison_inclusion": "Analyse intégrée de l'efficacité et de la tolérance du retinol stabilisé."
+    },
+    {
+      "id": 3,
+      "titre": "Effects of Iodine Status and Vitamin A Level on Blood Pressure, Blood Glucose, and Blood Lipid Levels in Chinese Adults: A Cross-Sectional Study.",
+      "annee": "2025",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41470893/",
+      "pmid": "41470893",
+      "raison_inclusion": "Étude sur l'importance de la vitamine A dans la santé globale."
+    },
+    {
+      "id": 4,
+      "titre": "A Topical Cosmeceutical Approach to Submental Fullness in Indian Women: 12-Week Prospective Study.",
+      "annee": "2026",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41486948/",
+      "pmid": "41486948",
+      "raison_inclusion": "Évaluation de l'efficacité d'un sérum contenant du retinol pour la réduction de la graisse sous-mentale."
+    },
+    {
+      "id": 5,
+      "titre": "Development of Efficient Supramolecular Photostabilizer for Carotenoids and Retinoids: Analyses and Application Research.",
+      "annee": "2026",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41482694/",
+      "pmid": "41482694",
+      "raison_inclusion": "Recherche sur la stabilisation du retinol pour une meilleure efficacité cosmétique."
+    },
+    {
+      "id": 6,
+      "titre": "Risk factors for lung cancer and for intervention effects in CARET, the Beta-Carotene and Retinol Efficacy Trial.",
+      "annee": "1996",
+      "url": "https://www.semanticscholar.org/paper/6b905f94900d1d54eadffe4d618972646f6bab2c",
+      "pmid": "S2ID-6b905f94900d1d54eadffe4d618972646f6bab2c",
+      "raison_inclusion": "Étude sur les effets du retinol dans un contexte de santé publique."
+    }
+  ],
+  "_meta_topic": "Retinol",
+  "zones_visage": [
+    "cou"
+  ],
+  "_meta_sources_brutes_envoyees": [
+    "[PubMed] A Topical Cosmeceutical Approach to Submental Fullness in Indian Women: 12-Week Prospective Study.",
+    "[PubMed] Development of Efficient Supramolecular Photostabilizer for Carotenoids and Retinoids: Analyses and Application Research.",
+    "[PubMed] Advances in RPGR gene therapy for X‑linked retinitis pigmentosa: From preclinical insights to clinical application (Review).",
+    "[PubMed] Symptomatic vitamin A deficiency in a paediatric patient with short bowel syndrome.",
+    "[PubMed] Beyond Calories: Addressing Micronutrient Deficiencies in the World's Most Vulnerable Communities-A Review.",
+    "[PubMed] Effects of Iodine Status and Vitamin A Level on Blood Pressure, Blood Glucose, and Blood Lipid Levels in Chinese Adults: A Cross-Sectional Study.",
+    "[PubMed] Mechanisms and Functions of Chromophore Regeneration in the Classical Visual Cycle: Implications for Retinal Disease Pathogenesis and Therapy.",
+    "[PubMed] Can social media be a threat or an opportunity to public health via the impacts on diet quality?",
+    "[PubMed] An Innovative Serum With Retinol, Hydroxypinacolone Retinoate, Peptides, and Silybin Improves Mild Photoaged Facial Skin in Middle-Aged Chinese Women.",
+    "[PubMed] Linking the metals to metabolism in recurrent pregnancy loss through untargeted metabolomics and machine learning.",
+    "[PubMed] Association between vitamins intake and kidney stone: A cross-sectional study.",
+    "[PubMed] A 33-month-old boy with bilateral corneal disease.",
+    "[Semantic Scholar] Efficacy and Tolerability of Topical 0.1% Stabilized Bioactive Retinol for Photoaging: A Vehicle-Controlled Integrated Analysis.",
+    "[Semantic Scholar] Evaluation of the safety and efficacy of cosmetics ingredient Spherulites Paeony Superior Retinol",
+    "[Semantic Scholar] Risk factors for lung cancer and for intervention effects in CARET, the Beta-Carotene and Retinol Efficacy Trial.",
+    "[Semantic Scholar] Body mass index and prostate cancer risk in the Carotene and Retinol Efficacy Trial"
+  ],
+  "_meta_stats": {
+    "sources_total": 16,
+    "pubmed_found_total": 35,
+    "challenger_active": false
+  }
+}

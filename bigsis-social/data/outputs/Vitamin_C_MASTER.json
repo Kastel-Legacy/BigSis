@@ -1,0 +1,122 @@
+{
+  "nom_scientifique": "Acide ascorbique",
+  "nom_commercial_courant": "Vitamine C",
+  "titre_social": "La Vitamine C : Éclat et Réparation !",
+  "carte_identite": {
+    "ce_que_c_est": "L'acide ascorbique est une vitamine hydrosoluble essentielle, connue pour ses propriétés antioxydantes et son rôle dans la synthèse du collagène.",
+    "comment_ca_marche": "Elle neutralise les radicaux libres, protège les cellules du stress oxydatif et favorise la régénération des tissus cutanés.",
+    "mode_application": "Topique (crèmes, sérums) ou orale (compléments alimentaires).",
+    "zone_anatomique": "Peau, visage."
+  },
+  "meta": {
+    "zones_concernees": [
+      "Visage",
+      "Cou"
+    ],
+    "problemes_traites": [
+      "Photo-vieillissement",
+      "Taches pigmentaires"
+    ]
+  },
+  "score_global": {
+    "note_efficacite_sur_10": 8,
+    "explication_efficacite_bref": "Les études montrent une amélioration significative de l'apparence de la peau et une réduction des signes de vieillissement.",
+    "note_securite_sur_10": 9,
+    "explication_securite_bref": "L'acide ascorbique est généralement bien toléré, avec peu d'effets secondaires rapportés.",
+    "verdict_final": "L'acide ascorbique est une option efficace et sûre pour améliorer l'apparence de la peau."
+  },
+  "alternative_bigsis": {
+    "titre": "Acide hyaluronique",
+    "pourquoi_c_est_mieux": "L'acide hyaluronique hydrate intensément et repulpe la peau, offrant des résultats immédiats.",
+    "niveau_fiabilite": "Gold Standard",
+    "source_preuve_id": null
+  },
+  "synthese_efficacite": {
+    "ce_que_ca_fait_vraiment": "Améliore l'hydratation, réduit les rides et les taches, et favorise la régénération cutanée.",
+    "delai_resultat": "Résultats visibles en 4 à 6 semaines.",
+    "duree_resultat": "Les effets peuvent durer plusieurs mois avec une utilisation régulière."
+  },
+  "synthese_securite": {
+    "niveau_douleur_moyen": "Aucun ou très léger inconfort lors de l'application topique.",
+    "risques_courants": [
+      "Irritation cutanée",
+      "Rougeur"
+    ],
+    "le_risque_qui_fait_peur": "Irritation cutanée, surtout en cas d'utilisation excessive."
+  },
+  "recuperation_sociale": {
+    "verdict_immediat": "Rien de visible immédiatement.",
+    "downtime_visage_nu": "Aucun temps d'éviction.",
+    "downtime_maquillage": "Peut être maquillé immédiatement.",
+    "zoom_ready": "Prêt pour une visio immédiatement.",
+    "date_ready": "Impeccable après quelques jours d'utilisation.",
+    "les_interdits_sociaux": [
+      "Pas d'exposition au soleil sans protection",
+      "Pas d'alcool en excès"
+    ]
+  },
+  "le_conseil_bigsis": "Utilisez un sérum à base de vitamine C le matin pour maximiser les effets antioxydants et suivez avec un écran solaire.",
+  "statistiques_consolidees": {
+    "nombre_etudes_pertinentes_retenues": 6,
+    "nombre_patients_total": 84,
+    "niveau_de_preuve_global": "Fort"
+  },
+  "annexe_sources_retenues": [
+    {
+      "id": 1,
+      "titre": "Clinical outcomes of intense pulsed light combined with non-crosslinked sodium hyaluronate, tranexamic acid, and vitamin C mesotherapy for facial photoaging",
+      "annee": "2023",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41489066/",
+      "pmid": "41489066",
+      "raison_inclusion": "Étude sur l'efficacité de la vitamine C en association avec d'autres traitements pour le photo-vieillissement."
+    },
+    {
+      "id": 2,
+      "titre": "Vitamin C in Oral Lichen Planus: Pathobiological Rationale and Therapeutic Potential",
+      "annee": "2023",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41465314/",
+      "pmid": "41465314",
+      "raison_inclusion": "Examine les effets de la vitamine C sur la santé de la peau et la réparation tissulaire."
+    },
+    {
+      "id": 3,
+      "titre": "Differential Effects of Vitamin C from Fruit and Vegetables Versus Supplements on the Risk of Frailty",
+      "annee": "2023",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41470821/",
+      "pmid": "41470821",
+      "raison_inclusion": "Analyse des sources de vitamine C et leur impact sur la santé globale."
+    },
+    {
+      "id": 4,
+      "titre": "Innovative Therapeutic Strategies for Chronic Ulcer Healing",
+      "annee": "2023",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41479107/",
+      "pmid": "41479107",
+      "raison_inclusion": "Étude sur l'utilisation de l'acide ascorbique dans la cicatrisation des plaies."
+    },
+    {
+      "id": 5,
+      "titre": "High-Dose Ascorbic Acid Combined With Dihydroartemisinin Inhibits Lung Adenocarcinoma Malignancy",
+      "annee": "2023",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41451920/",
+      "pmid": "41451920",
+      "raison_inclusion": "Étude sur les effets de l'acide ascorbique dans le traitement du cancer."
+    },
+    {
+      "id": 6,
+      "titre": "Natural Phytotherapeutics in Dermatology and Cosmetology: Bioactive Potential of Grape Pomace on Human Skin Fibroblasts",
+      "annee": "2023",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41471705/",
+      "pmid": "41471705",
+      "raison_inclusion": "Évaluation des extraits de raisin, incluant la vitamine C, sur la peau."
+    }
+  ],
+  "_meta_topic": "Vitamin C",
+  "zones_visage": [
+    "cou"
+  ],
+  "_meta_stats": {
+    "sources_total": 13,
+    "pubmed_found_total": 35
+  }
+}

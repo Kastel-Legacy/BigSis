@@ -1,28 +1,55 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { LayoutDashboard, Database, Activity } from 'lucide-react';
 
 export default function Header() {
     const navigate = useNavigate();
+    const location = useLocation();
+
     return (
-        <div className="app-header" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-            <svg className="logo-svg" viewBox="0 0 300 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '220px', display: 'block', margin: '0 auto' }}>
-                <defs>
-                    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style={{ stopColor: '#0B7A8F' }} />
-                        <stop offset="100%" style={{ stopColor: '#6B5B73' }} />
-                    </linearGradient>
-                </defs>
-                <rect x="55" y="5" width="50" height="50" rx="10" fill="url(#iconGradient)" />
-                <text x="80" y="40" fontFamily="Arial Black, Arial, sans-serif" fontSize="22" fontWeight="900" fill="white" textAnchor="middle">BS</text>
-                <line x1="62" y1="45" x2="98" y2="15" stroke="#D64F4F" strokeWidth="4" strokeLinecap="round" />
-                <text x="115" y="30" fontFamily="Arial, sans-serif" fontSize="20" fontWeight="700" fill="#0B7A8F" letterSpacing="1">BIG SIS</text>
-                <text x="115" y="48" fontFamily="Arial, sans-serif" fontSize="7" fill="#6B5B73" letterSpacing="1">CUTTING THROUGH THE BS</text>
-            </svg>
-            <nav>
-                <Link to="/" className="nav-item">Diagnostic</Link>
-                <Link to="/pdf" className="nav-item">Lecteur PDF</Link>
-                <a href="#" className="nav-item">Routines</a>
-            </nav>
-        </div>
+        <header className="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-white/10 bg-black/20 backdrop-blur-md">
+            <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+                <div
+                    className="flex items-center gap-4 cursor-pointer group"
+                    onClick={() => navigate('/')}
+                >
+                    <div className="relative w-12 h-12">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500 to-purple-600 rounded-xl opacity-80 blur group-hover:blur-md transition-all duration-300"></div>
+                        <div className="absolute inset-0.5 bg-black/40 rounded-[10px] flex items-center justify-center border border-white/10">
+                            <span className="font-black text-transparent bg-clip-text bg-gradient-to-tr from-cyan-400 to-purple-400 text-lg">BS</span>
+                        </div>
+                    </div>
+                    <div className="flex flex-col">
+                        <h1 className="text-xl font-bold tracking-wider text-white">BIG SIS</h1>
+                        <span className="text-[10px] tracking-[0.2em] text-cyan-400/80 uppercase">Cutting through the BS</span>
+                    </div>
+                </div>
+
+                <nav className="flex items-center gap-2">
+                    <NavLink to="/" icon={<LayoutDashboard size={18} />} label="Diagnostic" active={location.pathname === '/'} />
+                    <NavLink to="/knowledge" icon={<Database size={18} />} label="Knowledge" active={location.pathname === '/knowledge'} />
+                    <NavLink to="/routines" icon={<Activity size={18} />} label="Routines" active={location.pathname === '/routines'} />
+                </nav>
+            </div>
+        </header>
     );
 }
+
+function NavLink({ to, icon, label, active }: { to: string, icon: React.ReactNode, label: string, active: boolean }) {
+    return (
+        <Link
+            to={to}
+            className={`
+                flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 border border-transparent
+                ${active
+                    ? 'bg-white/10 border-white/10 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3)]'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/5'
+                }
+            `}
+        >
+            {icon}
+            <span className="font-medium text-sm">{label}</span>
+        </Link>
+    );
+}
+

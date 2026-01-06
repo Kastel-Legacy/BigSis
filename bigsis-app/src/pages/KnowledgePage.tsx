@@ -6,53 +6,32 @@ import DocumentList from '../components/DocumentList';
 
 const KnowledgePage: React.FC = () => {
     return (
-        <div className="page-container">
+        <div className="min-h-screen bg-transparent pt-24 pb-12 px-6">
             <Header />
-            <main className="content">
-                <h1>🧠 Tableau de Bord "Cerveau"</h1>
-                <p className="description">
-                    Gérez la base de connaissances de Big SIS. Ajoutez des documents PDF ou lancez des recherches PubMed pour enrichir les réponses.
-                </p>
 
-                <div className="dashboard-grid">
-                    <div className="left-col">
+            <main className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="text-center space-y-4 mb-12">
+                    <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-purple-200 drop-shadow-lg">
+                        Brain Dashboard
+                    </h1>
+                    <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+                        Manage Big SIS knowledge base. Ingest PDF documents or launch automated PubMed research agents to enrich the neural network.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    {/* Left Column: Actions */}
+                    <div className="lg:col-span-4 space-y-6 sticky top-24">
                         <PdfUpload />
                         <PubMedTrigger />
                     </div>
-                    <div className="right-col">
+
+                    {/* Right Column: Data */}
+                    <div className="lg:col-span-8 h-full">
                         <DocumentList />
                     </div>
                 </div>
             </main>
-            <style>{`
-                .content {
-                    max-width: 1200px;
-                    margin: 0 auto;
-                    padding: 2rem;
-                }
-                h1 {
-                    font-size: 2.5rem;
-                    margin-bottom: 0.5rem;
-                    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                }
-                .description {
-                    color: #94a3b8;
-                    margin-bottom: 2rem;
-                }
-                .dashboard-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 2rem;
-                    align-items: start;
-                }
-                @media (max-width: 768px) {
-                    .dashboard-grid {
-                        grid-template-columns: 1fr;
-                    }
-                }
-            `}</style>
         </div>
     );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { analyzeWrinkles } from '../api';
+import { ArrowRight, Loader2, User, Smile, Baby, Check } from 'lucide-react';
 
 const WizardForm: React.FC = () => {
     const navigate = useNavigate();
@@ -8,7 +9,7 @@ const WizardForm: React.FC = () => {
     const [formData, setFormData] = useState({
         area: '',
         wrinkle_type: '',
-        age_range: '',
+        age_range: '', // Not currently used in logic but present in state
         pregnancy: false,
     });
     const [loading, setLoading] = useState(false);
@@ -18,7 +19,6 @@ const WizardForm: React.FC = () => {
 
     const handleSubmit = async () => {
         setLoading(true);
-        // Use native browser UUID if available, or fallback
         const sessionId = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).substring(2);
         try {
             const result = await analyzeWrinkles({ session_id: sessionId, ...formData });
@@ -31,59 +31,205 @@ const WizardForm: React.FC = () => {
         }
     };
 
+    const renderProgressBar = () => (
+        <div className="w-full h-1 bg-white/10 rounded-full mb-8 overflow-hidden">
+            <div
+                className="h-full bg-cyan-400 shadow-[0_0_10px_theme(colors.cyan.400)] transition-all duration-500 ease-out"
+                style={{ width: `${(step / 3) * 100}%` }}
+            />
+        </div>
+    );
+
+    const OptionCard = ({ label, selected, onClick, icon: Icon }: any) => (
+        <button
+            onClick={onClick}
+            className={`
+                group relative flex flex-col items-center justify-center p-4 h-24 rounded-xl border transition-all duration-300
+                ${selected
+                    ? 'bg-cyan-500/20 border-cyan-400/50 shadow-[0_0_20px_rgba(34,211,238,0.2)]'
+                    : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
+                }
+            `}
+        >
+            {selected && (
+                <div className="absolute top-2 right-2">
+                    <Check size={16} className="text-cyan-400" />
+                </div>
+            )}
+            {Icon && <Icon className={`mb-2 ${selected ? 'text-cyan-300' : 'text-blue-200/70 group-hover:text-blue-100'}`} size={24} />}
+            <span className={`text-sm font-medium ${selected ? 'text-white' : 'text-blue-100/80 group-hover:text-white'}`}>
+                {label}
+            </span>
+        </button>
+    );
+
     return (
-        <div className="wizard-container">
+        <div className="p-6 md:p-8 min-h-[400px] flex flex-col">
+            {renderProgressBar()}
+
+            {/* Step 1: Area Selection */}
             {step === 1 && (
-                <div className="step-content">
-                    <h2>Quelle zone vous préoccupe ?</h2>
-                    <div className="options-grid">
-                        {['Front', 'Glabelle', 'Pattes d\'oie', 'Sillon Nasogénien'].map((area) => (
-                            <button
-                                key={area}
-                                className={formData.area === area.toLowerCase() ? 'selected' : ''}
-                                onClick={() => setFormData({ ...formData, area: area.toLowerCase() })}
-                            >
-                                {area}
-                            </button>
+                <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-4 duration-500">
+                    <h2 className="text-2xl font-bold text-white mb-2">Quelle zone vous préoccupe ?</h2>
+                    <p className="text-blue-200/60 mb-6 text-sm">Sélectionnez la zone principale à analyser</p>
+
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                        {[
+                            { id: 'front', label: 'Front', icon: User },
+                            { id: 'glabelle', label: 'Glabelle', icon: Smile }, // Using Smile as placeholder for expression lines
+                            { id: 'pattes_oie', label: 'Pattes d\'oie', icon: Smile },
+                            { id: 'sillon_nasogenien', label: 'Sillon Naso.', icon: User }
+                        ].map((opt) => (
+                            <OptionCard
+                                key={opt.id}
+                                label={opt.label}
+                                icon={opt.icon}
+                                selected={formData.area === opt.id}
+                                onClick={() => setFormData({ ...formData, area: opt.id })}
+                            />
                         ))}
                     </div>
-                    <button disabled={!formData.area} onClick={handleNext}>Suivant</button>
+
+                    <div className="mt-auto flex justify-end">
+                        <button
+                            disabled={!formData.area}
+                            onClick={handleNext}
+                            className={`
+                                flex items-center gap-2 px-6 py-2 rounded-full font-medium transition-all
+                                ${formData.area
+                                    ? 'bg-cyan-500 text-black hover:bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3)]'
+                                    : 'bg-white/10 text-white/30 cursor-not-allowed'
+                                }
+                            `}
+                        >
+                            Suivant <ArrowRight size={16} />
+                        </button>
+                    </div>
                 </div>
             )}
 
+            {/* Step 2: Wrinkle Type */}
             {step === 2 && (
-                <div className="step-content">
-                    <h2>Comment décririez-vous ces rides ?</h2>
-                    <div className="options-grid">
-                        <button onClick={() => setFormData({ ...formData, wrinkle_type: 'expression' })}>
-                            Liées aux expressions (apparaissent quand je bouge)
+                <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-4 duration-500">
+                    <h2 className="text-2xl font-bold text-white mb-2">Décrivez vos rides</h2>
+                    <p className="text-blue-200/60 mb-6 text-sm">Comment se manifestent-elles principalement ?</p>
+
+                    <div className="grid grid-cols-1 gap-3 mb-6">
+                        <button
+                            onClick={() => setFormData({ ...formData, wrinkle_type: 'expression' })}
+                            className={`
+                                text-left p-4 rounded-xl border transition-all duration-300
+                                ${formData.wrinkle_type === 'expression'
+                                    ? 'bg-cyan-500/20 border-cyan-400/50 shadow-[0_0_20px_rgba(34,211,238,0.2)]'
+                                    : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
+                                }
+                            `}
+                        >
+                            <div className="flex items-center justify-between mb-1">
+                                <span className="font-medium text-white">Liées aux expressions</span>
+                                {formData.wrinkle_type === 'expression' && <Check size={18} className="text-cyan-400" />}
+                            </div>
+                            <p className="text-xs text-blue-200/60">Apparaissent seulement quand je bouge mon visage (sourire, froncement...)</p>
                         </button>
-                        <button onClick={() => setFormData({ ...formData, wrinkle_type: 'statique' })}>
-                            Marquées au repos (toujours visibles)
+
+                        <button
+                            onClick={() => setFormData({ ...formData, wrinkle_type: 'statique' })}
+                            className={`
+                                text-left p-4 rounded-xl border transition-all duration-300
+                                ${formData.wrinkle_type === 'statique'
+                                    ? 'bg-cyan-500/20 border-cyan-400/50 shadow-[0_0_20px_rgba(34,211,238,0.2)]'
+                                    : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
+                                }
+                            `}
+                        >
+                            <div className="flex items-center justify-between mb-1">
+                                <span className="font-medium text-white">Marquées au repos</span>
+                                {formData.wrinkle_type === 'statique' && <Check size={18} className="text-cyan-400" />}
+                            </div>
+                            <p className="text-xs text-blue-200/60">Toujours visibles, même sans bouger le visage.</p>
                         </button>
                     </div>
-                    <div className="nav-buttons">
-                        <button onClick={handleBack}>Retour</button>
-                        <button disabled={!formData.wrinkle_type} onClick={handleNext}>Suivant</button>
+
+                    <div className="mt-auto flex justify-between">
+                        <button onClick={handleBack} className="text-blue-200/60 hover:text-white transition-colors text-sm px-4">
+                            Retour
+                        </button>
+                        <button
+                            disabled={!formData.wrinkle_type}
+                            onClick={handleNext}
+                            className={`
+                                flex items-center gap-2 px-6 py-2 rounded-full font-medium transition-all
+                                ${formData.wrinkle_type
+                                    ? 'bg-cyan-500 text-black hover:bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3)]'
+                                    : 'bg-white/10 text-white/30 cursor-not-allowed'
+                                }
+                            `}
+                        >
+                            Suivant <ArrowRight size={16} />
+                        </button>
                     </div>
                 </div>
             )}
 
+            {/* Step 3: Specifics */}
             {step === 3 && (
-                <div className="step-content">
-                    <h2>Derniers détails</h2>
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={formData.pregnancy}
-                            onChange={(e) => setFormData({ ...formData, pregnancy: e.target.checked })}
-                        />
-                        Je suis enceinte ou allaitante
-                    </label>
-                    <div className="nav-buttons">
-                        <button onClick={handleBack}>Retour</button>
-                        <button onClick={handleSubmit} disabled={loading}>
-                            {loading ? 'Analyse en cours...' : 'Obtenir mon analyse'}
+                <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-4 duration-500">
+                    <h2 className="text-2xl font-bold text-white mb-2">Derniers détails</h2>
+                    <p className="text-blue-200/60 mb-6 text-sm">Pour sécuriser l'analyse</p>
+
+                    <div className="mb-8">
+                        <label className={`
+                            flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-300
+                            ${formData.pregnancy
+                                ? 'bg-purple-500/20 border-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.2)]'
+                                : 'bg-white/5 border-white/10 hover:bg-white/10'
+                            }
+                        `}>
+                            <div className={`
+                                w-6 h-6 rounded border flex items-center justify-center transition-colors
+                                ${formData.pregnancy ? 'bg-purple-500 border-purple-500' : 'border-white/30'}
+                            `}>
+                                {formData.pregnancy && <Check size={14} className="text-white" />}
+                            </div>
+                            <input
+                                type="checkbox"
+                                className="hidden"
+                                checked={formData.pregnancy}
+                                onChange={(e) => setFormData({ ...formData, pregnancy: e.target.checked })}
+                            />
+                            <div className="flex items-center gap-2">
+                                <Baby size={20} className={formData.pregnancy ? 'text-purple-300' : 'text-blue-200/60'} />
+                                <span className={formData.pregnancy ? 'text-white' : 'text-blue-100/80'}>Je suis enceinte ou allaitante</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div className="mt-auto flex justify-between items-center">
+                        <button onClick={handleBack} className="text-blue-200/60 hover:text-white transition-colors text-sm px-4">
+                            Retour
+                        </button>
+                        <button
+                            onClick={handleSubmit}
+                            disabled={loading}
+                            className={`
+                                flex items-center gap-2 px-8 py-3 rounded-full font-bold transition-all
+                                ${loading
+                                    ? 'bg-blue-600/50 text-white cursor-wait'
+                                    : 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:shadow-[0_0_30px_rgba(34,211,238,0.4)] hover:scale-105'
+                                }
+                            `}
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="animate-spin" size={18} />
+                                    Analyse...
+                                </>
+                            ) : (
+                                <>
+                                    Obtenir mon analyse
+                                    <ArrowRight size={18} />
+                                </>
+                            )}
                         </button>
                     </div>
                 </div>

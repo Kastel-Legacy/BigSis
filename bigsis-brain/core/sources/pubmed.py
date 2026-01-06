@@ -1,7 +1,7 @@
 import requests
 import xml.etree.ElementTree as ET
 from typing import List, Dict
-from src.config import settings
+from core.config import settings
 
 BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 

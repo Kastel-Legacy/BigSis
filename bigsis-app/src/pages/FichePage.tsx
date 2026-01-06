@@ -33,10 +33,13 @@ export default function FichePage() {
     const scores = data.score_global || {};
 
     // Colors
-    const effVal = scores.note_efficacite_sur_10 || "?";
-    const effColor = effVal >= 8 ? 'var(--success-green)' : (effVal >= 5 ? 'var(--peachy-coral)' : 'var(--alert-red)');
-    const secVal = scores.note_securite_sur_10 || "?";
-    const secColor = secVal >= 7 ? 'var(--success-green)' : (secVal >= 5 ? 'var(--peachy-coral)' : 'var(--alert-red)');
+    const effVal = scores.note_efficacite_sur_10 ?? "?";
+    const effNum = typeof effVal === 'number' ? effVal : parseFloat(effVal as string);
+    const effColor = (!isNaN(effNum) && effNum >= 8) ? 'var(--success-green)' : ((!isNaN(effNum) && effNum >= 5) ? 'var(--peachy-coral)' : 'var(--alert-red)');
+
+    const secVal = scores.note_securite_sur_10 ?? "?";
+    const secNum = typeof secVal === 'number' ? secVal : parseFloat(secVal as string);
+    const secColor = (!isNaN(secNum) && secNum >= 7) ? 'var(--success-green)' : ((!isNaN(secNum) && secNum >= 5) ? 'var(--peachy-coral)' : 'var(--alert-red)');
 
     return (
         <div className="container">

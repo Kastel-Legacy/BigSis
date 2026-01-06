@@ -1,50 +1,64 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;900&family=DM+Sans:wght@400;500;700&display=swap');
+@import "tailwindcss";
 
 :root {
-  /* --- TA PALETTE OFFICIELLE --- */
-  --deep-teal: #0B7A8F;
-  --rich-plum: #6B5B73;
-  --alert-red: #D64F4F;
-  --warm-cream: #FBF7F0;
-  --soft-sage: #A8C2AC;
-  --peachy-coral: #F4A882;
-  --success-green: #5AA469;
-  --text-dark: #333333;
-  --white: #FFFFFF;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  font-family: 'DM Sans', sans-serif;
-  background-color: var(--warm-cream);
-  color: var(--text-dark);
   margin: 0;
-  padding: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
   min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
+  background: linear-gradient(135deg, #1a1c2e 0%, #312e81 100%);
+  /* Deep indigo gradient */
+  background-attachment: fixed;
 }
 
 #root {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.container {
-  max-width: 600px;
   width: 100%;
-  margin: 0 auto;
-  padding: 20px;
 }
 
-/* Common Classes */
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Space Grotesk', sans-serif;
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-button {
-  cursor: pointer;
-  transition: transform 0.1s;
+.glass-input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
 }
-button:active {
-  transform: translateY(1px);
+
+.glass-input:focus {
+  outline: none;
+  border-color: rgba(165, 180, 252, 0.5);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.glass-button {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.glass-button:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }

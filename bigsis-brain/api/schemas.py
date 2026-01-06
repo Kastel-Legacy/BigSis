@@ -16,3 +16,10 @@ class AnalyzeResponse(BaseModel):
     questions_for_practitioner: List[str]
     uncertainty_level: str
     evidence_used: Optional[List[dict]] = []
+
+class SocialGenerationRequest(BaseModel):
+    topic: str
+    problem: Optional[str] = None
+
+class SocialGenerationResponse(BaseModel):
+    data: dict # Returns the full JSON structure expected by the viewer
