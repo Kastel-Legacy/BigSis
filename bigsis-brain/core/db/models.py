@@ -96,4 +96,59 @@ class Chunk(Base):
     
     __table_args__ = (UniqueConstraint('document_version_id', 'chunk_no', name='uq_chunk_no'),)
     
+    
     version = relationship("DocumentVersion", back_populates="chunks")
+
+# --- ONTOLOGY / KNOWLEDGE GRAPH (Legacy V1 + V2 Compatible) ---
+
+class FaceArea(Base):
+    __tablename__ = "face_areas"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True)
+    description = Column(Text)
+
+class WrinkleType(Base):
+    __tablename__ = "wrinkle_types"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True)
+    description = Column(Text)
+
+class Procedure(Base):
+    __tablename__ = "procedures"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True)
+    description = Column(Text)
+    recovery_time = Column(String)
+
+class Risk(Base):
+    __tablename__ = "risks"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True)
+    description = Column(Text)
+    severity = Column(String)
+
+class ProcedureIndication(Base):
+    __tablename__ = "procedure_indications"
+    id = Column(Integer, primary_key=True)
+    procedure_id = Column(Integer, ForeignKey("procedures.id"))
+    wrinkle_type_id = Column(Integer, ForeignKey("wrinkle_types.id"))
+    face_area_id = Column(Integer, ForeignKey("face_areas.id"))
+
+class ProcedureContraindication(Base):
+    __tablename__ = "procedure_contraindications"
+    id = Column(Integer, primary_key=True)
+    procedure_id = Column(Integer, ForeignKey("procedures.id"))
+    condition_name = Column(String)
+
+# --- AUDIT / TRACE ---
+
+class DecisionTrace(Base):
+    __tablename__ = "decision_traces"
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String, index=True)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    input_snapshot = Column(JSONB)
+    rules_triggered = Column(JSONB) # Was ARRAY(String), using JSONB for compatibility
+    evidence_used = Column(JSONB) 
+    final_output = Column(JSONB)
+    user_feedback = Column(JSONB, nullable=True)
