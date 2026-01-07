@@ -53,10 +53,25 @@ async def get_knowledge_stats():
         doc_count = await session.scalar(select(func.count()).select_from(Document))
         # Count Procedures
         proc_count = await session.scalar(select(func.count()).select_from(Procedure))
+        # Count Chunks
+        chunk_count = await session.scalar(select(func.count()).select_from(Chunk))
+        
+        # Calculate Mock Radar Data (based on real counts to feel dynamic)
+        # We want 5-6 points for the radar
+        radar_data = [
+            {"subject": "Efficacité", "A": min(95, 40 + doc_count), "fullMark": 100},
+            {"subject": "Sécurité", "A": min(90, 30 + (chunk_count // 20)), "fullMark": 100},
+            {"subject": "Procédures", "A": min(100, 20 + (proc_count * 10)), "fullMark": 100},
+            {"subject": "Rigueur", "A": 85, "fullMark": 100},
+            {"subject": "Dermato", "A": 70, "fullMark": 100},
+            {"subject": "Innovation", "A": 75, "fullMark": 100},
+        ]
         
         return {
             "documents_read": doc_count,
             "procedures_indexed": proc_count,
+            "chunks_indexed": chunk_count,
+            "radar_data": radar_data,
             "status": "Online"
         }
 
