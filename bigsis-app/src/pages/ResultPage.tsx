@@ -1,9 +1,9 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import {
-    ArrowLeft, Download, RefreshCw, Share2,
-    ShieldAlert, AlertTriangle, Stethoscope, FileText, CheckCircle2,
-    Brain, Sparkles, BookOpen, Quote
+    ArrowLeft, Download,
+    ShieldAlert, AlertTriangle,
+    Sparkles, BookOpen, Quote
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import ProcedureList from '../components/ProcedureList';
@@ -12,8 +12,6 @@ const ResultPage: React.FC = () => {
     const { t } = useLanguage();
     const location = useLocation();
     const navigate = useNavigate();
-    const resultRef = useRef<HTMLDivElement>(null);
-
     const { result, mode } = location.state || {};
 
     if (!result) {
@@ -50,12 +48,11 @@ const ResultPage: React.FC = () => {
     }
 
     // Default: Analysis View (Legacy/Deep Dive)
-    const { summary, explanation, uncertainty_level, evidence_used, options_discussed, risks_and_limits, questions_for_practitioner } = result;
-    const uncertaintyColor = {
+    const uncertaintyColor = (level: string) => ({
         'Faible': 'bg-green-500/20 text-green-300 border-green-500/30',
         'Moyenne': 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
         'Haute': 'bg-red-500/20 text-red-300 border-red-500/30',
-    }[result.uncertainty_level] || 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+    }[level] || 'bg-blue-500/20 text-blue-300 border-blue-500/30');
 
     return (
         <div className="min-h-screen p-4 md:p-8 pb-24 max-w-5xl mx-auto animate-in fade-in duration-700">
@@ -70,7 +67,7 @@ const ResultPage: React.FC = () => {
                         {t('result.title')}
                     </h1>
                 </div>
-                <div className={`px - 4 py - 2 rounded - full border backdrop - blur - sm ${uncertaintyColor} flex items - center gap - 2`}>
+                <div className={`px-4 py-2 rounded-full border backdrop-blur-sm ${uncertaintyColor(result.uncertainty_level)} flex items-center gap-2`}>
                     <ShieldAlert size={16} />
                     <span className="text-sm font-medium">{t('result.uncertainty')}: {result.uncertainty_level}</span>
                 </div>
@@ -108,7 +105,7 @@ const ResultPage: React.FC = () => {
                         </h2>
                         {result.evidence_used && result.evidence_used.length > 0 ? (
                             <ul className="space-y-4">
-                                {result.evidence_used.map((ev, i) => (
+                                {result.evidence_used.map((ev: any, i: number) => (
                                     <li key={i} className="bg-black/20 p-4 rounded-xl border border-white/5">
                                         <p className="text-blue-100/90 italic mb-2">"{ev.text.substring(0, 150)}{ev.text.length > 150 ? '...' : ''}"</p>
                                         <div className="flex items-center gap-2 text-xs text-blue-300/60">
@@ -134,7 +131,7 @@ const ResultPage: React.FC = () => {
                             {t('result.options')}
                         </h3>
                         <ul className="space-y-2">
-                            {result.options_discussed.map((opt, i) => (
+                            {result.options_discussed.map((opt: string, i: number) => (
                                 <li key={i} className="flex items-start gap-2 text-sm text-blue-100/80">
                                     <span className="text-green-400/80 mt-1">•</span> {opt}
                                 </li>
@@ -149,7 +146,7 @@ const ResultPage: React.FC = () => {
                             {t('result.risks')}
                         </h3>
                         <ul className="space-y-2">
-                            {result.risks_and_limits.map((r, i) => (
+                            {result.risks_and_limits.map((r: string, i: number) => (
                                 <li key={i} className="flex items-start gap-2 text-sm text-blue-100/80">
                                     <span className="text-red-400/80 mt-1">•</span> {r}
                                 </li>
@@ -161,7 +158,7 @@ const ResultPage: React.FC = () => {
                     <div className="glass-panel p-6 rounded-2xl bg-cyan-900/10">
                         <h3 className="text-lg font-semibold text-white mb-4">{t('result.questions')}</h3>
                         <ul className="space-y-3">
-                            {result.questions_for_practitioner.map((q, i) => (
+                            {result.questions_for_practitioner.map((q: string, i: number) => (
                                 <li key={i} className="flex gap-3 text-sm text-blue-100/90 bg-white/5 p-3 rounded-lg border border-white/5">
                                     <span className="font-bold text-cyan-500/50">{i + 1}</span>
                                     {q}

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Loader2, User, Smile, Baby, Check, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, Loader2, User, Smile, Baby, Check } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 const WizardForm: React.FC = () => {
-    const { t, language } = useLanguage();
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
@@ -46,7 +46,14 @@ const WizardForm: React.FC = () => {
         </div>
     );
 
-    const OptionCard = ({ label, selected, onClick, icon: Icon }: any) => (
+    interface OptionCardProps {
+        label: string;
+        selected: boolean;
+        onClick: () => void;
+        icon?: React.ElementType;
+    }
+
+    const OptionCard = ({ label, selected, onClick, icon: Icon }: OptionCardProps) => (
         <button
             onClick={onClick}
             className={`

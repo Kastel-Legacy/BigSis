@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, BackgroundTasks
+from pydantic import BaseModel
 from core.social.generator import SocialContentGenerator
 from api.schemas import AnalyzeRequest, AnalyzeResponse, SocialGenerationRequest, SocialGenerationResponse
 import shutil

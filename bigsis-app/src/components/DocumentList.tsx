@@ -310,7 +310,7 @@ const DocumentList: React.FC = () => {
                         </div>
                         <div className="p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                             <div className="space-y-4">
-                                {selectedDoc.chunks.map((chunk: any, i: number) => (
+                                {selectedDoc.chunks.map((chunk: { index: number; text: string }, i: number) => (
                                     <div key={i} className="bg-white/5 rounded-xl p-4 border border-white/5 text-gray-300 text-sm leading-relaxed">
                                         <div className="text-xs text-cyan-400 mb-2 font-mono uppercase tracking-wider">Chunk #{chunk.index}</div>
                                         {chunk.text}
