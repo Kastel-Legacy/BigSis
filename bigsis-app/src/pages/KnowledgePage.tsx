@@ -16,7 +16,9 @@ const KnowledgePage: React.FC = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
+                console.log("Fetching stats from:", `${API_URL}/social/stats`);
                 const res = await axios.get(`${API_URL}/social/stats`);
+                console.log("Stats received:", res.data);
                 setStats(res.data);
             } catch (e) {
                 console.error("Failed to fetch stats", e);

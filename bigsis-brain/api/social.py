@@ -2,6 +2,9 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
 from core.social.generator import SocialContentGenerator
+from core.db.database import AsyncSessionLocal
+from core.db.models import Document, Chunk, Procedure
+from sqlalchemy import select, func, or_
 from core.prompts import APP_SYSTEM_PROMPT, DIAGNOSTIC_SYSTEM_PROMPT, RECOMMENDATION_SYSTEM_PROMPT
 
 router = APIRouter()
@@ -44,20 +47,20 @@ async def get_social_history():
 @router.get("/social/stats")
 async def get_knowledge_stats():
     """Returns stats about the Brain's knowledge base."""
-    from core.db.database import AsyncSessionLocal
-    from core.db.models import Document, Chunk, Procedure
-    from sqlalchemy import select, func, or_
-
     async with AsyncSessionLocal() as session:
         # Count Documents
-        doc_count = await session.scalar(select(func.count()).select_from(Document))
-        # Count Procedures
-        proc_count = await session.scalar(select(func.count()).select_from(Procedure))
-        # Count Chunks
-        chunk_count = await session.scalar(select(func.count()).select_from(Chunk))
+        doc_count_res = await session.execute(select(func.count(Document.id)))
+        doc_count = doc_count_res.scalar() or 0
         
-        # Calculate Mock Radar Data (based on real counts to feel dynamic)
-        # We want 5-6 points for the radar
+        # Count Procedures
+        proc_count_res = await session.execute(select(func.count(Procedure.id)))
+        proc_count = proc_count_res.scalar() or 0
+        
+        # Count Chunks
+        chunk_count_res = await session.execute(select(func.count(Chunk.id)))
+        chunk_count = chunk_count_res.scalar() or 0
+        
+        # Calculate Mock Radar Data
         radar_data = [
             {"subject": "Efficacité", "A": min(95, 40 + doc_count), "fullMark": 100},
             {"subject": "Sécurité", "A": min(90, 30 + (chunk_count // 20)), "fullMark": 100},
@@ -72,7 +75,8 @@ async def get_knowledge_stats():
             "procedures_indexed": proc_count,
             "chunks_indexed": chunk_count,
             "radar_data": radar_data,
-            "status": "Online"
+            "status": "Online",
+            "v": "2.1" # Version marker for debug
         }
 
 @router.get("/fiches/{pmid}", response_model=SocialGenerationResponse)
