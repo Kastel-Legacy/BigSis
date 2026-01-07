@@ -113,6 +113,8 @@ class SocialContentGenerator:
         # Step 4: Specialized Scouts (Scraping FDA, Trials, etc.)
         # We only do this for FICHE mode to keep it rich
         specialized_context = ""
+        is_recommendation = (system_prompt == RECOMMENDATION_SYSTEM_PROMPT or "[RECOMMENDATION]" in topic)
+        
         if not is_recommendation:
             print(f"[SocialAgent] 🔍 Gathering specialized context for: {topic}")
             try:
@@ -132,7 +134,6 @@ class SocialContentGenerator:
                 print(f"Warn: Specialized scouts failed: {e}")
 
         # Step 5: Determine Template & System Prompt
-        is_recommendation = (system_prompt == RECOMMENDATION_SYSTEM_PROMPT or "[RECOMMENDATION]" in topic)
         is_social = "[SOCIAL]" in topic
         
         if is_recommendation:

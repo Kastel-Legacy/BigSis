@@ -40,12 +40,38 @@ Structure attendue :
     "mode_application": "Injection/Topique/etc",
     "zone_anatomique": "Cible"
   },
+  "meta": {
+    "zones_concernees": ["Visage", "Cou", "etc"],
+    "categories": ["Injectable", "Skinboosters"]
+  },
   "score_global": {
     "note_efficacite_sur_10": 0,
     "explication_efficacite_bref": "...",
     "note_securite_sur_10": 0,
     "explication_securite_bref": "...",
     "verdict_final": "..."
+  },
+  "synthese_efficacite": {
+    "ce_que_ca_fait_vraiment": "...",
+    "delai_resultat": "...",
+    "duree_resultat": "..."
+  },
+  "synthese_securite": {
+    "le_risque_qui_fait_peur": "...",
+    "risques_courants": ["Rougeur", "Gonflement"]
+  },
+  "recuperation_sociale": {
+    "verdict_immediat": "Gonflé pendant 2h",
+    "downtime_visage_nu": "Aucun / 2 jours",
+    "zoom_ready": "Immédiat / 12h",
+    "date_ready": "24h / 1 semaine",
+    "les_interdits_sociaux": ["Pas de sport 24h", "Pas d'alcool"]
+  },
+  "le_conseil_bigsis": "Phrase courte d'avis tranché.",
+  "statistiques_consolidees": {
+    "niveau_de_preuve_global": "Elevé/Moyen/Faible",
+    "nombre_patients_total": "milliers / centaines",
+    "nombre_etudes_pertinentes_retenues": 12
   },
   "annexe_sources_retenues": [
     {"id": 1, "titre": "...", "annee": "...", "url": "...", "pmid": "...", "raison_inclusion": "..."}
