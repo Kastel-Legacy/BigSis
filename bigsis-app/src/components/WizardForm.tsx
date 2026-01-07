@@ -4,7 +4,7 @@ import { ArrowRight, Loader2, User, Smile, Baby, Check } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+import { API_URL } from '../api';
 
 const WizardForm: React.FC = () => {
     const { t } = useLanguage();

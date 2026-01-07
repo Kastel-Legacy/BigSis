@@ -7,7 +7,7 @@ import KnowledgeRadar from '../components/KnowledgeRadar';
 import axios from 'axios';
 import { BookOpen, BrainCircuit, List, X, ShieldCheck } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+import { API_URL } from '../api';
 
 const KnowledgePage: React.FC = () => {
     const [stats, setStats] = useState<any>(null);

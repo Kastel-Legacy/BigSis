@@ -4,7 +4,7 @@ import { Sparkles, BrainCircuit, FileText, History, BookOpen } from 'lucide-reac
 import axios from 'axios';
 import FicheVeriteViewer from '../components/social/FicheVeriteViewer';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+import { API_URL } from '../api';
 
 const StudioPage: React.FC = () => {
     const [topic, setTopic] = useState('');

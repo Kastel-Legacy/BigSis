@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import { Scan, Text, Camera, AlertOctagon, Check, Info } from 'lucide-react';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+import { API_URL } from '../api';
 
 interface ScanResult {
     verdict_category: string;
