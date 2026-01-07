@@ -18,6 +18,10 @@ class AnalyzeResponse(BaseModel):
     uncertainty_level: str
     evidence_used: Optional[List[dict]] = []
 
+class GenerateRequest(BaseModel):
+    topic: str
+    mode: str = "social" # social, diagnostic, recommendation
+
 class SocialGenerationRequest(BaseModel):
     topic: str
     problem: Optional[str] = None
@@ -53,7 +57,7 @@ class FicheMaster(BaseModel):
     annexe_sources_retenues: List[FICHE_SOURCE]
 
 class SocialGenerationResponse(BaseModel):
-    data: FicheMaster
+    data: Any
 
 class IngredientBase(BaseModel):
     name: str
@@ -75,7 +79,7 @@ class IngredientRead(IngredientBase):
     created_at: Any
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- SCANNER SCHEMAS ---
 
@@ -92,7 +96,7 @@ class EvidenceClaimRead(EvidenceClaimBase):
     id: UUID
     ingredient_id: UUID
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ProductBase(BaseModel):
     ean: Optional[str] = None
@@ -108,7 +112,7 @@ class ProductRead(ProductBase):
     id: UUID
     created_at: Any
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserProductBase(BaseModel):
     product_id: UUID
@@ -118,4 +122,4 @@ class UserProductRead(UserProductBase):
     id: UUID
     date_added: Any
     class Config:
-        orm_mode = True
+        from_attributes = True
