@@ -43,7 +43,8 @@ const StudioPage: React.FC = () => {
 
         try {
             const res = await axios.post(`${API_URL}/social/generate`, { topic: targetTopic });
-            setFicheData(res.data);
+            // API returns { data: { ... } }
+            setFicheData(res.data.data);
             fetchDashboard();
         } catch (err: any) {
             console.error(err);

@@ -84,7 +84,7 @@ export interface FicheData {
 
 export const getFiche = async (pmid: string): Promise<FicheData> => {
   const response = await axios.get(`${API_URL}/fiches/${pmid}`);
-  return response.data;
+  return response.data.data;
 };
 
 export const getDocument = async (id: string): Promise<any> => {
