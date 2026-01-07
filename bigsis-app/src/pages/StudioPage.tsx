@@ -96,6 +96,8 @@ const StudioPage: React.FC = () => {
                     </div>
                     <input
                         type="text"
+                        id="studio-topic-input"
+                        name="topic"
                         value={topic}
                         onChange={(e) => setTopic(e.target.value)}
                         placeholder="Sujet à analyser (ex: Morpheus8, Rétinol...)"

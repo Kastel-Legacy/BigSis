@@ -53,6 +53,8 @@ const PubMedTrigger: React.FC = () => {
                 <div className="relative">
                     <input
                         type="text"
+                        id="pubmed-query-input"
+                        name="pubmed_query"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         placeholder="e.g. 'botox glabella safety'"

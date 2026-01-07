@@ -204,6 +204,8 @@ const WizardForm: React.FC = () => {
                             </div>
                             <input
                                 type="checkbox"
+                                id="pregnancy-checkbox"
+                                name="pregnancy"
                                 className="hidden"
                                 checked={formData.pregnancy}
                                 onChange={(e) => setFormData({ ...formData, pregnancy: e.target.checked })}

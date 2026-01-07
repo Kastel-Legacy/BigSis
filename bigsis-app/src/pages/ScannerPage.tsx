@@ -87,6 +87,8 @@ const ScannerPage: React.FC = () => {
                 {mode === 'text' ? (
                     <div className="bg-[#0B1221] border border-white/10 rounded-2xl p-4 space-y-4">
                         <textarea
+                            id="inci-list-input"
+                            name="inci_text"
                             className="w-full h-32 bg-black/30 border border-white/10 rounded-xl p-3 text-sm text-gray-300 focus:outline-none focus:border-cyan-500/50 transition-colors"
                             placeholder="Collez la liste des ingrédients ici (Ex: Aqua, Retinol, Glycerin...)"
                             value={inciText}
