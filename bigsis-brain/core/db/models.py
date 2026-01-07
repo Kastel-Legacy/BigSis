@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean, Float, UniqueConstraint, func
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.dialects.postgresql import UUID, JSONB, ARRAY
 from sqlalchemy.orm import relationship, declarative_base
 from pgvector.sqlalchemy import Vector
 import uuid
@@ -113,32 +113,33 @@ class WrinkleType(Base):
     name = Column(String, unique=True)
     description = Column(Text)
 
+# --- PROCEDURES (V2 Knowledge Base) ---
+
 class Procedure(Base):
     __tablename__ = "procedures"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String, unique=True, index=True, nullable=False)
     description = Column(Text)
-    recovery_time = Column(String)
+    
+    # Clinical Details
+    downtime = Column(String) # e.g. "2-3 jours", "Aucun"
+    price_range = Column(String) # e.g. "300-500€"
+    duration = Column(String) # e.g. "30 min"
+    pain_level = Column(String) # e.g. "Faible"
+    
+    # Classification
+    category = Column(String) # e.g. "Injectable", "Laser", "Chirurgie"
+    tags = Column(ARRAY(String)) # e.g. ["Eclat", "Volume", "Rides"]
+    
+    # RAG
+    embedding = Column(Vector(1536))
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-class Risk(Base):
-    __tablename__ = "risks"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True)
-    description = Column(Text)
-    severity = Column(String)
+# (Legacy tables removed or commented out if unused, relying on Tags/Vector for matching now)
+# If we need structured relations later, we can add them back. 
 
-class ProcedureIndication(Base):
-    __tablename__ = "procedure_indications"
-    id = Column(Integer, primary_key=True)
-    procedure_id = Column(Integer, ForeignKey("procedures.id"))
-    wrinkle_type_id = Column(Integer, ForeignKey("wrinkle_types.id"))
-    face_area_id = Column(Integer, ForeignKey("face_areas.id"))
-
-class ProcedureContraindication(Base):
-    __tablename__ = "procedure_contraindications"
-    id = Column(Integer, primary_key=True)
-    procedure_id = Column(Integer, ForeignKey("procedures.id"))
-    condition_name = Column(String)
 
 # --- AUDIT / TRACE ---
 

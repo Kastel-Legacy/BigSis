@@ -9,70 +9,54 @@ interface Props {
 
 export default function StudyCard({ study, onAnalyze, isAnalyzing }: Props) {
     return (
-        <div style={{
-            background: 'white',
-            borderRadius: '16px',
-            padding: '20px',
-            marginBottom: '15px',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
-            border: '1px solid #E0E0E0'
-        }}>
-            <h3 style={{
-                margin: '0 0 10px 0',
-                fontSize: '16px',
-                color: 'var(--deep-teal)',
-                lineHeight: '1.4'
-            }}>
+        <div className="glass-panel p-6 mb-4 hover:bg-white/5 transition-all group relative overflow-hidden">
+            <h3 className="text-lg font-bold text-white mb-2 leading-tight">
                 {study.titre}
             </h3>
 
-            <div style={{ display: 'flex', gap: '15px', fontSize: '12px', color: '#666', marginBottom: '15px' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Calendar size={12} /> {study.annee}
+            <div className="flex gap-4 text-xs text-blue-200/50 mb-4 items-center">
+                <span className="flex items-center gap-1.5">
+                    <Calendar size={14} className="text-cyan-400/60" /> {study.annee}
                 </span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <FileText size={12} /> PMID: {study.pmid}
+                <span className="flex items-center gap-1.5 border-l border-white/10 pl-4">
+                    <FileText size={14} className="text-cyan-400/60" /> PMID: {study.pmid}
                 </span>
             </div>
 
-            <p style={{ fontSize: '13px', color: '#444', lineHeight: '1.5', marginBottom: '15px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            <p className="text-sm text-blue-100/80 leading-relaxed mb-6 line-clamp-3">
                 {study.resume}
             </p>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div className="flex gap-3">
                 <button
                     onClick={() => onAnalyze(study)}
                     disabled={isAnalyzing}
-                    style={{
-                        flex: 1,
-                        background: 'linear-gradient(135deg, var(--deep-teal), var(--rich-plum))',
-                        color: 'white',
-                        border: 'none',
-                        padding: '10px',
-                        borderRadius: '8px',
-                        fontWeight: 700,
-                        fontSize: '13px',
-                        opacity: isAnalyzing ? 0.7 : 1
-                    }}
+                    className={`
+                        flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all
+                        ${isAnalyzing
+                            ? 'bg-white/10 text-white/40 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-900/20 active:scale-[0.98]'
+                        }
+                    `}
                 >
-                    {isAnalyzing ? 'Analyse en cours...' : 'Générer Fiche BigSIS ✨'}
+                    {isAnalyzing ? (
+                        <span className="flex items-center justify-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                            Analyse...
+                        </span>
+                    ) : (
+                        'Générer Fiche BigSIS ✨'
+                    )}
                 </button>
 
                 <a
                     href={study.lien}
                     target="_blank"
                     rel="noreferrer"
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '40px',
-                        background: '#F5F5F5',
-                        borderRadius: '8px',
-                        color: '#666'
-                    }}
+                    className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                    title="Voir sur PubMed"
                 >
-                    <ExternalLink size={16} />
+                    <ExternalLink size={20} />
                 </a>
             </div>
         </div>

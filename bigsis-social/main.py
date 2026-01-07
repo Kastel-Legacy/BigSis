@@ -4,7 +4,7 @@ import argparse
 import requests
 import re
 
-API_URL = "http://localhost:8000/api/v1/generate/social"
+API_URL = "http://localhost:8000/api/v1/social/generate"
 
 def main():
     parser = argparse.ArgumentParser()

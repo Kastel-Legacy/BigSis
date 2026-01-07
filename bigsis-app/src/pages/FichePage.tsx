@@ -1,191 +1,250 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Sparkles, Brain, ShieldCheck, Info, MessageSquare, Quote, BookOpen } from 'lucide-react';
 import { getFiche } from '../api';
 import type { FicheData } from '../api';
 import Header from '../components/Header';
 
 export default function FichePage() {
     const { pmid } = useParams();
+    const navigate = useNavigate();
     const [data, setData] = useState<FicheData | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (!pmid) return;
+        setLoading(true);
+        setError(null);
         getFiche(pmid)
-            .then(setData)
-            .catch((e) => alert("Erreur chargement fiche: " + e))
+            .then((res) => {
+                if (res && (res.nom_commercial_courant || res.nom_scientifique || res.titre_officiel)) {
+                    setData(res);
+                } else {
+                    setError("Le format de la fiche reçue est invalide.");
+                }
+            })
+            .catch((e) => setError("Erreur chargement fiche: " + e))
             .finally(() => setLoading(false));
     }, [pmid]);
 
-    if (loading) return <div className="container" style={{ textAlign: 'center', marginTop: '50px' }}>Chargement de la fiche...</div>;
-    if (!data) return <div className="container">Fiche introuvable.</div>;
+    if (loading) return (
+        <div className="min-h-screen bg-black text-white flex items-center justify-center">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+                <p className="text-blue-200/60 transition-pulse">Génération de votre fiche experte en cours...</p>
+            </div>
+        </div>
+    );
 
-    // Extraction logic similar to viewer.html
-    const mainTitle = data.nom_commercial_courant || data.titre_officiel || "Titre";
+    if (error) return (
+        <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
+            <div className="max-w-md w-full glass-panel p-8 rounded-2xl border border-red-500/30 text-center">
+                <div className="text-red-400 mb-4 text-4xl">⚠️</div>
+                <h2 className="text-xl font-bold mb-2">Oups !</h2>
+                <p className="text-blue-100/60 mb-6">{error}</p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all"
+                >
+                    Réessayer
+                </button>
+            </div>
+        </div>
+    );
+
+    if (!data) return <div className="container p-10 text-white">Fiche introuvable.</div>;
+
+    const mainTitle = data.nom_commercial_courant || data.titre_officiel || "Procédure";
     const subTitle = data.nom_scientifique || "";
     const ci = data.carte_identite || {};
     const eff = data.synthese_efficacite || {};
-
     const meta = data.meta || { zones_concernees: [] };
     const stats = data.statistiques_consolidees || {};
     const sources = data.annexe_sources_retenues || [];
     const swap = data.alternative_bigsis || null;
     const scores = data.score_global || {};
 
-    // Colors
     const effVal = scores.note_efficacite_sur_10 ?? "?";
-    const effNum = typeof effVal === 'number' ? effVal : parseFloat(effVal as string);
-    const effColor = (!isNaN(effNum) && effNum >= 8) ? 'var(--success-green)' : ((!isNaN(effNum) && effNum >= 5) ? 'var(--peachy-coral)' : 'var(--alert-red)');
+    const effColor = (Number(effVal) >= 8) ? 'text-green-400' : (Number(effVal) >= 5 ? 'text-yellow-400' : 'text-red-400');
 
     const secVal = scores.note_securite_sur_10 ?? "?";
-    const secNum = typeof secVal === 'number' ? secVal : parseFloat(secVal as string);
-    const secColor = (!isNaN(secNum) && secNum >= 7) ? 'var(--success-green)' : ((!isNaN(secNum) && secNum >= 5) ? 'var(--peachy-coral)' : 'var(--alert-red)');
+    const secColor = (Number(secVal) >= 7) ? 'text-green-400' : (Number(secVal) >= 5 ? 'text-yellow-400' : 'text-red-400');
 
     return (
-        <div className="container">
+        <div className="min-h-screen bg-black text-white pb-20 pt-24 font-sans">
             <Header />
 
-            <div className="master-card" style={{
-                background: 'white',
-                borderRadius: '24px',
-                boxShadow: '0 10px 30px rgba(107, 91, 115, 0.1)',
-                overflow: 'hidden',
-                marginBottom: '30px'
-            }}>
-                {/* HEADER */}
-                <div style={{
-                    background: 'linear-gradient(135deg, var(--deep-teal) 0%, var(--rich-plum) 100%)',
-                    padding: '30px 25px 25px 25px',
-                    color: 'white'
-                }}>
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
-                        {meta.zones_concernees?.map((z: string, i: number) => (
-                            <span key={i} style={{
-                                background: 'rgba(255,255,255,0.15)',
-                                fontSize: '10px', padding: '5px 12px', borderRadius: '20px',
-                                fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px',
-                                border: '1px solid rgba(255,255,255,0.2)'
-                            }}>{z}</span>
-                        ))}
-                    </div>
+            <div className="max-w-4xl mx-auto px-4">
+                {/* Back Button */}
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center gap-2 text-white/40 hover:text-white mb-6 transition-colors group"
+                >
+                    <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                    <span>Retour</span>
+                </button>
 
-                    <h1 style={{ margin: '0 0 5px 0', fontSize: '32px', letterSpacing: '-0.5px', lineHeight: '1.1' }}>
-                        {mainTitle}
-                    </h1>
-                    {subTitle && <span style={{ fontSize: '13px', opacity: 0.8, fontWeight: 400, marginBottom: '15px', display: 'block', fontStyle: 'italic' }}>({subTitle})</span>}
+                {/* Main Content Card */}
+                <div className="glass-panel rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
 
-                    {ci.ce_que_c_est && (
-                        <div style={{
-                            background: 'rgba(255,255,255,0.1)',
-                            padding: '15px',
-                            borderRadius: '16px',
-                            backdropFilter: 'blur(5px)',
-                            border: '1px solid rgba(255,255,255,0.2)',
-                            marginBottom: '30px'
-                        }}>
-                            <div style={{ display: 'flex', marginBottom: '8px', fontSize: '13px', lineHeight: '1.4', color: 'white' }}>
-                                <div style={{ marginRight: '10px', fontSize: '14px', marginTop: '2px' }}>💡</div>
-                                <div style={{ opacity: 0.95 }}>
-                                    <span style={{ fontWeight: 700, opacity: 0.7, fontSize: '9px', textTransform: 'uppercase', display: 'block', marginBottom: '3px', letterSpacing: '1px' }}>C'est quoi ?</span>
-                                    {ci.ce_que_c_est}
-                                </div>
-                            </div>
-                            <div style={{ display: 'flex', fontSize: '13px', lineHeight: '1.4', color: 'white' }}>
-                                <div style={{ marginRight: '10px', fontSize: '14px', marginTop: '2px' }}>⚙️</div>
-                                <div style={{ opacity: 0.95 }}>
-                                    <span style={{ fontWeight: 700, opacity: 0.7, fontSize: '9px', textTransform: 'uppercase', display: 'block', marginBottom: '3px', letterSpacing: '1px' }}>Mécanisme</span>
-                                    {ci.comment_ca_marche}
-                                </div>
-                            </div>
+                    {/* Header Section */}
+                    <div className="bg-gradient-to-br from-[#0D3B4C] to-[#4B1D3F] p-8 md:p-10 border-b border-white/10">
+                        <div className="flex flex-wrap gap-2 mb-6">
+                            {meta.zones_concernees?.map((z: string, i: number) => (
+                                <span key={i} className="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] uppercase font-bold tracking-widest text-cyan-300">
+                                    {z}
+                                </span>
+                            ))}
                         </div>
-                    )}
 
-                    <div style={{ display: 'flex', gap: '15px', marginBottom: '-55px', position: 'relative', zIndex: 10, padding: '0 5px' }}>
-                        <div className="score-box" style={{ flex: 1, background: 'white', padding: '15px', borderRadius: '16px', textAlign: 'center', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
-                            <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '32px', fontWeight: 700, display: 'block', lineHeight: 1, marginBottom: '5px', color: effColor }}>{effVal}</span>
-                            <span style={{ fontSize: '10px', textTransform: 'uppercase', color: '#888', fontWeight: 700, display: 'block', letterSpacing: '0.5px' }}>Efficacité</span>
-                            <div style={{ fontSize: '9px', color: effColor, fontWeight: 700, marginTop: '5px', lineHeight: '1.2' }}>{scores.explication_efficacite_bref}</div>
-                        </div>
-                        <div className="score-box" style={{ flex: 1, background: 'white', padding: '15px', borderRadius: '16px', textAlign: 'center', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }}>
-                            <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '32px', fontWeight: 700, display: 'block', lineHeight: 1, marginBottom: '5px', color: secColor }}>{secVal}</span>
-                            <span style={{ fontSize: '10px', textTransform: 'uppercase', color: '#888', fontWeight: 700, display: 'block', letterSpacing: '0.5px' }}>Sécurité</span>
-                            <div style={{ fontSize: '9px', color: secColor, fontWeight: 700, marginTop: '5px', lineHeight: '1.2' }}>{scores.explication_securite_bref}</div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* BODY */}
-                <div style={{ padding: '70px 25px 30px 25px' }}>
-                    {swap && (
-                        <div style={{
-                            background: 'linear-gradient(135deg, #FFF8F0 0%, #FFFFFF 100%)',
-                            border: '2px dashed var(--peachy-coral)',
-                            borderRadius: '16px',
-                            padding: '20px',
-                            marginBottom: '30px',
-                            position: 'relative'
-                        }}>
-                            <div style={{
-                                position: 'absolute', top: '-10px', left: '20px',
-                                background: 'var(--peachy-coral)', color: 'white',
-                                fontSize: '9px', fontWeight: 800, textTransform: 'uppercase',
-                                padding: '4px 10px', borderRadius: '12px', letterSpacing: '1px'
-                            }}>Le Conseil Sœur ✨</div>
-                            <div style={{ color: 'var(--rich-plum)', fontFamily: 'Space Grotesk, sans-serif', fontSize: '16px', fontWeight: 700, margin: '5px 0 8px 0' }}>
-                                <span>🔄</span> {swap.titre}
-                            </div>
-                            <p style={{ fontSize: '13px', color: '#555', lineHeight: '1.5', margin: 0 }}>
-                                <strong>Pourquoi ?</strong> {swap.pourquoi_c_est_mieux}
+                        <h1 className="text-4xl md:text-5xl font-black mb-2 tracking-tight">
+                            {mainTitle}
+                        </h1>
+                        {subTitle && (
+                            <p className="text-lg text-white/60 italic font-light mb-8">
+                                ({subTitle})
                             </p>
+                        )}
+
+                        {/* Concept & Mechanism */}
+                        {(ci.ce_que_c_est || ci.comment_ca_marche) && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-black/30 p-6 rounded-2xl backdrop-blur-sm border border-white/5 mb-8">
+                                {ci.ce_que_c_est && (
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2 text-cyan-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+                                            <Info size={14} /> <span>Le Concept</span>
+                                        </div>
+                                        <p className="text-sm text-blue-100/90 leading-relaxed font-medium">
+                                            {ci.ce_que_c_est}
+                                        </p>
+                                    </div>
+                                )}
+                                {ci.comment_ca_marche && (
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2 text-purple-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+                                            <Brain size={14} /> <span>Mécanisme</span>
+                                        </div>
+                                        <p className="text-sm text-blue-100/90 leading-relaxed font-light">
+                                            {ci.comment_ca_marche}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Scores Section */}
+                        <div className="flex gap-4 relative z-10 mt-8">
+                            <div className="flex-1 bg-white/10 backdrop-blur-xl p-5 md:p-6 rounded-2xl border border-white/20 shadow-xl text-center">
+                                <span className={`text-4xl md:text-5xl font-black block leading-none mb-1 ${effColor}`}>
+                                    {effVal}
+                                </span>
+                                <span className="text-[10px] md:text-[11px] uppercase font-bold text-white/40 tracking-widest block">Efficacité</span>
+                                <p className="text-[10px] mt-2 text-blue-100/60 leading-tight italic">
+                                    {scores.explication_efficacite_bref}
+                                </p>
+                            </div>
+                            <div className="flex-1 bg-white/10 backdrop-blur-xl p-5 md:p-6 rounded-2xl border border-white/20 shadow-xl text-center">
+                                <span className={`text-4xl md:text-5xl font-black block leading-none mb-1 ${secColor}`}>
+                                    {secVal}
+                                </span>
+                                <span className="text-[10px] md:text-[11px] uppercase font-bold text-white/40 tracking-widest block">Sécurité</span>
+                                <p className="text-[10px] mt-2 text-blue-100/60 leading-tight italic">
+                                    {scores.explication_securite_bref}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Body Content */}
+                    <div className="p-8 md:p-12 space-y-12">
+
+                        {/* Alternative / Swap */}
+                        {swap && (
+                            <div className="bg-gradient-to-r from-pink-500/10 to-transparent border-l-4 border-pink-500 rounded-r-2xl p-6 relative">
+                                <div className="absolute -top-3 left-4 bg-pink-500 text-[9px] font-black uppercase px-2 py-1 rounded-md text-white tracking-widest">
+                                    Le Conseil Sœur ✨
+                                </div>
+                                <h4 className="text-lg font-bold text-pink-300 mb-2 flex items-center gap-2">
+                                    <Sparkles size={18} /> {swap.titre}
+                                </h4>
+                                <p className="text-sm text-blue-100/80 leading-relaxed">
+                                    <span className="font-bold text-pink-200/50">Pourquoi ?</span> {swap.pourquoi_c_est_mieux}
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Promise Section */}
+                        <section>
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-1.5 h-6 bg-cyan-400 rounded-full" />
+                                <h3 className="text-xl font-bold uppercase tracking-tight text-white/90">La Promesse</h3>
+                            </div>
+                            <p className="text-lg text-blue-100/90 leading-loose font-light italic mb-8 border-l-2 border-white/5 pl-6">
+                                "{eff.ce_que_ca_fait_vraiment || "Données non disponibles"}"
+                            </p>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-white/5 rounded-xl p-5 border border-white/5 hover:bg-white/10 transition-colors text-center">
+                                    <span className="text-cyan-400 font-bold block text-lg mb-1">{eff.delai_resultat || "?"}</span>
+                                    <span className="text-[9px] uppercase font-bold text-white/30 tracking-widest">Premiers effets</span>
+                                </div>
+                                <div className="bg-white/5 rounded-xl p-5 border border-white/5 hover:bg-white/10 transition-colors text-center">
+                                    <span className="text-purple-400 font-bold block text-lg mb-1">{eff.duree_resultat || "?"}</span>
+                                    <span className="text-[9px] uppercase font-bold text-white/30 tracking-widest">Durée totale</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Quote Section */}
+                        <div className="relative p-10 bg-black/40 rounded-3xl border border-white/5 overflow-hidden group">
+                            <Quote size={80} className="absolute -top-4 -right-4 text-white/5 group-hover:text-white/10 transition-colors" />
+                            <div className="relative font-serif text-2xl md:text-3xl text-blue-100/80 leading-snug">
+                                "{data.le_conseil_bigsis || ""}"
+                            </div>
+                            <div className="mt-6 flex items-center gap-3">
+                                <div className="w-8 h-[2px] bg-cyan-400/50" />
+                                <span className="text-sm font-black uppercase tracking-widest text-cyan-400/70">Big Sister’s Note</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {/* Sources & Stats Footer */}
+                    {sources.length > 0 && (
+                        <div className="bg-black/60 p-8 md:p-12 border-t border-white/10">
+                            <div className="flex items-center gap-3 mb-8">
+                                <BookOpen size={20} className="text-white/40" />
+                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white/40">Preuves Scientifiques</h3>
+                            </div>
+
+                            <div className="space-y-6">
+                                {sources.map((s: any, idx: number) => (
+                                    <div key={idx} className="group cursor-pointer">
+                                        <div className="flex items-baseline gap-3 mb-1">
+                                            <span className="text-sm font-bold text-cyan-400">{s.annee}</span>
+                                            <span className="text-blue-100/70 group-hover:text-white transition-colors leading-snug">{s.titre}</span>
+                                        </div>
+                                        <a href={s.url} target="_blank" rel="noreferrer" className="text-[10px] font-black text-white/20 hover:text-cyan-400 transition-colors flex items-center gap-1 uppercase tracking-widest">
+                                            Consulter l'étude ↗
+                                        </a>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="mt-12 pt-8 border-t border-white/5 flex flex-wrap justify-between gap-6 text-[11px] font-black uppercase tracking-[0.2em] text-white/30">
+                                <div className="flex items-center gap-2">
+                                    <MessageSquare size={14} className="text-white/10" />
+                                    <span>{stats.nombre_patients_total || "?"} Patients observés</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <ShieldCheck size={14} className="text-white/10" />
+                                    <span>Niveau de preuve : <span className="text-cyan-400/50">{stats.niveau_de_preuve_global || "?"}</span></span>
+                                </div>
+                            </div>
                         </div>
                     )}
 
-                    <h3 style={{
-                        fontFamily: 'Space Grotesk, sans-serif', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1.5px',
-                        color: 'var(--deep-teal)', margin: '35px 0 15px 0', borderBottom: '2px solid var(--soft-sage)', paddingBottom: '8px'
-                    }}>🚀 La Promesse</h3>
-
-                    <p style={{ fontSize: '15px', lineHeight: '1.7', color: 'var(--text-dark)' }}>
-                        {eff.ce_que_ca_fait_vraiment || "Données non disponibles"}
-                    </p>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '20px' }}>
-                        <div style={{ background: '#F0F7F4', padding: '15px', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--soft-sage)' }}>
-                            <span style={{ display: 'block', fontWeight: 700, color: 'var(--deep-teal)', fontSize: '14px', lineHeight: '1.4', marginBottom: '4px' }}>{eff.delai_resultat || "?"}</span>
-                            <span style={{ fontSize: '9px', color: 'var(--rich-plum)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>Premiers effets</span>
-                        </div>
-                        <div style={{ background: '#F0F7F4', padding: '15px', borderRadius: '12px', textAlign: 'center', border: '1px solid var(--soft-sage)' }}>
-                            <span style={{ display: 'block', fontWeight: 700, color: 'var(--deep-teal)', fontSize: '14px', lineHeight: '1.4', marginBottom: '4px' }}>{eff.duree_resultat || "?"}</span>
-                            <span style={{ fontSize: '9px', color: 'var(--rich-plum)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>Durée totale</span>
-                        </div>
-                    </div>
-
-                    <div className="advice" style={{
-                        background: '#FFF8F3', borderRadius: '16px', padding: '25px', marginTop: '40px', position: 'relative', borderLeft: '4px solid var(--peachy-coral)'
-                    }}>
-                        <div style={{ position: 'absolute', top: '-15px', left: '20px', background: 'var(--peachy-coral)', color: 'white', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', fontSize: '16px', boxShadow: '0 4px 8px rgba(244, 168, 130, 0.4)' }}>💬</div>
-                        <p style={{ margin: 0, fontSize: '15px', color: 'var(--rich-plum)', lineHeight: '1.6', fontStyle: 'italic', fontWeight: 500 }}>
-                            "{data.le_conseil_bigsis || ""}"
-                        </p>
-                        <span style={{ display: 'block', textAlign: 'right', fontSize: '12px', fontWeight: 700, color: '#999', marginTop: '10px' }}>— Big Sis</span>
-                    </div>
-                </div>
-
-                {/* SOURCES */}
-                <div style={{ background: '#F5F5F5', padding: '30px 25px', color: '#666', fontSize: '12px', borderTop: '1px solid #EEE' }}>
-                    <div style={{ textTransform: 'uppercase', fontWeight: 800, marginBottom: '15px', color: 'var(--rich-plum)', letterSpacing: '1px', fontSize: '11px' }}>📚 Preuves Scientifiques</div>
-
-                    {sources.map((s: any, idx: number) => (
-                        <div key={idx} style={{ marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid #E0E0E0' }}>
-                            <strong style={{ fontWeight: 700, color: 'var(--rich-plum)' }}>{s.annee}</strong> • {s.titre}<br />
-                            <a href={s.url} target="_blank" rel="noreferrer" style={{ color: 'var(--deep-teal)', textDecoration: 'none', fontWeight: 700, fontSize: '10px', display: 'inline-block', marginTop: '2px' }}>LIRE L'ÉTUDE ↗</a>
-                        </div>
-                    ))}
-
-                    <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '2px dashed #DDD', display: 'flex', justifyContent: 'space-between', color: '#888', fontWeight: 700, fontSize: '11px', textTransform: 'uppercase' }}>
-                        <span>👥 {stats.nombre_patients_total || "?"} Patients</span>
-                        <span>📊 Preuve : {stats.niveau_de_preuve_global || "?"}</span>
-                    </div>
                 </div>
             </div>
         </div>

@@ -26,7 +26,7 @@ export default function Header() {
                 </div>
 
                 <nav className="flex items-center gap-2">
-                    <NavLink to="/" icon={<LayoutDashboard size={18} />} label="Diagnostic" active={location.pathname === '/'} />
+                    <NavLink to="/" icon={<LayoutDashboard size={18} />} label="Diagnostic" active={location.pathname === '/' || location.pathname === '/diagnostic'} />
                     <NavLink to="/scanner" icon={<ScanLine size={18} />} label="Scanner" active={location.pathname === '/scanner'} />
                     <NavLink to="/knowledge" icon={<Database size={18} />} label="Knowledge" active={location.pathname === '/knowledge'} />
                     <NavLink to="/ingredients" icon={<FlaskConical size={18} />} label="Ingredients" active={location.pathname === '/ingredients'} />

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Dict
 
 class AnalyzeRequest(BaseModel):
     session_id: str
@@ -22,8 +22,38 @@ class SocialGenerationRequest(BaseModel):
     topic: str
     problem: Optional[str] = None
 
+class FICHE_SCORE_GLOBAL(BaseModel):
+    note_efficacite_sur_10: float
+    explication_efficacite_bref: str
+    note_securite_sur_10: float
+    explication_securite_bref: str
+    verdict_final: str
+
+class FICHE_SOURCE(BaseModel):
+    id: int
+    titre: str
+    annee: str
+    url: Optional[str] = None
+    pmid: Optional[str] = None
+    raison_inclusion: Optional[str] = None
+
+class FicheMaster(BaseModel):
+    nom_scientifique: str
+    nom_commercial_courant: str
+    titre_social: str
+    carte_identite: Dict[str, str]
+    meta: Dict[str, List[str]]
+    score_global: FICHE_SCORE_GLOBAL
+    alternative_bigsis: Optional[Dict[str, Any]] = None
+    synthese_efficacite: Dict[str, str]
+    synthese_securite: Dict[str, Any]
+    recuperation_sociale: Dict[str, Any]
+    le_conseil_bigsis: str
+    statistiques_consolidees: Dict[str, Any]
+    annexe_sources_retenues: List[FICHE_SOURCE]
+
 class SocialGenerationResponse(BaseModel):
-    data: dict # Returns the full JSON structure expected by the viewer
+    data: FicheMaster
 
 class IngredientBase(BaseModel):
     name: str

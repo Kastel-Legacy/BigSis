@@ -2,88 +2,104 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
 from core.social.generator import SocialContentGenerator
+from core.prompts import APP_SYSTEM_PROMPT, DIAGNOSTIC_SYSTEM_PROMPT, RECOMMENDATION_SYSTEM_PROMPT
 
 router = APIRouter()
+generator = SocialContentGenerator()
 
-class SocialGenRequest(BaseModel):
-    topic: str
-    language: Optional[str] = "fr"
+from api.schemas import GenerateRequest, SocialGenerationResponse
 
-@router.post("/social/generate")
-async def generate_social_content(req: SocialGenRequest):
-    """
-    Generates a 'Fiche Verité' for Instagram based on PubMed evidence.
-    Triggers RAG retrieval and LLM synthesis.
-    """
-    generator = SocialContentGenerator()
+@router.post("/social/generate", response_model=SocialGenerationResponse)
+async def generate_social_content(request: GenerateRequest):
+    """Generates social content, diagnostic advice, or recommendations."""
     try:
-        content = await generator.generate_social_content(req.topic)
-        if "error" in content:
-            raise HTTPException(status_code=500, detail=content["error"])
-        return content
+        # Select Prompt based on Mode
+        if request.mode == "diagnostic":
+            system_prompt = DIAGNOSTIC_SYSTEM_PROMPT
+        elif request.mode == "recommendation":
+            system_prompt = RECOMMENDATION_SYSTEM_PROMPT
+        else:
+            system_prompt = APP_SYSTEM_PROMPT
+        
+        # Prefix topic to differentiate cache between modes (Social vs Reco vs Diag)
+        cache_topic = f"[{request.mode.upper()}] {request.topic}"
+        
+        result = await generator.generate_social_content(cache_topic, system_prompt=system_prompt)
+        
+        if "error" in result:
+             raise HTTPException(status_code=500, detail=result["error"])
+             
+        return {"data": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/social/history")
 async def get_social_history():
-    """Returns recent generated social fiches metadata."""
-    from core.db.database import AsyncSessionLocal
-    from core.db.models import SocialGeneration
-    from sqlalchemy import select
-
-    async with AsyncSessionLocal() as session:
-        stmt = select(SocialGeneration).order_by(SocialGeneration.created_at.desc()).limit(20)
-        result = await session.execute(stmt)
-        gens = result.scalars().all()
-        return [
-            {
-                "id": str(g.id),
-                "topic": g.topic,
-                "created_at": g.created_at,
-                "verdict_brief": g.content.get("score_global", {}).get("verdict_final", "N/A")
-            }
-            for g in gens
-        ]
+    """Returns mock history of generated content."""
+    return [
+        {"id": 1, "topic": "Rides Front", "type": "Diagnostic", "date": "2024-01-20", "status": "Ready"},
+        {"id": 2, "topic": "Acide Hyaluronique", "type": "Social", "date": "2024-01-19", "status": "Published"}
+    ]
 
 @router.get("/social/stats")
 async def get_knowledge_stats():
     """Returns stats about the Brain's knowledge base."""
     from core.db.database import AsyncSessionLocal
-    from core.db.models import Document, Chunk
+    from core.db.models import Document, Chunk, Procedure
     from sqlalchemy import select, func, or_
 
     async with AsyncSessionLocal() as session:
         # Count Documents
         doc_count = await session.scalar(select(func.count()).select_from(Document))
-        # Count Chunks
-        chunk_count = await session.scalar(select(func.count()).select_from(Chunk))
+        # Count Procedures
+        proc_count = await session.scalar(select(func.count()).select_from(Procedure))
         
-        # Radar Data Calculation (BigSIS DNA: Face & Non-Invasive Focus)
-        categories = {
-            "Anti-Âge": ["wrinkle", "ride", "aging", "vieillissement", "nasolabial"],
-            "Injections": ["toxin", "botox", "filler", "acide hyaluronique", "volum"],
-            "Skin Quality": ["glow", "texture", "acne", "pores", "pigment"],
-            "Technologies": ["laser", "radiofrequency", "led", "ultrasound", "device"],
-            "Cosméto-Active": ["retinol", "vitamin", "peptide", "acid", "serum"],
-            "Sécurité": ["risk", "danger", "side effect", "complication", "safety"]
-        }
-        
-        radar_data = []
-        
-        for cat, keywords in categories.items():
-            # semantic search would be better but simple like is fast
-            conditions = [Chunk.text.ilike(f"%{k}%") for k in keywords]
-            count = await session.scalar(select(func.count()).select_from(Chunk).where(or_(*conditions)))
-            
-            # Normalize to 0-100 scale. Assuming 50 chunks mentions is "Mastery" (100) for now.
-            normalization_factor = 2.0 
-            score = min(100, int(count * normalization_factor))
-            
-            radar_data.append({"subject": cat, "A": score, "fullMark": 100})
-
         return {
             "documents_read": doc_count,
-            "chunks_indexed": chunk_count,
-            "knowledge_power_level": "High" if doc_count > 100 else "Growing",
-            "radar_data": radar_data
+            "procedures_indexed": proc_count,
+            "status": "Online"
         }
+
+@router.get("/fiches/{pmid}", response_model=SocialGenerationResponse)
+async def get_fiche(pmid: str):
+    """
+    Get (or generate) a Fiche for the given ID/Name.
+    For MVP, pmid is treated as the Procedure Name / Topic.
+    """
+    # Decoding URL (fastapi does it automatically for path params? mostly yes)
+    topic = pmid
+    # We use SOCIAL mode for the Fiche View
+    cache_topic = f"[SOCIAL] {topic}"
+    
+    # We leave system_prompt=None so the generator defaults to APP_SYSTEM_PROMPT
+    result = await generator.generate_social_content(cache_topic)
+    
+    if "error" in result:
+         raise HTTPException(status_code=500, detail=result["error"])
+         
+    return {"data": result}
+
+class ProcedureCreate(BaseModel):
+    name: str
+    description: str
+    downtime: str
+    price_range: str
+    tags: list[str] = []
+
+@router.post("/knowledge/procedures")
+async def create_procedure(proc: ProcedureCreate):
+    """Adds a new medical procedure to the Knowledge Base."""
+    from core.db.database import AsyncSessionLocal
+    from core.db.models import Procedure
+    
+    async with AsyncSessionLocal() as session:
+        new_proc = Procedure(
+            name=proc.name,
+            description=proc.description,
+            downtime=proc.downtime,
+            price_range=proc.price_range,
+            tags=proc.tags
+        )
+        session.add(new_proc)
+        await session.commit()
+        return {"status": "created", "name": new_proc.name}

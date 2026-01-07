@@ -1,0 +1,10 @@
+
+from .medical_rules import MEDICAL_SOUL_RULES
+from .app_fiches import APP_SYSTEM_PROMPT, APP_USER_PROMPT_TEMPLATE
+from .social_content import SOCIAL_SYSTEM_PROMPT, SOCIAL_USER_PROMPT_TEMPLATE
+from .diagnostics import DIAGNOSTIC_SYSTEM_PROMPT
+from .recommendations import RECOMMENDATION_SYSTEM_PROMPT, RECOMMENDATION_USER_PROMPT_TEMPLATE
+
+# Legacy mapping for reverse compatibility during migration
+FICHE_SYSTEM_PROMPT = APP_SYSTEM_PROMPT
+FICHE_USER_PROMPT_TEMPLATE = APP_USER_PROMPT_TEMPLATE

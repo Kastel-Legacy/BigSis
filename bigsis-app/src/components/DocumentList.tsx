@@ -221,7 +221,7 @@ const DocumentList: React.FC = () => {
                                         <td className="p-4 text-gray-400 text-sm whitespace-nowrap">
                                             <div className="flex items-center gap-2">
                                                 <Calendar size={12} />
-                                                {new Date(doc.created_at).toLocaleDateString()}
+                                                {new Date(doc.created_at).toLocaleDateString()} <span className="text-gray-600 ml-1 text-xs">at {new Date(doc.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                             </div>
                                         </td>
                                         <td className="p-4 text-right whitespace-nowrap">

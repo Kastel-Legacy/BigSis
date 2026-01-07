@@ -13,6 +13,18 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* BigSIS Design Tokens */
+  --deep-teal: #0D3B4C;
+  --rich-plum: #4B1D3F;
+  --accent-cyan: #22D3EE;
+  --success-green: #10B981;
+  --peachy-coral: #FB7185;
+  --alert-red: #EF4444;
+  --card-bg: #FFFFFF;
+  --text-main: #1F2937;
+  --text-muted: #6B7280;
+  --soft-sage: #E2E8F0;
 }
 
 body {

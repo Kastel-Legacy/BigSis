@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { analyzeWrinkles } from '../api';
-import { ArrowRight, Loader2, User, Smile, Baby, Check } from 'lucide-react';
+import { ArrowRight, Loader2, User, Smile, Baby, Check, ShieldCheck, Sparkles } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 const WizardForm: React.FC = () => {
     const { t, language } = useLanguage();
@@ -11,7 +13,6 @@ const WizardForm: React.FC = () => {
     const [formData, setFormData] = useState({
         area: '',
         wrinkle_type: '',
-        age_range: '', // Not currently used in logic but present in state
         pregnancy: false,
     });
     const [loading, setLoading] = useState(false);
@@ -21,10 +22,13 @@ const WizardForm: React.FC = () => {
 
     const handleSubmit = async () => {
         setLoading(true);
-        const sessionId = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).substring(2);
         try {
-            const result = await analyzeWrinkles({ session_id: sessionId, ...formData, language: language });
-            navigate('/result', { state: { result } });
+            // New "Procedures List" Logic
+            const topic = `Diagnostic: ${formData.area} (${formData.wrinkle_type}).`;
+            // We use mode='recommendation' to trigger the List Logic backend side
+            const result = await axios.post(`${API_URL}/social/generate`, { topic, mode: 'recommendation' });
+
+            navigate('/result', { state: { result: result.data, mode: 'list' } });
         } catch (error) {
             console.error("Analysis failed", error);
             alert("Une erreur est survenue. Veuillez réessayer.");
@@ -46,7 +50,7 @@ const WizardForm: React.FC = () => {
         <button
             onClick={onClick}
             className={`
-                group relative flex flex-col items-center justify-center p-4 h-24 rounded-xl border transition-all duration-300
+                group relative flex flex-col items-center justify-center p-4 h-24 rounded-xl border transition-all duration-300 w-full
                 ${selected
                     ? 'bg-cyan-500/20 border-cyan-400/50 shadow-[0_0_20px_rgba(34,211,238,0.2)]'
                     : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
@@ -171,7 +175,7 @@ const WizardForm: React.FC = () => {
                 </div>
             )}
 
-            {/* Step 3: Specifics */}
+            {/* Step 3: Specifics (Pregnancy) - Re-numbered to 3 */}
             {step === 3 && (
                 <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-right-4 duration-500">
                     <h2 className="text-2xl font-bold text-white mb-2">{t('wizard.step3.title')}</h2>

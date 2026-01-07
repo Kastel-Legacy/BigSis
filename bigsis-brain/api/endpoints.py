@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, BackgroundTasks
-from core.orchestrator import Orchestrator
+from core.social.generator import SocialContentGenerator
 from api.schemas import AnalyzeRequest, AnalyzeResponse, SocialGenerationRequest, SocialGenerationResponse
 import shutil
 import tempfile
@@ -11,23 +11,16 @@ from core.db.database import AsyncSessionLocal
 from core.db.models import Source, Document, DocumentVersion, Chunk
 from sqlalchemy.future import select
 from sqlalchemy import delete, func
-from core.social_agent import SocialAgent
-from pydantic import BaseModel
+from api.schemas import AnalyzeRequest, AnalyzeResponse, SocialGenerationRequest, SocialGenerationResponse
+from core.orchestrator import Orchestrator
 
 class PubMedRequest(BaseModel):
     query: str
 
 router = APIRouter()
 orchestrator = Orchestrator()
-social_agent = SocialAgent()
+social_gen = SocialContentGenerator()
 
-@router.post("/generate/social", response_model=SocialGenerationResponse)
-async def generate_social_content(request: SocialGenerationRequest):
-    """
-    Generate the social media content JSON for a given topic.
-    """
-    result = await social_agent.generate(request.topic, request.problem)
-    return {"data": result}
 
 @router.post("/analyze", response_model=AnalyzeResponse)
 async def analyze_wrinkles(request: AnalyzeRequest):

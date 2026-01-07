@@ -1,25 +1,56 @@
-import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import type { AnalyzeResponse } from '../api';
-import { ArrowLeft, Sparkles, AlertTriangle, ShieldAlert, BookOpen, Quote, Download } from 'lucide-react';
+import React, { useRef } from 'react';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import {
+    ArrowLeft, Download, RefreshCw, Share2,
+    ShieldAlert, AlertTriangle, Stethoscope, FileText, CheckCircle2,
+    Brain, Sparkles, BookOpen, Quote
+} from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import ProcedureList from '../components/ProcedureList';
 
 const ResultPage: React.FC = () => {
     const { t } = useLanguage();
     const location = useLocation();
-    const result = location.state?.result as AnalyzeResponse;
+    const navigate = useNavigate();
+    const resultRef = useRef<HTMLDivElement>(null);
 
-    if (!result) return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="glass-panel p-8 rounded-2xl text-center">
-                <p className="text-white/80 mb-4">{t('result.no_result')}</p>
-                <Link to="/" className="text-cyan-400 hover:text-cyan-300 flex items-center justify-center gap-2">
-                    <ArrowLeft size={16} /> {t('result.back_home')}
-                </Link>
+    const { result, mode } = location.state || {};
+
+    if (!result) {
+        return (
+            <div className="min-h-screen bg-black text-white flex items-center justify-center">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold mb-4">Aucun résultat trouvé</h2>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="text-cyan-400 hover:text-cyan-300 underline"
+                    >
+                        Retour à l'accueil
+                    </button>
+                </div>
             </div>
-        </div>
-    );
+        );
+    }
 
+    // RENDER PROCEDURE LIST IF MODE IS 'list' or result has recommendations
+    if (mode === 'list' || result.recommendations) {
+        return (
+            <div className="min-h-screen bg-black text-white p-6 pb-24 overflow-y-auto">
+                <button
+                    onClick={() => navigate('/')}
+                    className="mb-6 flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+                >
+                    <ArrowLeft size={20} />
+                    Retour
+                </button>
+
+                <ProcedureList recommendations={result.recommendations || []} />
+            </div>
+        );
+    }
+
+    // Default: Analysis View (Legacy/Deep Dive)
+    const { summary, explanation, uncertainty_level, evidence_used, options_discussed, risks_and_limits, questions_for_practitioner } = result;
     const uncertaintyColor = {
         'Faible': 'bg-green-500/20 text-green-300 border-green-500/30',
         'Moyenne': 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
@@ -39,7 +70,7 @@ const ResultPage: React.FC = () => {
                         {t('result.title')}
                     </h1>
                 </div>
-                <div className={`px-4 py-2 rounded-full border backdrop-blur-sm ${uncertaintyColor} flex items-center gap-2`}>
+                <div className={`px - 4 py - 2 rounded - full border backdrop - blur - sm ${uncertaintyColor} flex items - center gap - 2`}>
                     <ShieldAlert size={16} />
                     <span className="text-sm font-medium">{t('result.uncertainty')}: {result.uncertainty_level}</span>
                 </div>
