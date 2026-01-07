@@ -1,42 +1,35 @@
-# BigSis Social
+# Big SIS Social 📸 - The Viral Voice
 
-## 🤳 C'est quoi ?
-BigSis Social est le module de génération de contenu pour les réseaux sociaux. 
-Il agit comme un **Client** qui consomme l'API de `bigsis-brain` pour générer du contenu éducatif et scientifique sur les soins de la peau.
-Il inclut également un **Viewer** pour visualiser le contenu généré sous forme de carrousel Instagram.
+The `bigsis-social` is a specialized lightweight client designed for content creators and social media managers. It focuses on speed and "viral" formatting.
 
-## 🚀 Installation
+## 🎯 Primary Objectives
+1.  **Viral Tone**: Generate catchy, direct, and slightly disruptive content for Instagram (The "Fiche Vérité").
+2.  **Lean Client**: Delegating all medical logic, RAG, and validation to the `bigsis-brain` API.
+3.  **Previewing**: Providing a simple way to visualize content before publication.
 
-1. **Pré-requis** : Python 3.10+
-2. **Installation des dépendances** :
-   ```bash
-   cd bigsis-social
-   # Création venv recommandée mais pas obligatoire si déjà isolée
-   pip install requests
-   ```
-   (Note: La logique lourde étant dans `bigsis-brain`, ce module est très léger).
+## 🛠 Features
 
-## ⚡ Utilisation
+### 🖋 Social Generation
+- **Direct Mode**: Generates a social-ready JSON with a catchy title, a viral advice, and a bold verdict.
+- **Brain-Powered**: Uses the `SOCIAL_VOICE` prompt layer on top of the Brain's clinical knowledge.
 
-### 1. Démarrer Brain (Obligatoire)
-Assurez-vous que le serveur API tourne sur le port 8000 :
+### 🖼 Insta-Viewer
+- A specialized local tool (`insta-viewer.html`) to preview how the generated content would look on mobile/feed.
+
+## 🏁 Development
+
+### Requirements
+- Python 3.10+
+- Access to a running `bigsis-brain` instance.
+
+### Setup
 ```bash
-# Dans bigsis-brain
-uvicorn main:app --port 8000
+cd bigsis-social
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python main.py
 ```
 
-### 2. Générer du contenu
-```bash
-# Dans bigsis-social
-python3 main.py --topic "Vitamin C"
-```
-Cela va :
-1. Envoyer une requête à l'API.
-2. Recevoir le fichier JSON.
-3. Sauvegarder dans `data/outputs/Vitamin_C_MASTER.json`.
-
-### 3. Visualiser
-```bash
-python3 -m http.server 8001
-```
-Ouvrir `http://localhost:8001/insta-viewer.html` et glisser le fichier JSON généré.
+## 🏗 Relationship with the Brain
+Unlike the main App which seeks to educate, the Social client seeks to **engage**. It calls the same Brain but asks for a "Social Delivery". This ensures that even "catchy" content is always backed by real science.
