@@ -144,3 +144,40 @@ async def ingest_pubmed_results(query: str):
         
     print(f"✅ Ingestion terminée pour {count} articles.")
     return count
+
+async def search_claims_for_ingredient(ingredient: str) -> List[Dict]:
+    """
+    Specific search for 'efficacy' and 'safety' claims.
+    Returns raw docs (title, abstract, pmid).
+    """
+    print(f"🔎 Recherche de PREUVES pour: {ingredient}")
+    
+    # 1. Construct Queries
+    # Efficacy: (Ingredient) AND (Skin OR Dermatology) AND (Efficacy OR Effectiveness OR Treatment)
+    # Safety: (Ingredient) AND (Skin OR Dermatology) AND (Safety OR Side Effects OR Adverse)
+    
+    base_term = f'("{ingredient}"[Title/Abstract]) AND ("skin"[MeSH Terms] OR "dermatology"[MeSH Terms])'
+    
+    queries = [
+        f'{base_term} AND ("efficacy"[Title/Abstract] OR "effectiveness"[Title/Abstract]) AND (Meta-Analysis[pt] OR Systematic Review[pt] OR Randomized Controlled Trial[pt])',
+        f'{base_term} AND ("safety"[Title/Abstract] OR "adverse effects"[Title/Abstract] OR "toxicity"[Title/Abstract])'
+    ]
+    
+    all_pmids = set()
+    
+    # 2. Search
+    for q in queries:
+        pmids = search_pubmed(q)
+        all_pmids.update(pmids)
+        
+    if not all_pmids:
+        print(f"   -> Aucune preuve trouvée pour {ingredient}")
+        return []
+
+    # 3. Fetch Details
+    # Limit to top 5 most relevant/recent combined
+    top_pmids = list(all_pmids)[:5] 
+    docs = fetch_details(top_pmids)
+    
+    print(f"   -> Trouvé {len(docs)} documents pertinents.")
+    return docs

@@ -8,41 +8,36 @@ logger = logging.getLogger(__name__)
 class LLMClient:
     def __init__(self, api_key: str = None, model: str = "gpt-4o-mini"): # using mini for cost/speed in V1
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
-        self.client = AsyncOpenAI(api_key=self.api_key)
+        # Ensure client is created safely even without real key for mock scenarios
+        safe_key = self.api_key or "sk-placeholder"
+        self.client = AsyncOpenAI(api_key=safe_key)
         self.model = model
 
-    async def generate_response(self, system_prompt: str, user_content: str, json_mode: bool = True, language: str = 'fr') -> dict:
+    async def generate_response(
+        self, 
+        system_prompt: str, 
+        user_content: str, 
+        json_mode: bool = True, 
+        language: str = 'fr',
+        model_override: str = None,
+        temperature_override: float = None
+    ) -> any:
         if not self.api_key or self.api_key.startswith("sk-placeholder"):
             logger.warning("Using MOCK LLM response due to missing/placeholder API key.")
-            
-            if language == 'en':
-                mock_response = {
-                    "summary": "This is a MOCK response because no valid OpenAI API key was found.",
-                    "explanation": "To get real AI analysis, please provide a valid OPENAI_API_KEY in the .env file.",
-                    "options_discussed": ["Dermatologist Consultation", "Injections (Mock)"],
-                    "risks_and_limits": ["Temporary redness", "Avoid aspirin"],
-                    "questions_for_practitioner": ["What are the alternatives?", "How long do the results last?"],
-                    "uncertainty_level": "High (Mock)"
-                }
-            else:
-                 mock_response = {
-                    "summary": "Ceci est une réponse SIMULÉE car aucune clé API OpenAI valide n'a été trouvée.",
-                    "explanation": "Pour obtenir une vraie analyse IA, veuillez fournir une clé OPENAI_API_KEY valide dans le fichier .env.",
-                    "options_discussed": ["Consultation Dermatologue", "Injections (Mock)"],
-                    "risks_and_limits": ["Rougeurs temporaires", "Eviter aspirine"],
-                    "questions_for_practitioner": ["Quelles sont les alternatives ?", "Combien de temps durent les effets ?"],
-                    "uncertainty_level": "Haute (Mock)"
-                }
-            return mock_response
+            return {"mock": "data", "note": "Please set OPENAI_API_KEY"}
 
         try:
+            target_model = model_override or self.model
+            # default temp 0.1 unless overridden
+            target_temp = temperature_override if temperature_override is not None else 0.1
+            
             kwargs = {
-                "model": self.model,
+                "model": target_model,
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_content}
                 ],
-                "temperature": 0.1,
+                "temperature": target_temp,
             }
             
             if json_mode:
@@ -53,7 +48,7 @@ class LLMClient:
             
             if json_mode:
                 return json.loads(content)
-            return {"content": content}
+            return content
 
         except Exception as e:
             logger.error(f"LLM Generation Error: {e}")

@@ -157,3 +157,76 @@ class DecisionTrace(Base):
     evidence_used = Column(JSONB) 
     final_output = Column(JSONB)
     user_feedback = Column(JSONB, nullable=True)
+
+# --- PRODUCTS / INGREDIENTS ---
+
+class Ingredient(Base):
+    __tablename__ = "ingredients"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String, nullable=False, unique=True, index=True)
+    inci_name = Column(String, unique=True, index=True)
+    description = Column(Text)
+    category = Column(String, index=True) # e.g. "Anti-âge"
+    efficacy_rating = Column(String, index=True) # "High", "Medium", "Low"
+    min_concentration = Column(Float)
+    safety_profile = Column(Text)
+    evidence_source = Column(String)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    # [NEW] Scanner Fields
+    synonyms = Column(ARRAY(String))
+    mesh_terms = Column(ARRAY(String))
+
+class Product(Base):
+    __tablename__ = "products"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    ean = Column(String, unique=True, index=True)
+    brand = Column(String)
+    name = Column(String)
+    image_url = Column(String)
+    inci_text_raw = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class ProductIngredient(Base):
+    __tablename__ = "product_ingredients"
+
+    id = Column(Integer, primary_key=True, index=True) # Join table usually just needs simple ID or composite PK
+    product_id = Column(UUID(as_uuid=True), ForeignKey('products.id'))
+    ingredient_id = Column(UUID(as_uuid=True), ForeignKey('ingredients.id'))
+    rank = Column(Integer) # Position in INCI list
+
+class EvidenceClaim(Base):
+    __tablename__ = "evidence_claims"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    ingredient_id = Column(UUID(as_uuid=True), ForeignKey('ingredients.id'))
+    indication = Column(String) # e.g. "wrinkles", "acne"
+    outcome = Column(String) # "positive", "negative", "inconclusive"
+    confidence_level = Column(String) # "High", "Medium", "Low"
+    pmid = Column(String)
+    study_type = Column(String) # "Meta-Analysis", "RCT"
+    summary = Column(Text)
+    year = Column(Integer)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class UserProduct(Base):
+    __tablename__ = "user_products"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), index=True) # Linking to generic User ID
+    product_id = Column(UUID(as_uuid=True), ForeignKey('products.id'))
+    status = Column(String) # "in_use", "finished", "wishlist"
+    date_added = Column(DateTime(timezone=True), server_default=func.now())
+
+# --- SOCIAL / STUDIO ---
+
+class SocialGeneration(Base):
+    __tablename__ = "social_generations"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    topic = Column(String, index=True)
+    language = Column(String, default="fr")
+    content = Column(JSONB, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+

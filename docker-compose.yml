@@ -33,7 +33,7 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://bigsis_user:bigsis_password@db:5432/bigsis
-      - OPENAI_API_KEY=sk-placeholder-key
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       db:
         condition: service_healthy

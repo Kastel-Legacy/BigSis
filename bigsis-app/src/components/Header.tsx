@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Database, Activity } from 'lucide-react';
+import { LayoutDashboard, Database, FlaskConical, ScanLine, Sparkles } from 'lucide-react';
 
 export default function Header() {
     const navigate = useNavigate();
@@ -27,8 +27,10 @@ export default function Header() {
 
                 <nav className="flex items-center gap-2">
                     <NavLink to="/" icon={<LayoutDashboard size={18} />} label="Diagnostic" active={location.pathname === '/'} />
+                    <NavLink to="/scanner" icon={<ScanLine size={18} />} label="Scanner" active={location.pathname === '/scanner'} />
                     <NavLink to="/knowledge" icon={<Database size={18} />} label="Knowledge" active={location.pathname === '/knowledge'} />
-                    <NavLink to="/routines" icon={<Activity size={18} />} label="Routines" active={location.pathname === '/routines'} />
+                    <NavLink to="/ingredients" icon={<FlaskConical size={18} />} label="Ingredients" active={location.pathname === '/ingredients'} />
+                    <NavLink to="/studio" icon={<Sparkles size={18} />} label="Studio" active={location.pathname === '/studio'} />
                 </nav>
             </div>
         </header>
@@ -52,4 +54,3 @@ function NavLink({ to, icon, label, active }: { to: string, icon: React.ReactNod
         </Link>
     );
 }
-

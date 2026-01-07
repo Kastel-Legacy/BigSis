@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.endpoints import router as api_router
+from api.ingredients import router as ingredients_router
+from api.scanner import router as scanner_router # [NEW]
 from core.db.database import engine, Base
 from sqlalchemy import text
 
@@ -15,7 +17,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from api.social import router as social_router
+
 app.include_router(api_router, prefix="/api/v1")
+app.include_router(ingredients_router, prefix="/api/v1")
+app.include_router(scanner_router, prefix="/api/v1")
+app.include_router(social_router, prefix="/api/v1") # [NEW]
 
 @app.on_event("startup")
 async def startup():
