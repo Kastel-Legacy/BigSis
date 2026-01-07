@@ -31,75 +31,109 @@ const KnowledgePage: React.FC = () => {
         <div className="min-h-screen bg-transparent pt-24 pb-12 px-6">
             <Header />
 
-            <main className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="text-center space-y-4 mb-4">
-                    <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-purple-200 drop-shadow-lg">
+            <main className="max-w-7xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                {/* Hero Header */}
+                <div className="text-center space-y-4">
+                    <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-purple-200 drop-shadow-lg tracking-tight">
                         Brain Dashboard
                     </h1>
-                    <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                        Interface d'administration de la base de connaissances Big SIS.
+                    <p className="text-lg text-gray-400 max-w-2xl mx-auto font-light">
+                        Visualisez et gérez l'intelligence collective de <span className="text-cyan-400 font-medium">Big SIS</span> en temps réel.
                     </p>
-
-                    {stats && (
-                        <div className="flex flex-col items-center gap-6 pt-4">
-                            {/* Stats Counters */}
-                            <div className="flex flex-wrap justify-center gap-6">
-                                <div className="bg-white/5 border border-white/10 rounded-xl px-6 py-3 flex items-center gap-3 backdrop-blur-md">
-                                    <BookOpen className="text-purple-400" size={24} />
-                                    <div className="text-left">
-                                        <div className="text-2xl font-bold text-white">{stats.documents_read}</div>
-                                        <div className="text-xs text-gray-400 uppercase tracking-widest">Etudes Lues</div>
-                                    </div>
-                                </div>
-                                <div className="bg-white/5 border border-white/10 rounded-xl px-6 py-3 flex items-center gap-3 backdrop-blur-md">
-                                    <BrainCircuit className="text-cyan-400" size={24} />
-                                    <div className="text-left">
-                                        <div className="text-2xl font-bold text-white">{stats.chunks_indexed}</div>
-                                        <div className="text-xs text-gray-400 uppercase tracking-widest">Fragments Connectés</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Radar Graph */}
-                            {stats.radar_data && (
-                                <div className="w-full max-w-md bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                                    <KnowledgeRadar data={stats.radar_data} />
-                                </div>
-                            )}
-                        </div>
-                    )}
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    {/* Left Column: Actions */}
-                    <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
-                        <PdfUpload />
-                        <PubMedTrigger />
-
-                        {/* Open Document List Button */}
-                        <div className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-md hover:bg-white/10 transition-colors group cursor-pointer shadow-lg" onClick={() => setShowDocs(true)}>
-                            <div className="flex items-center gap-3 mb-2 text-cyan-300">
-                                <List size={24} />
-                                <h3 className="font-bold text-lg">Bibliothèque Scientifique</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    {/* LEFT AREA: Analytics & State (8 cols) */}
+                    <div className="lg:col-span-8 space-y-8">
+                        {/* Radar Graph Card */}
+                        <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl relative overflow-hidden group shadow-2xl">
+                            <div className="absolute top-0 right-0 p-6 opacity-20 group-hover:opacity-40 transition-opacity">
+                                <BrainCircuit size={120} />
                             </div>
-                            <p className="text-gray-400 text-sm mb-4">
-                                Consulter la liste détaillée des {stats?.documents_read || 0} études sources ingérées par le Brain.
-                            </p>
-                            <button className="w-full py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg text-cyan-300 text-sm font-bold group-hover:bg-cyan-500/20 transition-all">
-                                Ouvrir la Liste
-                            </button>
+
+                            <div className="relative z-10 flex flex-col items-center">
+                                <div className="w-full flex justify-between items-center mb-8">
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                                            <ShieldCheck className="text-cyan-400" size={20} />
+                                            Cartographie Cognitive
+                                        </h3>
+                                        <p className="text-sm text-gray-500">Répartition de l'expertise actuelle du Brain</p>
+                                    </div>
+                                    <div className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-[10px] text-cyan-400 font-mono uppercase tracking-tighter animate-pulse">
+                                        Live Status: {stats?.status || 'Active'}
+                                    </div>
+                                </div>
+
+                                {stats?.radar_data ? (
+                                    <div className="w-full h-[350px]">
+                                        <KnowledgeRadar data={stats.radar_data} />
+                                    </div>
+                                ) : (
+                                    <div className="h-[350px] flex items-center justify-center text-gray-600 italic">
+                                        Initialisation des données...
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Stats Counters Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md flex flex-col gap-1 hover:border-purple-500/30 transition-all">
+                                <BookOpen className="text-purple-400 mb-2" size={24} />
+                                <div className="text-3xl font-black text-white">{stats?.documents_read || 0}</div>
+                                <div className="text-xs text-gray-400 uppercase tracking-widest font-bold">Etudes Lues</div>
+                            </div>
+
+                            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md flex flex-col gap-1 hover:border-cyan-500/30 transition-all">
+                                <BrainCircuit className="text-cyan-400 mb-2" size={24} />
+                                <div className="text-3xl font-black text-white">{stats?.chunks_indexed || 0}</div>
+                                <div className="text-xs text-gray-400 uppercase tracking-widest font-bold">Fragments Connectés</div>
+                            </div>
+
+                            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md flex flex-col gap-1 hover:border-green-500/30 transition-all font-sans">
+                                <ShieldCheck className="text-green-400 mb-2" size={24} />
+                                <div className="text-3xl font-black text-white">{stats?.procedures_indexed || 0}</div>
+                                <div className="text-xs text-gray-400 uppercase tracking-widest font-bold">Procédures Validées</div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Right Column: Placeholder or Other Info (Currently Empty as Docs are moved) */}
-                    <div className="lg:col-span-8 h-full flex flex-col gap-6">
-                        <div className="flex items-center justify-center border-2 border-dashed border-white/5 rounded-2xl min-h-[200px] bg-white/5">
-                            <div className="text-center text-gray-500 p-8">
-                                <ShieldCheck size={48} className="mx-auto mb-4 opacity-50 text-cyan-500" />
-                                <h3 className="text-white font-bold text-lg mb-2">Système de Veille Actif</h3>
-                                <p className="text-sm max-w-md mx-auto">
-                                    Le Brain analyse en continu les nouvelles publications scientifiques pour mettre à jour ses connaissances sur les ingrédients et procédures.
+                    {/* RIGHT AREA: Control Panel & Actions (4 cols) */}
+                    <div className="lg:col-span-4 space-y-6">
+                        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md space-y-6">
+                            <div className="pb-2 border-b border-white/5">
+                                <h3 className="text-lg font-bold text-white uppercase tracking-wider">Ingestion de Savoir</h3>
+                                <p className="text-xs text-gray-500">Alimentez le cerveau en données brutes</p>
+                            </div>
+
+                            <PdfUpload />
+                            <div className="relative">
+                                <div className="absolute inset-x-0 top-1/2 h-px bg-white/5" />
+                                <span className="relative bg-[#0B1221] px-2 text-[10px] text-gray-600 uppercase font-bold text-center block w-max mx-auto">OU</span>
+                            </div>
+                            <PubMedTrigger />
+                        </div>
+
+                        {/* Open Document List Button - Prominent Card */}
+                        <div
+                            className="bg-gradient-to-br from-cyan-900/20 to-purple-900/20 border border-cyan-500/30 rounded-3xl p-8 backdrop-blur-md hover:from-cyan-900/40 hover:to-purple-900/40 transition-all group cursor-pointer shadow-xl relative overflow-hidden"
+                            onClick={() => setShowDocs(true)}
+                        >
+                            <div className="absolute -right-4 -bottom-4 text-cyan-500/10 group-hover:scale-110 transition-transform">
+                                <List size={120} />
+                            </div>
+                            <div className="relative z-10">
+                                <div className="flex items-center gap-3 mb-4 text-cyan-300">
+                                    <List size={32} />
+                                    <h3 className="font-extrabold text-2xl">Bibliothèque</h3>
+                                </div>
+                                <p className="text-gray-300 text-sm mb-6 leading-relaxed">
+                                    Accédez à l'index complet des sources vérifiées. Consultez les extraits originaux utilisés par l'IA.
                                 </p>
+                                <button className="flex items-center gap-2 text-cyan-400 font-bold text-sm group-hover:gap-3 transition-all">
+                                    Explorer les sources <BrainCircuit size={16} />
+                                </button>
                             </div>
                         </div>
                     </div>
