@@ -6,17 +6,17 @@ import type { FicheData } from '../api';
 import Header from '../components/Header';
 
 export default function FichePage() {
-    const { pmid } = useParams();
+    const { name } = useParams();
     const navigate = useNavigate();
     const [data, setData] = useState<FicheData | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!pmid) return;
+        if (!name) return;
         setLoading(true);
         setError(null);
-        getFiche(pmid)
+        getFiche(name)
             .then((res) => {
                 if (res && (res.nom_commercial_courant || res.nom_scientifique || res.titre_officiel)) {
                     setData(res);
@@ -26,10 +26,10 @@ export default function FichePage() {
             })
             .catch((e) => setError("Erreur chargement fiche: " + e))
             .finally(() => setLoading(false));
-    }, [pmid]);
+    }, [name]);
 
     if (loading) return (
-        <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
             <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
                 <p className="text-blue-200/60 transition-pulse">Génération de votre fiche experte en cours...</p>
@@ -38,7 +38,7 @@ export default function FichePage() {
     );
 
     if (error) return (
-        <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
+        <div className="min-h-screen bg-transparent text-white flex items-center justify-center p-6">
             <div className="max-w-md w-full glass-panel p-8 rounded-2xl border border-red-500/30 text-center">
                 <div className="text-red-400 mb-4 text-4xl">⚠️</div>
                 <h2 className="text-xl font-bold mb-2">Oups !</h2>
@@ -72,7 +72,7 @@ export default function FichePage() {
     const secColor = (Number(secVal) >= 7) ? 'text-green-400' : (Number(secVal) >= 5 ? 'text-yellow-400' : 'text-red-400');
 
     return (
-        <div className="min-h-screen bg-black text-white pb-20 pt-24 font-sans">
+        <div className="min-h-screen bg-transparent text-white pb-20 pt-24 font-sans">
             <Header />
 
             <div className="max-w-4xl mx-auto px-4">

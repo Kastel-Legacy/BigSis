@@ -16,7 +16,7 @@ const ResultPage: React.FC = () => {
 
     if (!result) {
         return (
-            <div className="min-h-screen bg-black text-white flex items-center justify-center">
+            <div className="min-h-screen bg-transparent text-white flex items-center justify-center">
                 <div className="text-center">
                     <h2 className="text-2xl font-bold mb-4">Aucun résultat trouvé</h2>
                     <button
@@ -33,7 +33,7 @@ const ResultPage: React.FC = () => {
     // RENDER PROCEDURE LIST IF MODE IS 'list' or result has recommendations
     if (mode === 'list' || result.recommendations) {
         return (
-            <div className="min-h-screen bg-black text-white p-6 pb-24 overflow-y-auto">
+            <div className="min-h-screen bg-transparent text-white p-6 pb-24 overflow-y-auto">
                 <button
                     onClick={() => navigate('/')}
                     className="mb-6 flex items-center gap-2 text-white/60 hover:text-white transition-colors"

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
 import { Sparkles, BrainCircuit, FileText, History, BookOpen } from 'lucide-react';
 import axios from 'axios';
 import FicheVeriteViewer from '../components/social/FicheVeriteViewer';
@@ -55,10 +54,8 @@ const StudioPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0B1221] text-white font-sans selection:bg-cyan-500/30">
-            <Header />
-
-            <main className="max-w-4xl mx-auto pt-28 px-6 pb-20">
+        <div className="min-h-screen bg-transparent text-white font-sans selection:bg-cyan-500/30">
+            <main className="max-w-4xl mx-auto pt-10 px-6 pb-20">
                 <div className="text-center space-y-6 mb-8">
                     <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 animate-gradient-x drop-shadow-2xl">
                         Studio Social

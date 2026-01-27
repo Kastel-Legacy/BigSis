@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
 import PdfUpload from '../components/PdfUpload';
 import PubMedTrigger from '../components/PubMedTrigger';
+import SemanticScholarTrigger from '../components/SemanticScholarTrigger';
 import DocumentList from '../components/DocumentList';
 import KnowledgeRadar from '../components/KnowledgeRadar';
 import axios from 'axios';
@@ -28,8 +28,8 @@ const KnowledgePage: React.FC = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-transparent pt-24 pb-12 px-6">
-            <Header />
+        <div className="min-h-screen bg-transparent pt-6 px-6">
+
 
             <main className="max-w-7xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 {/* Hero Header */}
@@ -113,6 +113,11 @@ const KnowledgePage: React.FC = () => {
                                 <span className="relative bg-[#0B1221] px-2 text-[10px] text-gray-600 uppercase font-bold text-center block w-max mx-auto">OU</span>
                             </div>
                             <PubMedTrigger />
+                            <div className="relative">
+                                <div className="absolute inset-x-0 top-1/2 h-px bg-white/5" />
+                                <span className="relative bg-[#0B1221] px-2 text-[10px] text-gray-600 uppercase font-bold text-center block w-max mx-auto">OU</span>
+                            </div>
+                            <SemanticScholarTrigger />
                         </div>
 
                         {/* Open Document List Button - Prominent Card */}
@@ -141,16 +146,22 @@ const KnowledgePage: React.FC = () => {
 
                 {/* MODAL for Document List */}
                 {showDocs && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+                    <div
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="library-modal-title"
+                    >
                         <div className="bg-[#0f172a] border border-white/10 rounded-2xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-300">
                             <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5 rounded-t-2xl">
                                 <div className="flex items-center gap-3 text-cyan-400">
                                     <List size={24} />
-                                    <h2 className="text-xl font-bold">Bibliothèque des Sources ({stats?.documents_read})</h2>
+                                    <h2 id="library-modal-title" className="text-xl font-bold">Bibliothèque des Sources ({stats?.documents_read})</h2>
                                 </div>
                                 <button
                                     onClick={() => setShowDocs(false)}
                                     className="p-2 hover:bg-white/10 rounded-full text-gray-400 hover:text-white transition-colors"
+                                    aria-label="Close library"
                                 >
                                     <X size={24} />
                                 </button>

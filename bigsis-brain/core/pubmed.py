@@ -6,16 +6,18 @@ import asyncio
 
 BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 
-def search_pubmed(query: str) -> List[str]:
+def search_pubmed(query: str, max_results: int = None) -> List[str]:
     print(f"   ... Appel API PubMed Search pour: {query}")
+    limit = max_results if max_results else (settings.MAX_STUDIES_PER_RUN + 2)
     params = {
         "db": "pubmed",
         "term": query,
         "retmode": "json",
-        "retmax": settings.MAX_STUDIES_PER_RUN + 2, 
+        "retmax": limit, 
         "reldate": settings.SEARCH_DAYS_BACK,
         "email": settings.PUBMED_EMAIL
     }
+
     try:
         resp = requests.get(f"{BASE_URL}/esearch.fcgi", params=params)
         resp.raise_for_status()

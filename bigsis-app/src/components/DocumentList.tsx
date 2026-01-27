@@ -253,14 +253,19 @@ const DocumentList: React.FC = () => {
 
             {/* Delete Confirmation Modal */}
             {deleteConfirmationId && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+                <div
+                    className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="delete-modal-title"
+                >
                     <div className="bg-gray-900 border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in zoom-in-95 duration-200">
                         <div className="flex items-center gap-4 mb-6 text-red-400">
                             <div className="p-3 bg-red-500/10 rounded-full">
                                 <AlertCircle size={24} />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold text-white">Delete Document?</h3>
+                                <h3 id="delete-modal-title" className="text-lg font-bold text-white">Delete Document?</h3>
                                 <p className="text-sm text-gray-400">This action cannot be undone.</p>
                             </div>
                         </div>
@@ -297,13 +302,19 @@ const DocumentList: React.FC = () => {
 
             {/* Document Preview Modal */}
             {selectedDoc && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+                <div
+                    className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="preview-modal-title"
+                >
                     <div className="bg-gray-900 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200">
                         <div className="flex items-center justify-between p-6 border-b border-white/10">
-                            <h3 className="text-xl font-bold text-white line-clamp-1 pr-4">{selectedDoc.title}</h3>
+                            <h3 id="preview-modal-title" className="text-xl font-bold text-white line-clamp-1 pr-4">{selectedDoc.title}</h3>
                             <button
                                 onClick={() => setSelectedDoc(null)}
                                 className="p-2 hover:bg-white/10 rounded-lg text-gray-400 transition-colors"
+                                aria-label="Close preview"
                             >
                                 <X size={20} />
                             </button>

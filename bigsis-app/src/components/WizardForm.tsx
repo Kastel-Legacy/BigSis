@@ -69,7 +69,7 @@ const WizardForm: React.FC = () => {
                     <Check size={16} className="text-cyan-400" />
                 </div>
             )}
-            {Icon && <Icon className={`mb-2 ${selected ? 'text-cyan-300' : 'text-blue-200/70 group-hover:text-blue-100'}`} size={24} />}
+            {Icon && <Icon className={`mb-2 ${selected ? 'text-cyan-300' : 'text-blue-100 group-hover:text-blue-100'}`} size={24} />}
             <span className={`text-sm font-medium ${selected ? 'text-white' : 'text-blue-100/80 group-hover:text-white'}`}>
                 {label}
             </span>
@@ -111,7 +111,7 @@ const WizardForm: React.FC = () => {
                                 flex items-center gap-2 px-6 py-2 rounded-full font-medium transition-all
                                 ${formData.area
                                     ? 'bg-cyan-500 text-black hover:bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3)]'
-                                    : 'bg-white/10 text-white/30 cursor-not-allowed'
+                                    : 'bg-white/10 text-white/70 cursor-not-allowed'
                                 }
                             `}
                         >
@@ -172,7 +172,7 @@ const WizardForm: React.FC = () => {
                                 flex items-center gap-2 px-6 py-2 rounded-full font-medium transition-all
                                 ${formData.wrinkle_type
                                     ? 'bg-cyan-500 text-black hover:bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3)]'
-                                    : 'bg-white/10 text-white/30 cursor-not-allowed'
+                                    : 'bg-white/10 text-white/70 cursor-not-allowed'
                                 }
                             `}
                         >

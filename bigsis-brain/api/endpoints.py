@@ -20,7 +20,30 @@ class PubMedRequest(BaseModel):
 
 router = APIRouter()
 orchestrator = Orchestrator()
+router = APIRouter()
+orchestrator = Orchestrator()
 social_gen = SocialContentGenerator()
+
+class SemanticRequest(BaseModel):
+    query: str
+
+from core.semantic_scholar import ingest_semantic_results
+from api.research import router as research_router
+
+router.include_router(research_router)
+
+@router.post("/ingest/semantic")
+async def trigger_semantic_ingestion(request: SemanticRequest, background_tasks: BackgroundTasks):
+    """
+    Trigger a background job to search Semantic Scholar and ingest results.
+    """
+    if not request.query.strip():
+        raise HTTPException(status_code=400, detail="Query cannot be empty")
+        
+    background_tasks.add_task(ingest_semantic_results, request.query)
+    
+    return {"status": "accepted", "message": f"Semantic Scholar ingestion started for query: {request.query}"}
+
 
 
 @router.post("/analyze", response_model=AnalyzeResponse)

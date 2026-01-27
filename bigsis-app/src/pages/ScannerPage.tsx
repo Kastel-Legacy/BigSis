@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Header from '../components/Header';
 import { Scan, Text, Camera, AlertOctagon, Check, Info } from 'lucide-react';
 import axios from 'axios';
 
@@ -50,9 +49,15 @@ const ScannerPage: React.FC = () => {
         return 'text-red-400 border-red-400 bg-red-400/10';
     };
 
+    const getVerdictLabel = (color: string) => {
+        if (color === 'green') return 'Validé';
+        if (color === 'yellow') return 'Attention';
+        return 'Risque';
+    };
+
     return (
-        <div className="min-h-screen bg-transparent pt-20 px-4 pb-24">
-            <Header />
+        <div className="min-h-screen bg-transparent pt-6 px-4 pb-24">
+
 
             <div className="max-w-md mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
@@ -114,6 +119,11 @@ const ScannerPage: React.FC = () => {
                     <div className="space-y-6 animate-in zoom-in-95 duration-300">
                         {/* Verdict Card */}
                         <div className={`p-6 rounded-2xl border flex flex-col items-center text-center space-y-4 ${getColor(result.verdict_color)}`}>
+                            <div className="flex items-center gap-2">
+                                <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-bold uppercase tracking-widest">
+                                    {getVerdictLabel(result.verdict_color)}
+                                </span>
+                            </div>
                             <h3 className="text-2xl font-black uppercase tracking-wider">{result.verdict_category}</h3>
                             <p className="text-white text-lg font-medium leading-relaxed italic">
                                 "{result.advice}"

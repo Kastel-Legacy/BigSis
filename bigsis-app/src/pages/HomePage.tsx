@@ -45,12 +45,12 @@ const HomePage: React.FC = () => {
                         </span>
                     </h1>
 
-                    <p className="text-lg text-blue-100/80 leading-relaxed max-w-md mx-auto md:mx-0">
+                    <p className="text-lg text-blue-100 leading-relaxed max-w-md mx-auto md:mx-0">
                         {t('home.description')}
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-4">
-                        <div className="flex items-center gap-2 text-sm text-blue-200/60">
+                        <div className="flex items-center gap-2 text-sm text-blue-200">
                             <span className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_10px_theme(colors.green.400)]"></span>
                             {t('home.system.status')}
                         </div>

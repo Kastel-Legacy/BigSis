@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
 import { Search, FlaskConical, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import axios from 'axios';
 
@@ -54,8 +53,8 @@ const IngredientsPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-transparent pt-24 pb-12 px-6">
-            <Header />
+        <div className="min-h-screen bg-transparent pt-6 px-6">
+
 
             <main className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="text-center space-y-4 mb-12">
@@ -124,18 +123,24 @@ const IngredientsPage: React.FC = () => {
 
             {/* Modal Detail */}
             {selectedIngredient && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="ingredient-modal-title"
+                >
                     <div className="bg-[#0B1221] border border-white/10 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative shadow-2xl animate-in zoom-in-95 duration-300">
 
                         <div className="p-8 space-y-6">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <h2 className="text-3xl font-black text-white mb-2">{selectedIngredient.name}</h2>
+                                    <h2 id="ingredient-modal-title" className="text-3xl font-black text-white mb-2">{selectedIngredient.name}</h2>
                                     <p className="text-lg text-cyan-400 font-mono">{selectedIngredient.inci_name}</p>
                                 </div>
                                 <button
                                     onClick={() => setSelectedIngredient(null)}
                                     className="p-2 hover:bg-white/10 rounded-full text-gray-400 hover:text-white"
+                                    aria-label="Close ingredient details"
                                 >
                                     Fermer
                                 </button>

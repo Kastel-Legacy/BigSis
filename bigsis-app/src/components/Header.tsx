@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Database, FlaskConical, ScanLine, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Database, FlaskConical, ScanLine, Sparkles, Search } from 'lucide-react';
 
 export default function Header() {
     const navigate = useNavigate();
@@ -31,6 +31,7 @@ export default function Header() {
                     <NavLink to="/knowledge" icon={<Database size={18} />} label="Knowledge" active={location.pathname === '/knowledge'} />
                     <NavLink to="/ingredients" icon={<FlaskConical size={18} />} label="Ingredients" active={location.pathname === '/ingredients'} />
                     <NavLink to="/studio" icon={<Sparkles size={18} />} label="Studio" active={location.pathname === '/studio'} />
+                    <NavLink to="/research" icon={<Search size={18} />} label="Research" active={location.pathname === '/research'} />
                 </nav>
             </div>
         </header>
@@ -41,11 +42,12 @@ function NavLink({ to, icon, label, active }: { to: string, icon: React.ReactNod
     return (
         <Link
             to={to}
+            aria-current={active ? 'page' : undefined}
             className={`
                 flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 border border-transparent
                 ${active
                     ? 'bg-white/10 border-white/10 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3)]'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/5'
+                    : 'text-gray-300 hover:text-white hover:bg-white/5 hover:border-white/5'
                 }
             `}
         >

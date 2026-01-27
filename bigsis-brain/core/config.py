@@ -6,6 +6,7 @@ load_dotenv()
 class Settings:
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     PUBMED_EMAIL = os.getenv("PUBMED_EMAIL", "contact@bigsis.app")
+    SEMANTIC_SCHOLAR_API_KEY = os.getenv("SEMANTIC_SCHOLAR_API_KEY")
     MODEL_NAME = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
     
     # Garde-fous budgétaires
