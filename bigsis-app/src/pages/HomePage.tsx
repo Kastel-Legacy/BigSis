@@ -3,12 +3,9 @@ import WizardForm from '../components/WizardForm';
 import { Sparkles } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
-import { useNavigate } from 'react-router-dom';
-import { Database } from 'lucide-react';
 
 const HomePage: React.FC = () => {
     const { t } = useLanguage();
-    const navigate = useNavigate();
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
