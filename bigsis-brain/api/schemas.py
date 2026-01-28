@@ -123,3 +123,16 @@ class UserProductRead(UserProductBase):
     date_added: Any
     class Config:
         from_attributes = True
+
+class ProcedureBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    downtime: Optional[str] = None
+    price_range: Optional[str] = None
+    tags: List[str] = []
+
+class ProcedureRead(ProcedureBase):
+    id: UUID
+    created_at: Any
+    class Config:
+        from_attributes = True

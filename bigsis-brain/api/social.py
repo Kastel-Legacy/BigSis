@@ -10,7 +10,7 @@ from core.prompts import APP_SYSTEM_PROMPT, DIAGNOSTIC_SYSTEM_PROMPT, RECOMMENDA
 router = APIRouter()
 generator = SocialContentGenerator()
 
-from api.schemas import GenerateRequest, SocialGenerationResponse
+from api.schemas import GenerateRequest, SocialGenerationResponse, ProcedureRead
 
 @router.post("/social/generate", response_model=SocialGenerationResponse)
 async def generate_social_content(request: GenerateRequest):
@@ -122,3 +122,13 @@ async def create_procedure(proc: ProcedureCreate):
         session.add(new_proc)
         await session.commit()
         return {"status": "created", "name": new_proc.name}
+
+@router.get("/knowledge/procedures", response_model=list[ProcedureRead])
+async def list_procedures():
+    """List all medical procedures in the Knowledge Base."""
+    from core.db.database import AsyncSessionLocal
+    from core.db.models import Procedure
+    
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(Procedure).order_by(Procedure.name))
+        return result.scalars().all()
