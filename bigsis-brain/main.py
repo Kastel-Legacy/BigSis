@@ -24,6 +24,7 @@ app.include_router(api_router, prefix="/api/v1")
 app.include_router(ingredients_router, prefix="/api/v1")
 app.include_router(scanner_router, prefix="/api/v1")
 app.include_router(social_router, prefix="/api/v1")
+app.include_router(trends_router, prefix="/api/v1")
 
 
 @app.on_event("startup")
