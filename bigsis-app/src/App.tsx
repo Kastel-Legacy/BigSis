@@ -28,8 +28,10 @@ function App() {
             <Route path="/result" element={<ResultPage />} />
             <Route path="/ingredients" element={<IngredientsPage />} />
             <Route path="/scanner" element={<ScannerPage />} />
-            <Route path="/procedure/:name" element={<FichePage />} />
           </Route>
+
+          {/* STANDALONE VIEW (No Header/Footer) */}
+          <Route path="/procedure/:name" element={<FichePage />} />
 
           {/* ADMIN BACKOFFICE (Restricted) */}
           <Route path="/admin" element={<AdminLayout />}>

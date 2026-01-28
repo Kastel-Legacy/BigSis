@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, Brain, ShieldCheck, Info, MessageSquare, Quote, BookOpen } from 'lucide-react';
 import { getFiche } from '../api';
 import type { FicheData } from '../api';
-import Header from '../components/Header';
 
 export default function FichePage() {
     const { name } = useParams();
@@ -72,8 +71,7 @@ export default function FichePage() {
     const secColor = (Number(secVal) >= 7) ? 'text-green-400' : (Number(secVal) >= 5 ? 'text-yellow-400' : 'text-red-400');
 
     return (
-        <div className="min-h-screen bg-transparent text-white pb-20 pt-24 font-sans">
-            <Header />
+        <div className="min-h-screen bg-[#0B1221] text-white pb-20 pt-8 font-sans">
 
             <div className="max-w-4xl mx-auto px-4">
                 {/* Back Button */}
