@@ -231,3 +231,45 @@ class SocialGeneration(Base):
     content = Column(JSONB, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
+
+# --- TREND INTELLIGENCE ---
+
+class TrendTopic(Base):
+    __tablename__ = "trend_topics"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    titre = Column(String, nullable=False)
+    topic_type = Column(String, nullable=False)  # procedure, ingredient, combinaison, mythes, comparatif
+    description = Column(Text)
+    zones = Column(ARRAY(String))  # front, glabelle, pattes_doie
+    search_queries = Column(ARRAY(String))  # Pre-generated PubMed queries
+
+    # Expert scores
+    score_marketing = Column(Float, default=0.0)
+    justification_marketing = Column(Text)
+    score_science = Column(Float, default=0.0)
+    justification_science = Column(Text)
+    references_suggerees = Column(JSONB)  # [{titre, pmid, annee}]
+    score_knowledge = Column(Float, default=0.0)
+    justification_knowledge = Column(Text)
+    score_composite = Column(Float, default=0.0)
+
+    # Status workflow
+    status = Column(String, default="proposed")  # proposed, approved, learning, ready, rejected, stagnated
+    recommandation = Column(String)  # APPROUVER, REPORTER, REJETER
+
+    # TRS (Topic Readiness Score)
+    trs_current = Column(Float, default=0.0)
+    trs_details = Column(JSONB)  # {docs, chunks, diversity, recency, coverage, atlas}
+
+    # Learning pipeline tracking
+    learning_iterations = Column(Integer, default=0)
+    last_learning_delta = Column(Float, default=0.0)  # TRS gain of last iteration
+    learning_log = Column(JSONB)  # [{iteration, queries, new_chunks, trs_before, trs_after}]
+
+    # Batch tracking
+    batch_id = Column(String, index=True)  # Groups topics from same discovery session
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+

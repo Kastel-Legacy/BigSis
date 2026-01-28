@@ -15,13 +15,7 @@ const HomePage: React.FC = () => {
 
             {/* Language Switcher & Nav - Top Right */}
             <div className="absolute top-4 right-4 z-50 flex items-center gap-4">
-                <button
-                    onClick={() => navigate('/knowledge')}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-sm text-gray-300 hover:text-white"
-                >
-                    <Database size={14} />
-                    <span className="font-medium hidden sm:inline">{t('nav.knowledge')}</span>
-                </button>
+
                 <LanguageSwitcher />
             </div>
 

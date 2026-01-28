@@ -15,6 +15,7 @@ import FichePage from './pages/FichePage';
 import StudioPage from './pages/StudioPage';
 import ResearcherPage from './pages/ResearcherPage';
 import KnowledgePage from './pages/KnowledgePage';
+import TrendsPage from './pages/TrendsPage';
 
 function App() {
   return (
@@ -32,7 +33,8 @@ function App() {
 
           {/* ADMIN BACKOFFICE (Restricted) */}
           <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<Navigate to="/admin/research" replace />} />
+            <Route index element={<Navigate to="/admin/trends" replace />} />
+            <Route path="trends" element={<TrendsPage />} />
             <Route path="research" element={<ResearcherPage />} />
             <Route path="knowledge" element={<KnowledgePage />} />
             <Route path="studio" element={<StudioPage />} />

@@ -9,12 +9,8 @@ class LLMClient:
     def __init__(self, api_key: str = None, model: str = "gpt-4o-mini"): # using mini for cost/speed in V1
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         
-        # DEBUG LOG
-        masked_key = self.api_key[:8] + "..." if self.api_key else "None"
-        logger.info(f"LLMClient initialized with Key: {masked_key}")
-        print(f"DEBUG: LLMClient Key Repr: {repr(self.api_key)}")
-        if self.api_key:
-             print(f"DEBUG: LLMClient Key Length: {len(self.api_key)}")
+        masked_key = (self.api_key[:8] + "...") if self.api_key else "None"
+        logger.info(f"LLMClient initialized with key: {masked_key}")
 
         # Ensure client is created safely even without real key for mock scenarios
         safe_key = self.api_key or "sk-placeholder"

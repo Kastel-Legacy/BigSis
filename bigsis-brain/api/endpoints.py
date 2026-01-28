@@ -29,8 +29,10 @@ class SemanticRequest(BaseModel):
 
 from core.semantic_scholar import ingest_semantic_results
 from api.research import router as research_router
+from api.trends import router as trends_router
 
 router.include_router(research_router)
+router.include_router(trends_router)
 
 @router.post("/ingest/semantic")
 async def trigger_semantic_ingestion(request: SemanticRequest, background_tasks: BackgroundTasks):

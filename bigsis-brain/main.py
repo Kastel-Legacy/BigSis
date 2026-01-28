@@ -18,11 +18,13 @@ app.add_middleware(
 )
 
 from api.social import router as social_router
+from api.trends import router as trends_router
 
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(ingredients_router, prefix="/api/v1")
 app.include_router(scanner_router, prefix="/api/v1")
-app.include_router(social_router, prefix="/api/v1") # [NEW]
+app.include_router(social_router, prefix="/api/v1")
+
 
 @app.on_event("startup")
 async def startup():

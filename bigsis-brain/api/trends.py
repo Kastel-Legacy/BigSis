@@ -1,0 +1,254 @@
+"""
+Trends API - Discover, evaluate, approve, and learn trending topics.
+"""
+
+from fastapi import APIRouter, HTTPException, BackgroundTasks
+from pydantic import BaseModel
+from typing import Optional
+from sqlalchemy import select, func
+
+from core.db.database import AsyncSessionLocal
+from core.db.models import TrendTopic
+from core.trends.scout import discover_trends
+from core.trends.learning_pipeline import run_learning_iteration, run_full_learning
+from core.trends.trs_engine import compute_trs
+
+router = APIRouter()
+
+
+# --- SCHEMAS ---
+
+class TopicActionRequest(BaseModel):
+    action: str  # approve, reject, defer
+
+
+class TRSCheckRequest(BaseModel):
+    topic: str
+
+
+# --- ENDPOINTS ---
+
+@router.post("/trends/discover")
+async def discover_trending_topics():
+    """
+    Launch the Trend Scout agent to discover 5 trending topics.
+    Uses LLM multi-expert evaluation + real PubMed signals.
+    Returns topics with expert scores, TRS, and recommendations.
+    """
+    try:
+        result = await discover_trends()
+        if "error" in result:
+            raise HTTPException(status_code=500, detail=result["error"])
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/trends/topics")
+async def list_trend_topics(status: Optional[str] = None, batch_id: Optional[str] = None):
+    """
+    List all trend topics, optionally filtered by status or batch.
+    """
+    async with AsyncSessionLocal() as session:
+        stmt = select(TrendTopic).order_by(TrendTopic.created_at.desc())
+        if status:
+            stmt = stmt.where(TrendTopic.status == status)
+        if batch_id:
+            stmt = stmt.where(TrendTopic.batch_id == batch_id)
+
+        result = await session.execute(stmt)
+        topics = result.scalars().all()
+
+        return [
+            {
+                "id": str(t.id),
+                "titre": t.titre,
+                "type": t.topic_type,
+                "description": t.description,
+                "zones": t.zones,
+                "search_queries": t.search_queries,
+                "score_marketing": t.score_marketing,
+                "justification_marketing": t.justification_marketing,
+                "score_science": t.score_science,
+                "justification_science": t.justification_science,
+                "references_suggerees": t.references_suggerees,
+                "score_knowledge": t.score_knowledge,
+                "justification_knowledge": t.justification_knowledge,
+                "score_composite": t.score_composite,
+                "recommandation": t.recommandation,
+                "status": t.status,
+                "trs_current": t.trs_current,
+                "trs_details": t.trs_details,
+                "learning_iterations": t.learning_iterations,
+                "last_learning_delta": t.last_learning_delta,
+                "learning_log": t.learning_log,
+                "batch_id": t.batch_id,
+                "created_at": t.created_at,
+            }
+            for t in topics
+        ]
+
+
+@router.get("/trends/topics/{topic_id}")
+async def get_trend_topic(topic_id: str):
+    """Get a single trend topic with full details."""
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(TrendTopic).where(TrendTopic.id == topic_id)
+        )
+        t = result.scalar_one_or_none()
+        if not t:
+            raise HTTPException(status_code=404, detail="Topic not found")
+
+        return {
+            "id": str(t.id),
+            "titre": t.titre,
+            "type": t.topic_type,
+            "description": t.description,
+            "zones": t.zones,
+            "search_queries": t.search_queries,
+            "score_marketing": t.score_marketing,
+            "justification_marketing": t.justification_marketing,
+            "score_science": t.score_science,
+            "justification_science": t.justification_science,
+            "references_suggerees": t.references_suggerees,
+            "score_knowledge": t.score_knowledge,
+            "justification_knowledge": t.justification_knowledge,
+            "score_composite": t.score_composite,
+            "recommandation": t.recommandation,
+            "status": t.status,
+            "trs_current": t.trs_current,
+            "trs_details": t.trs_details,
+            "learning_iterations": t.learning_iterations,
+            "last_learning_delta": t.last_learning_delta,
+            "learning_log": t.learning_log,
+            "batch_id": t.batch_id,
+            "created_at": t.created_at,
+        }
+
+
+@router.post("/trends/topics/{topic_id}/action")
+async def topic_action(topic_id: str, request: TopicActionRequest):
+    """
+    Admin action on a topic: approve, reject, or defer.
+    - approve: sets status to 'approved', ready for learning pipeline
+    - reject: sets status to 'rejected'
+    - defer: sets status to 'proposed' (back to queue)
+    """
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(TrendTopic).where(TrendTopic.id == topic_id)
+        )
+        topic = result.scalar_one_or_none()
+        if not topic:
+            raise HTTPException(status_code=404, detail="Topic not found")
+
+        if request.action == "approve":
+            topic.status = "approved"
+        elif request.action == "reject":
+            topic.status = "rejected"
+        elif request.action == "defer":
+            topic.status = "proposed"
+        else:
+            raise HTTPException(status_code=400, detail=f"Unknown action: {request.action}")
+
+        await session.commit()
+        return {"id": str(topic.id), "status": topic.status, "action": request.action}
+
+
+@router.post("/trends/topics/{topic_id}/learn")
+async def trigger_learning(topic_id: str):
+    """
+    Trigger one learning iteration for an approved topic.
+    Runs PubMed + Semantic Scholar ingestion, then re-computes TRS.
+    Detects stagnation if delta < threshold.
+    """
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(TrendTopic).where(TrendTopic.id == topic_id)
+        )
+        topic = result.scalar_one_or_none()
+        if not topic:
+            raise HTTPException(status_code=404, detail="Topic not found")
+        if topic.status not in ("approved", "learning", "ready", "stagnated"):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Topic status '{topic.status}' does not allow learning. Allowed: approved, learning, ready, stagnated."
+            )
+
+    try:
+        result = await run_learning_iteration(topic_id)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/trends/topics/{topic_id}/learn-full")
+async def trigger_full_learning(topic_id: str):
+    """
+    Run the full learning pipeline: iterate until ready, stagnated, or max iterations.
+    """
+    try:
+        result = await run_full_learning(topic_id)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+@router.post("/trends/trs-check")
+async def check_trs(request: TRSCheckRequest):
+    """
+    Ad-hoc TRS check for any topic string.
+    Useful for debugging or manual checks.
+    """
+    try:
+        result = await compute_trs(request.topic)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/trends/topics/{topic_id}")
+async def delete_trend_topic(topic_id: str):
+    """
+    Delete a specific trend topic by ID.
+    """
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(TrendTopic).where(TrendTopic.id == topic_id)
+        )
+        topic = result.scalar_one_or_none()
+        if not topic:
+            raise HTTPException(status_code=404, detail="Topic not found")
+            
+        from sqlalchemy import delete
+        await session.execute(delete(TrendTopic).where(TrendTopic.id == topic_id))
+        await session.commit()
+        
+        return {"message": f"Topic {topic_id} deleted successfully"}
+
+
+@router.delete("/trends/cleanup")
+async def cleanup_rejected_topics():
+    """
+    Delete all topics with status 'rejected'.
+    Returns the count of deleted topics.
+    """
+    async with AsyncSessionLocal() as session:
+        try:
+            # Check count first
+            stmt_count = select(func.count(TrendTopic.id)).where(TrendTopic.status == "rejected")
+            count = (await session.execute(stmt_count)).scalar() or 0
+            
+            if count > 0:
+                # Delete
+                from sqlalchemy import delete
+                stmt = delete(TrendTopic).where(TrendTopic.status == "rejected")
+                await session.execute(stmt)
+                await session.commit()
+                
+            return {"deleted_count": count, "message": f"Successfully deleted {count} rejected topics."}
+        except Exception as e:
+            await session.rollback()
+            raise HTTPException(status_code=500, detail=str(e))

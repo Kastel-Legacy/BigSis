@@ -6,7 +6,8 @@ import {
     Sparkles,
     Home,
     Settings,
-    Shield
+    Shield,
+    TrendingUp
 } from 'lucide-react';
 
 const AdminLayout: React.FC = () => {
@@ -25,6 +26,7 @@ const AdminLayout: React.FC = () => {
 
                 <div className="flex-1 py-6 px-4 space-y-1">
                     <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Backoffice</p>
+                    <SidebarLink to="/admin/trends" icon={<TrendingUp size={18} />} label="Trend Discovery" />
                     <SidebarLink to="/admin/research" icon={<Search size={18} />} label="Deep Research" />
                     <SidebarLink to="/admin/knowledge" icon={<Database size={18} />} label="Knowledge Base" />
                     <SidebarLink to="/admin/studio" icon={<Sparkles size={18} />} label="Studio (Debug)" />
