@@ -194,6 +194,27 @@ async def _discover_trends_llm_driven(batch_id: str = None) -> Dict:
     if not batch_id:
         batch_id = str(uuid.uuid4())[:8]
     logger.info(f"[Scout] Running LLM-driven fallback flow (batch {batch_id})...")
+
+    doc_count, chunk_count, proc_count, fiche_topics = await _gather_brain_stats()
+
+    user_prompt = TREND_USER_PROMPT_TEMPLATE.format(
+        doc_count=doc_count,
+        chunk_count=chunk_count,
+        proc_count=proc_count,
+        fiche_topics=", ".join(fiche_topics) if fiche_topics else "Aucune",
+        extra_context="",
+    )
+
+    llm_result = await llm.generate_response(
+        system_prompt=TREND_SCOUT_SYSTEM_PROMPT,
+        user_content=user_prompt,
+        json_mode=True,
+        model_override="gpt-4o",
+        temperature_override=0.4,
+    )
+
+    if not isinstance(llm_result, dict) or "trending_topics" not in llm_result:
+        return {"error": "LLM returned invalid format", "raw": llm_result}
     topics_output = []
 
     async with AsyncSessionLocal() as session:
