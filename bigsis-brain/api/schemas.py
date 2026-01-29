@@ -127,9 +127,9 @@ class UserProductRead(UserProductBase):
 class ProcedureBase(BaseModel):
     name: str
     description: Optional[str] = None
-    # downtime: Optional[str] = None
-    # price_range: Optional[str] = None
-    # tags: List[str] = []
+    downtime: Optional[str] = None
+    price_range: Optional[str] = None
+    tags: List[str] = []
 
 class ProcedureRead(ProcedureBase):
     id: UUID

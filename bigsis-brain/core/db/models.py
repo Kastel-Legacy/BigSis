@@ -124,14 +124,14 @@ class Procedure(Base):
     
     # Clinical Details
     # Clinical Details
-    # downtime = Column(String) # e.g. "2-3 jours", "Aucun"
-    # price_range = Column(String) # e.g. "300-500€"
-    # duration = Column(String) # e.g. "30 min"
-    # pain_level = Column(String) # e.g. "Faible"
+    downtime = Column(String) # e.g. "2-3 jours", "Aucun"
+    price_range = Column(String) # e.g. "300-500€"
+    duration = Column(String) # e.g. "30 min"
+    pain_level = Column(String) # e.g. "Faible"
     
     # Classification
-    # category = Column(String) # e.g. "Injectable", "Laser", "Chirurgie"
-    # tags = Column(ARRAY(String)) # e.g. ["Eclat", "Volume", "Rides"]
+    category = Column(String) # e.g. "Injectable", "Laser", "Chirurgie"
+    tags = Column(ARRAY(String)) # e.g. ["Eclat", "Volume", "Rides"]
     
     # RAG
     embedding = Column(Vector(1536))
