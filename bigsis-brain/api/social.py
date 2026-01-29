@@ -129,6 +129,11 @@ async def list_procedures():
     from core.db.database import AsyncSessionLocal
     from core.db.models import Procedure
     
-    async with AsyncSessionLocal() as session:
-        result = await session.execute(select(Procedure).order_by(Procedure.name))
-        return result.scalars().all()
+    try:
+        async with AsyncSessionLocal() as session:
+            result = await session.execute(select(Procedure).order_by(Procedure.name))
+            return result.scalars().all()
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        raise HTTPException(status_code=500, detail=f"DB Error: {str(e)} | Trace: {error_details}")
