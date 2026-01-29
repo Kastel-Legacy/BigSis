@@ -131,7 +131,7 @@ class Procedure(Base):
     
     # Classification
     # category = Column(String) # e.g. "Injectable", "Laser", "Chirurgie"
-    tags = Column(ARRAY(String)) # e.g. ["Eclat", "Volume", "Rides"]
+    # tags = Column(ARRAY(String)) # e.g. ["Eclat", "Volume", "Rides"]
     
     # RAG
     embedding = Column(Vector(1536))

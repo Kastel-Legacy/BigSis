@@ -129,7 +129,7 @@ class ProcedureBase(BaseModel):
     description: Optional[str] = None
     # downtime: Optional[str] = None
     # price_range: Optional[str] = None
-    tags: List[str] = []
+    # tags: List[str] = []
 
 class ProcedureRead(ProcedureBase):
     id: UUID
