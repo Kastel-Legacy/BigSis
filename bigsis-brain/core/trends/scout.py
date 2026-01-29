@@ -45,24 +45,10 @@ async def discover_trends(batch_id: str = None) -> Dict:
         batch_id = str(uuid.uuid4())[:8]
     
     # ===== PHASE 1: GOOGLE TRENDS MINING =====
-    logger.info("[Scout] Phase 1: Mining Google Trends for rising queries...")
-
-    try:
-        raw_gt = await run_in_threadpool(mine_rising_trends)
-        ranked = aggregate_and_rank_trends(raw_gt, top_n=20)
-        logger.info(f"[Scout] GT: {len(raw_gt)} raw -> {len(ranked)} ranked trends")
-    except Exception as e:
-        logger.error(f"[Scout] GT mining failed: {e}")
-        raw_gt = []
-        ranked = []
-    
-    # Check if we have enough trends
-    if len(ranked) < MIN_GT_TRENDS:
-        logger.warning(
-            f"[Scout] Only {len(ranked)} GT trends (min {MIN_GT_TRENDS}). "
-            f"Falling back to LLM-driven discovery."
-        )
-        return await _discover_trends_llm_driven()
+    # TEMPORARILY DISABLED: Render IP is heavily rate-limited by Google
+    # Forcing LLM-driven discovery for reliability
+    logger.info("[Scout] Skipping Google Trends (IP rate-limited). Using LLM-driven discovery.")
+    return await _discover_trends_llm_driven(batch_id)
 
     # ===== PHASE 2: GATHER BRAIN CONTEXT =====
     logger.info("[Scout] Phase 2: Gathering brain context...")
@@ -202,34 +188,12 @@ async def discover_trends(batch_id: str = None) -> Dict:
 # FALLBACK: Original LLM-driven discovery flow
 # ==========================================================================
 
-async def _discover_trends_llm_driven() -> Dict:
+async def _discover_trends_llm_driven(batch_id: str = None) -> Dict:
     # Fallback flow: LLM proposes topics, Google Trends validates post-hoc.
     # Used when GT mining returns insufficient data.
-    logger.info("[Scout] Running LLM-driven fallback flow...")
-
-    doc_count, chunk_count, proc_count, fiche_topics = await _gather_brain_stats()
-
-
-    user_prompt = TREND_USER_PROMPT_TEMPLATE.format(
-        doc_count=doc_count,
-        chunk_count=chunk_count,
-        proc_count=proc_count,
-        fiche_topics=", ".join(fiche_topics) if fiche_topics else "Aucune",
-        extra_context="",
-    )
-
-    llm_result = await llm.generate_response(
-        system_prompt=TREND_SCOUT_SYSTEM_PROMPT,
-        user_content=user_prompt,
-        json_mode=True,
-        model_override="gpt-4o",
-        temperature_override=0.4,
-    )
-
-    if not isinstance(llm_result, dict) or "trending_topics" not in llm_result:
-        return {"error": "LLM returned invalid format", "raw": llm_result}
-
-    batch_id = str(uuid.uuid4())[:8]
+    if not batch_id:
+        batch_id = str(uuid.uuid4())[:8]
+    logger.info(f"[Scout] Running LLM-driven fallback flow (batch {batch_id})...")
     topics_output = []
 
     async with AsyncSessionLocal() as session:
