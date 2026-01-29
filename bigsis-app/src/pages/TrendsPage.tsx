@@ -130,9 +130,44 @@ const TrendsPage: React.FC = () => {
         setError(null);
         try {
             const res = await axios.post(`${API_URL}/trends/discover`);
-            const data: DiscoverResult = res.data;
-            setSynthese(data.synthese || '');
-            await fetchTopics();
+
+            // Handle Async/Background Response
+            if (res.data.status === 'processing' && res.data.batch_id) {
+                const batchId = res.data.batch_id;
+                console.log(`[TrendsPage] Background task started. Batch: ${batchId}. Polling...`);
+
+                // Poll for results (max 60 attempts * 3s = 3 mins)
+                let attempts = 0;
+                let found = false;
+
+                while (attempts < 60) {
+                    await new Promise(r => setTimeout(r, 3000)); // Wait 3s
+                    attempts++;
+
+                    try {
+                        const checkRes = await axios.get(`${API_URL}/trends/topics?batch_id=${batchId}`);
+                        if (checkRes.data && Array.isArray(checkRes.data) && checkRes.data.length > 0) {
+                            console.log(`[TrendsPage] Found ${checkRes.data.length} topics!`);
+                            setTopics(prev => [...checkRes.data, ...prev]); // Prepend new topics
+                            await fetchTopics(); // Full refresh to be safe
+                            found = true;
+                            break;
+                        }
+                    } catch (err) {
+                        console.warn('Polling error', err);
+                    }
+                }
+
+                if (!found) {
+                    throw new Error("Discovery timed out (background task might still be running). Please refresh manually.");
+                }
+
+            } else {
+                // Legacy sync handling (if ever reverted)
+                const data: DiscoverResult = res.data;
+                setSynthese(data.synthese || '');
+                await fetchTopics();
+            }
         } catch (e: any) {
             console.error('Discovery failed', e);
             setError(e?.response?.data?.detail || e?.message || 'Discovery failed');

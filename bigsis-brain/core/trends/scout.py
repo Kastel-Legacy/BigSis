@@ -12,6 +12,7 @@ import uuid
 import logging
 from typing import Dict, List
 from sqlalchemy import select, func
+from starlette.concurrency import run_in_threadpool
 
 from core.llm_client import LLMClient
 from core.db.database import AsyncSessionLocal
@@ -38,8 +39,10 @@ llm = LLMClient()
 MIN_GT_TRENDS = 8
 
 
-async def discover_trends() -> Dict:
+async def discover_trends(batch_id: str = None) -> Dict:
     # Main entry: discover 5 trending topics within BigSIS scope.
+    if not batch_id:
+        batch_id = str(uuid.uuid4())[:8]
     
     # ===== PHASE 1: GOOGLE TRENDS MINING =====
     logger.info("[Scout] Phase 1: Mining Google Trends for rising queries...")
@@ -97,7 +100,7 @@ async def discover_trends() -> Dict:
     # ===== PHASE 5: TRS + PERSIST =====
     logger.info("[Scout] Phase 5: Computing TRS and persisting topics...")
 
-    batch_id = str(uuid.uuid4())[:8]
+    # batch_id = str(uuid.uuid4())[:8]
     topics_output = []
 
     async with AsyncSessionLocal() as session:

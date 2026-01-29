@@ -28,20 +28,32 @@ class TRSCheckRequest(BaseModel):
 
 # --- ENDPOINTS ---
 
-@router.post("/trends/discover")
-async def discover_trending_topics():
-    """
-    Launch the Trend Scout agent to discover 5 trending topics.
-    Uses LLM multi-expert evaluation + real PubMed signals.
-    Returns topics with expert scores, TRS, and recommendations.
-    """
+import uuid
+from starlette.concurrency import run_in_threadpool
+
+async def run_discovery_bg(batch_id: str):
+    logger = logging.getLogger("uvicorn.error")
+    logger.info(f"Starting Background Trend Discovery (Batch {batch_id})")
     try:
-        result = await discover_trends()
-        if "error" in result:
-            raise HTTPException(status_code=500, detail=result["error"])
-        return result
+        await discover_trends(batch_id=batch_id)
+        logger.info(f"Background Trend Discovery Finished (Batch {batch_id})")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Background Trend Discovery Failed: {e}")
+
+@router.post("/trends/discover")
+async def discover_trending_topics(background_tasks: BackgroundTasks):
+    """
+    Launch the Trend Scout agent in BACKGROUND.
+    Returns a batch_id immediately. Client should poll /trends/topics?batch_id={batch_id}.
+    """
+    batch_id = str(uuid.uuid4())[:8]
+    background_tasks.add_task(run_discovery_task_bg, batch_id)
+    
+    return {
+        "status": "processing",
+        "message": "Trend discovery started in background. Please poll for results.",
+        "batch_id": batch_id
+    }
 
 
 @router.get("/trends/topics")
