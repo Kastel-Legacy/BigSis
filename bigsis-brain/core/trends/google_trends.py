@@ -15,6 +15,12 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# --- RETRY CONFIG ---
+MAX_RETRIES = 3
+MIN_SLEEP = 2.0
+MAX_SLEEP = 5.0
+RETRY_BACKOFF_BASE = 10  # seconds
+
 
 # --- DYNAMIC SEED GENERATION ---
 
