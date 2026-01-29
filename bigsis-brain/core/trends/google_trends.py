@@ -16,10 +16,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # --- RETRY CONFIG ---
-MAX_RETRIES = 3
-MIN_SLEEP = 2.0
-MAX_SLEEP = 5.0
-RETRY_BACKOFF_BASE = 10  # seconds
+MAX_RETRIES = 0  # Fail fast: no retry, switch to LLM fallback immediately
+MIN_SLEEP = 30.0  # 30s between requests to avoid rate limiting
+MAX_SLEEP = 30.0  # Fixed 30s delay
+RETRY_BACKOFF_BASE = 10  # seconds (unused with MAX_RETRIES=0)
 
 
 # --- DYNAMIC SEED GENERATION ---
@@ -94,8 +94,8 @@ def mine_rising_trends(
     if seed_keywords is None:
         logger.info("[Scout] Generating dynamic seeds via Google Autocomplete...")
         seed_keywords = get_dynamic_seeds()
-        # Limit to 6 seeds total for performance/quota
-        seed_keywords = random.sample(seed_keywords, min(6, len(seed_keywords)))
+        # Limit to 2 seeds total for conservative rate limiting
+        seed_keywords = random.sample(seed_keywords, min(2, len(seed_keywords)))
         logger.info(f"[Scout] Using seeds: {seed_keywords}")
 
     all_results = []

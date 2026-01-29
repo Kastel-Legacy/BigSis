@@ -36,7 +36,8 @@ logger = logging.getLogger(__name__)
 llm = LLMClient()
 
 # Minimum ranked GT trends needed to use the GT-driven flow
-MIN_GT_TRENDS = 8
+# Lowered to 3 due to conservative rate limiting (2 seeds max)
+MIN_GT_TRENDS = 3
 
 
 async def discover_trends(batch_id: str = None) -> Dict:
@@ -45,10 +46,24 @@ async def discover_trends(batch_id: str = None) -> Dict:
         batch_id = str(uuid.uuid4())[:8]
     
     # ===== PHASE 1: GOOGLE TRENDS MINING =====
-    # TEMPORARILY DISABLED: Render IP is heavily rate-limited by Google
-    # Forcing LLM-driven discovery for reliability
-    logger.info("[Scout] Skipping Google Trends (IP rate-limited). Using LLM-driven discovery.")
-    return await _discover_trends_llm_driven(batch_id)
+    logger.info("[Scout] Phase 1: Mining Google Trends (conservative mode: 2 seeds, 0 retry)...")
+
+    try:
+        raw_gt = await run_in_threadpool(mine_rising_trends)
+        ranked = aggregate_and_rank_trends(raw_gt, top_n=20)
+        logger.info(f"[Scout] GT: {len(raw_gt)} raw -> {len(ranked)} ranked trends")
+    except Exception as e:
+        logger.error(f"[Scout] GT mining failed: {e}")
+        raw_gt = []
+        ranked = []
+    
+    # Check if we have enough trends (fail fast if not)
+    if len(ranked) < MIN_GT_TRENDS:
+        logger.warning(
+            f"[Scout] Only {len(ranked)} GT trends (min {MIN_GT_TRENDS}). "
+            f"Falling back to LLM-driven discovery."
+        )
+        return await _discover_trends_llm_driven(batch_id)
 
     # ===== PHASE 2: GATHER BRAIN CONTEXT =====
     logger.info("[Scout] Phase 2: Gathering brain context...")
