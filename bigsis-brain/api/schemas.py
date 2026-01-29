@@ -133,6 +133,5 @@ class ProcedureBase(BaseModel):
 
 class ProcedureRead(ProcedureBase):
     id: UUID
-    created_at: Any
     class Config:
         from_attributes = True
