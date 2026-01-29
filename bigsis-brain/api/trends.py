@@ -2,6 +2,7 @@
 Trends API - Discover, evaluate, approve, and learn trending topics.
 """
 
+import logging
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from typing import Optional
