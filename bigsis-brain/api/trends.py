@@ -47,7 +47,7 @@ async def discover_trending_topics(background_tasks: BackgroundTasks):
     Returns a batch_id immediately. Client should poll /trends/topics?batch_id={batch_id}.
     """
     batch_id = str(uuid.uuid4())[:8]
-    background_tasks.add_task(run_discovery_task_bg, batch_id)
+    background_tasks.add_task(run_discovery_bg, batch_id)
     
     return {
         "status": "processing",
