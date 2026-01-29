@@ -44,6 +44,8 @@ async def startup():
         await conn.execute(text("ALTER TABLE procedures ADD COLUMN IF NOT EXISTS pain_level VARCHAR"))
         await conn.execute(text("ALTER TABLE procedures ADD COLUMN IF NOT EXISTS category VARCHAR"))
         await conn.execute(text("ALTER TABLE procedures ADD COLUMN IF NOT EXISTS tags VARCHAR[]"))
+        await conn.execute(text("ALTER TABLE procedures ADD COLUMN IF NOT EXISTS embedding vector(1536)"))
+        await conn.execute(text("ALTER TABLE procedures ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW()"))
         
         # 3. Create tables if missing (for entirely new tables)
         await conn.run_sync(Base.metadata.create_all)
