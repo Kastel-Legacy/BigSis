@@ -34,7 +34,7 @@ const KnowledgePage: React.FC = () => {
     const [customQuery, setCustomQuery] = useState('');
     const [ingestSources, setIngestSources] = useState<{ pubmed: boolean; semantic: boolean; crossref: boolean }>({ pubmed: true, semantic: true, crossref: true });
 
-    const PRESET_TOPICS = [
+    const [ingestTopics, setIngestTopics] = useState<string[]>([
         'botulinum toxin facial wrinkles forehead glabella',
         'hyaluronic acid dermal filler nasolabial lips cheeks',
         'retinol retinoid facial aging anti-wrinkle',
@@ -50,9 +50,9 @@ const KnowledgePage: React.FC = () => {
         'lip augmentation filler techniques safety',
         'dark circles under eye treatment aesthetic',
         'facial volume loss aging filler restoration',
-    ];
+    ]);
 
-    const PRESET_FICHE_TOPICS = [
+    const [ficheTopics, setFicheTopics] = useState<string[]>([
         'Botox (Toxine Botulique) - Rides du visage',
         'Acide Hyaluronique (Fillers) - Sillons et Levres',
         'Retinol / Retinoides - Anti-age visage',
@@ -68,7 +68,7 @@ const KnowledgePage: React.FC = () => {
         'Cernes et poches sous les yeux',
         'Augmentation des levres',
         'Perte de volume facial liee a l\'age',
-    ];
+    ]);
 
     const fetchStats = async () => {
         try {
@@ -464,33 +464,48 @@ const KnowledgePage: React.FC = () => {
                             {batchMode === 'ingest' ? 'Requetes pre-configurees (Medecine Esthetique)' : 'Sujets de Fiches pre-configures'}
                         </p>
                         <div className="flex flex-wrap gap-2">
-                            {(batchMode === 'ingest' ? PRESET_TOPICS : PRESET_FICHE_TOPICS).map((t, i) => (
-                                <span key={i} className={`text-xs px-2.5 py-1.5 rounded-lg border ${batchMode === 'ingest' ? 'bg-cyan-500/5 border-cyan-500/20 text-cyan-400/80' : 'bg-purple-500/5 border-purple-500/20 text-purple-400/80'}`}>
+                            {(batchMode === 'ingest' ? ingestTopics : ficheTopics).map((t: string, i: number) => (
+                                <span key={i} className={`group flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border ${batchMode === 'ingest' ? 'bg-cyan-500/5 border-cyan-500/20 text-cyan-400/80' : 'bg-purple-500/5 border-purple-500/20 text-purple-400/80'}`}>
                                     {t}
+                                    <button
+                                        onClick={() => batchMode === 'ingest'
+                                            ? setIngestTopics(prev => prev.filter((_, idx) => idx !== i))
+                                            : setFicheTopics(prev => prev.filter((_, idx) => idx !== i))
+                                        }
+                                        className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-400 ml-0.5"
+                                        title="Supprimer"
+                                    >
+                                        <X size={10} />
+                                    </button>
                                 </span>
                             ))}
                         </div>
                     </div>
 
-                    {/* Custom query input */}
+                    {/* Custom query input — supporte le multi-lignes et le paste */}
                     <div className="flex gap-2 mb-6">
-                        <input
-                            type="text"
-                            placeholder="+ Ajouter une requete personnalisee..."
+                        <textarea
+                            rows={3}
+                            placeholder={'+ Ajouter une ou plusieurs requetes (une par ligne)...\nEx: lip filler hyaluronic acid RCT\nEx: lip augmentation systematic review'}
                             value={customQuery}
                             onChange={e => setCustomQuery(e.target.value)}
-                            onKeyDown={e => {
-                                if (e.key === 'Enter' && customQuery.trim()) {
-                                    if (batchMode === 'ingest') {
-                                        PRESET_TOPICS.push(customQuery.trim());
-                                    } else {
-                                        PRESET_FICHE_TOPICS.push(customQuery.trim());
-                                    }
-                                    setCustomQuery('');
-                                }
-                            }}
-                            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-cyan-500/50 outline-none"
+                            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-cyan-500/50 outline-none resize-none"
                         />
+                        <button
+                            onClick={() => {
+                                const lines = customQuery.split('\n').map(l => l.trim()).filter(Boolean);
+                                if (!lines.length) return;
+                                if (batchMode === 'ingest') {
+                                    setIngestTopics(prev => [...prev, ...lines.filter(l => !prev.includes(l))]);
+                                } else {
+                                    setFicheTopics(prev => [...prev, ...lines.filter(l => !prev.includes(l))]);
+                                }
+                                setCustomQuery('');
+                            }}
+                            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-bold transition-colors self-start mt-0 flex-shrink-0"
+                        >
+                            <Plus size={16} />
+                        </button>
                     </div>
 
                     {/* Action buttons */}
@@ -498,9 +513,9 @@ const KnowledgePage: React.FC = () => {
                         <button
                             onClick={() => {
                                 if (batchMode === 'ingest') {
-                                    startBatchIngest([...PRESET_TOPICS]);
+                                    startBatchIngest([...ingestTopics]);
                                 } else {
-                                    startBatchFiches([...PRESET_FICHE_TOPICS]);
+                                    startBatchFiches([...ficheTopics]);
                                 }
                             }}
                             className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${
@@ -511,8 +526,8 @@ const KnowledgePage: React.FC = () => {
                         >
                             <Play size={16} />
                             {batchMode === 'ingest'
-                                ? `Lancer ${[ingestSources.pubmed && 'PubMed', ingestSources.semantic && 'Scholar', ingestSources.crossref && 'CrossRef'].filter(Boolean).join(' + ')} (${PRESET_TOPICS.length} requetes)`
-                                : `Generer ${PRESET_FICHE_TOPICS.length} Fiches Verite`}
+                                ? `Lancer ${[ingestSources.pubmed && 'PubMed', ingestSources.semantic && 'Scholar', ingestSources.crossref && 'CrossRef'].filter(Boolean).join(' + ')} (${ingestTopics.length} requetes)`
+                                : `Generer ${ficheTopics.length} Fiches Verite`}
                         </button>
                     ) : (
                         <div className="space-y-4">
