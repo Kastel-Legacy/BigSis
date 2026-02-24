@@ -20,3 +20,5 @@ langchain-community
 langchain-text-splitters
 tiktoken
 pytrends
+python-jose[cryptography]
+httpx

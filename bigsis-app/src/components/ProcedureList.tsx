@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
 import { Check, AlertCircle, Clock, Euro, ExternalLink } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 interface Procedure {
     procedure_name: string;
@@ -44,7 +46,7 @@ const ProcedureList: React.FC<ProcedureListProps> = ({ recommendations }) => {
 
                         <div className="flex justify-between items-start mb-2">
                             <h3 className="text-xl font-bold text-white hover:text-cyan-400 transition-colors">
-                                <Link to={`/procedure/${encodeURIComponent(proc.procedure_name)}`} className="flex items-center gap-2">
+                                <Link href={`/fiches/${encodeURIComponent(proc.procedure_name)}`} className="flex items-center gap-2">
                                     {proc.procedure_name}
                                     <ExternalLink size={16} className="opacity-50" />
                                 </Link>

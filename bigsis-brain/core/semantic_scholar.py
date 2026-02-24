@@ -1,28 +1,35 @@
 import requests
+import time
 from typing import List, Dict
 from core.config import settings
 from core.rag.ingestion import ingest_document
 
 BASE_URL = "https://api.semanticscholar.org/graph/v1/paper/search"
+_S2_DELAY = 1.0  # Semantic Scholar: 100 req/5min without key
 
 def search_semantic_scholar(query: str, limit: int = 10) -> List[Dict]:
     print(f"   ... Appel API Semantic Scholar pour: {query}")
-    
+
     # Fields to retrieve
     fields = "paperId,title,abstract,year,url,isOpenAccess,openAccessPdf"
-    
+
     params = {
         "query": query,
         "limit": limit,
         "fields": fields
     }
-    
+
     headers = {}
     if settings.SEMANTIC_SCHOLAR_API_KEY:
         headers["x-api-key"] = settings.SEMANTIC_SCHOLAR_API_KEY
-    
+
     try:
-        resp = requests.get(BASE_URL, params=params, headers=headers)
+        time.sleep(_S2_DELAY)
+        resp = requests.get(BASE_URL, params=params, headers=headers, timeout=15)
+        if resp.status_code == 429:
+            print(f"⚠️ Semantic Scholar rate limited, retrying in 5s...")
+            time.sleep(5)
+            resp = requests.get(BASE_URL, params=params, headers=headers, timeout=15)
         resp.raise_for_status()
         data = resp.json()
         return data.get("data", [])

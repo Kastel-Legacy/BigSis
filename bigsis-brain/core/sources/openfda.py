@@ -1,5 +1,8 @@
 import requests
+import time
 from typing import Dict
+
+_FDA_DELAY = 0.3  # OpenFDA allows 240 req/min (~4/s)
 
 def get_fda_adverse_events(query: str) -> str:
     """
@@ -18,7 +21,8 @@ def get_fda_adverse_events(query: str) -> str:
     }
     
     try:
-        resp = requests.get(drug_url, params=params)
+        time.sleep(_FDA_DELAY)
+        resp = requests.get(drug_url, params=params, timeout=15)
         data = resp.json()
         
         if "results" in data:

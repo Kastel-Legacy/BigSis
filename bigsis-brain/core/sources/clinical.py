@@ -1,4 +1,7 @@
 import requests
+import time
+
+_TRIALS_DELAY = 0.3  # ClinicalTrials.gov — polite delay
 
 def get_ongoing_trials(query: str) -> str:
     """
@@ -10,13 +13,14 @@ def get_ongoing_trials(query: str) -> str:
     # On filtre sur les statuts pertinents
     params = {
         "query.term": query,
-        "filter.overallStatus": ["RECRUITING", "ACTIVE", "COMPLETED"],
+        "filter.overallStatus": "RECRUITING,ACTIVE_NOT_RECRUITING,COMPLETED",
         "pageSize": 5,
-        "sort": [{"field": "lastUpdateSubmitDate", "direction": "DESC"}] # Les plus récentes
+        "sort": "LastUpdatePostDate:desc",
     }
-    
+
     try:
-        resp = requests.get(url, params=params)
+        time.sleep(_TRIALS_DELAY)
+        resp = requests.get(url, params=params, timeout=15)
         data = resp.json()
         
         if "studies" not in data or not data["studies"]:

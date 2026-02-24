@@ -1,5 +1,8 @@
 import requests
+import time
 import json
+
+_PUBCHEM_DELAY = 0.3  # PubChem allows 5 req/s
 
 def get_chemical_safety(query: str) -> str:
     """
@@ -12,7 +15,8 @@ def get_chemical_safety(query: str) -> str:
     search_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{query}/cids/JSON"
     
     try:
-        resp = requests.get(search_url)
+        time.sleep(_PUBCHEM_DELAY)
+        resp = requests.get(search_url, timeout=15)
         if resp.status_code != 200:
             return "Pas de données chimiques (Ce n'est probablement pas une molécule simple)."
         
@@ -27,7 +31,8 @@ def get_chemical_safety(query: str) -> str:
     details_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/{cid}/JSON?heading=GHS+Classification"
     
     try:
-        resp = requests.get(details_url)
+        time.sleep(_PUBCHEM_DELAY)
+        resp = requests.get(details_url, timeout=15)
         if resp.status_code != 200:
             return "Molécule trouvée, mais pas de données de sécurité GHS."
             

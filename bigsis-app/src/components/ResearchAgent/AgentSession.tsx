@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import {
     CheckCircle,
@@ -55,7 +57,6 @@ const AgentSession: React.FC<AgentSessionProps> = ({ query, onComplete }) => {
 
                 if (!response.ok) throw new Error("Search failed");
                 const data = await response.json();
-                console.log("🔍 API Response:", data);
 
                 // 4. Update UI based on real data
                 updateStep('search', 'completed', [

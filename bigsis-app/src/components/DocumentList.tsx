@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { FileText, Trash2, Calendar, Database, Search, Loader2, AlertCircle, Eye, X } from 'lucide-react';
 import { API_URL, getDocument } from '../api'; // Import API_URL and getDocument
@@ -208,15 +210,7 @@ const DocumentList: React.FC = () => {
                                             </div>
                                         </td>
                                         <td className="p-4">
-                                            <span className={`
-                                            px-2.5 py-1 rounded-full text-xs font-medium border flex items-center gap-1 w-fit
-                                            ${doc.metadata?.source === 'pubmed'
-                                                    ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                                                    : 'bg-orange-500/10 text-orange-400 border-orange-500/20'}
-                                        `}>
-                                                <span className={`w-1.5 h-1.5 rounded-full ${doc.metadata?.source === 'pubmed' ? 'bg-blue-400' : 'bg-orange-400'}`}></span>
-                                                {doc.metadata?.source || 'PDF'}
-                                            </span>
+                                            <SourceBadge source={doc.metadata?.source} />
                                         </td>
                                         <td className="p-4 text-gray-400 text-sm whitespace-nowrap">
                                             <div className="flex items-center gap-2">
@@ -340,5 +334,26 @@ const DocumentList: React.FC = () => {
         </>
     );
 };
+
+const SOURCE_STYLES: Record<string, { bg: string; text: string; dot: string; label: string }> = {
+    pubmed: { bg: 'bg-green-500/10 border-green-500/20', text: 'text-green-400', dot: 'bg-green-400', label: 'PubMed' },
+    semantic_scholar: { bg: 'bg-blue-500/10 border-blue-500/20', text: 'text-blue-400', dot: 'bg-blue-400', label: 'Scholar' },
+    crossref: { bg: 'bg-purple-500/10 border-purple-500/20', text: 'text-purple-400', dot: 'bg-purple-400', label: 'CrossRef' },
+    openfda: { bg: 'bg-red-500/10 border-red-500/20', text: 'text-red-400', dot: 'bg-red-400', label: 'OpenFDA' },
+    clinicaltrials: { bg: 'bg-amber-500/10 border-amber-500/20', text: 'text-amber-400', dot: 'bg-amber-400', label: 'Trials' },
+    pubchem: { bg: 'bg-cyan-500/10 border-cyan-500/20', text: 'text-cyan-400', dot: 'bg-cyan-400', label: 'PubChem' },
+    pdf: { bg: 'bg-orange-500/10 border-orange-500/20', text: 'text-orange-400', dot: 'bg-orange-400', label: 'PDF' },
+};
+
+function SourceBadge({ source }: { source?: string }) {
+    const key = (source || 'unknown').toLowerCase();
+    const style = SOURCE_STYLES[key] || { bg: 'bg-gray-500/10 border-gray-500/20', text: 'text-gray-400', dot: 'bg-gray-400', label: source || 'Unknown' };
+    return (
+        <span className={`px-2.5 py-1 rounded-full text-xs font-medium border flex items-center gap-1 w-fit ${style.bg} ${style.text}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
+            {style.label}
+        </span>
+    );
+}
 
 export default DocumentList;

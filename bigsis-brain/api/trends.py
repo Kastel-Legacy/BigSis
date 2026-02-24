@@ -3,11 +3,12 @@ Trends API - Discover, evaluate, approve, and learn trending topics.
 """
 
 import logging
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from typing import Optional
 from sqlalchemy import select, func
 
+from core.auth import AuthUser, require_admin
 from core.db.database import AsyncSessionLocal
 from core.db.models import TrendTopic
 from core.trends.scout import discover_trends
@@ -141,9 +142,9 @@ async def get_trend_topic(topic_id: str):
 
 
 @router.post("/trends/topics/{topic_id}/action")
-async def topic_action(topic_id: str, request: TopicActionRequest):
+async def topic_action(topic_id: str, request: TopicActionRequest, admin: AuthUser = Depends(require_admin)):
     """
-    Admin action on a topic: approve, reject, or defer.
+    Admin action on a topic: approve, reject, or defer. Admin only.
     - approve: sets status to 'approved', ready for learning pipeline
     - reject: sets status to 'rejected'
     - defer: sets status to 'proposed' (back to queue)
@@ -223,9 +224,9 @@ async def check_trs(request: TRSCheckRequest):
 
 
 @router.delete("/trends/topics/{topic_id}")
-async def delete_trend_topic(topic_id: str):
+async def delete_trend_topic(topic_id: str, admin: AuthUser = Depends(require_admin)):
     """
-    Delete a specific trend topic by ID.
+    Delete a specific trend topic by ID. Admin only.
     """
     async with AsyncSessionLocal() as session:
         result = await session.execute(
@@ -243,9 +244,9 @@ async def delete_trend_topic(topic_id: str):
 
 
 @router.delete("/trends/cleanup")
-async def cleanup_rejected_topics():
+async def cleanup_rejected_topics(admin: AuthUser = Depends(require_admin)):
     """
-    Delete all topics with status 'rejected'.
+    Delete all topics with status 'rejected'. Admin only.
     Returns the count of deleted topics.
     """
     async with AsyncSessionLocal() as session:

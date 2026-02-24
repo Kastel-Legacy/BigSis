@@ -61,6 +61,17 @@ class RulesEngine:
             elif condition.operator == "in":
                 if user_val not in condition.value:
                     return False
-            # Add gt/lt if needed later
-            
+            elif condition.operator == "gt":
+                try:
+                    if float(user_val) <= float(condition.value):
+                        return False
+                except (ValueError, TypeError):
+                    return False
+            elif condition.operator == "lt":
+                try:
+                    if float(user_val) >= float(condition.value):
+                        return False
+                except (ValueError, TypeError):
+                    return False
+
         return True

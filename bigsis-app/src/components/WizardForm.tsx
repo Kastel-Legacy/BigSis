@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { ArrowRight, Loader2, User, Smile, Baby, Check } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import axios from 'axios';
@@ -8,7 +10,7 @@ import { API_URL } from '../api';
 
 const WizardForm: React.FC = () => {
     const { t } = useLanguage();
-    const navigate = useNavigate();
+    const router = useRouter();
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         area: '',
@@ -28,7 +30,8 @@ const WizardForm: React.FC = () => {
             // We use mode='recommendation' to trigger the List Logic backend side
             const result = await axios.post(`${API_URL}/social/generate`, { topic, mode: 'recommendation' });
 
-            navigate('/result', { state: { result: result.data, mode: 'list' } });
+            sessionStorage.setItem('bigsis_result', JSON.stringify({ result: result.data, mode: 'list', formData }));
+            router.push('/result');
         } catch (error) {
             console.error("Analysis failed", error);
             alert("Une erreur est survenue. Veuillez réessayer.");

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Search, Globe, Loader2, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import { API_URL } from '../api';

@@ -1,10 +1,39 @@
 import requests
+import time
 from typing import List, Dict
 from core.config import settings
 from core.rag.ingestion import ingest_document
 import asyncio
 
 BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
+_PUBMED_DELAY = 0.4  # NCBI allows 3 req/s without API key
+
+def validate_pmids(pmids: List[str]) -> Dict[str, bool]:
+    """Batch-validate PMIDs via NCBI esummary. Returns {pmid: exists}."""
+    if not pmids:
+        return {}
+    ids_str = ",".join(pmids)
+    params = {
+        "db": "pubmed",
+        "id": ids_str,
+        "retmode": "json",
+        "email": settings.PUBMED_EMAIL,
+    }
+    try:
+        time.sleep(_PUBMED_DELAY)
+        resp = requests.get(f"{BASE_URL}/esummary.fcgi", params=params, timeout=10)
+        resp.raise_for_status()
+        data = resp.json().get("result", {})
+        results = {}
+        for pmid in pmids:
+            entry = data.get(pmid, {})
+            # Invalid PMIDs have an "error" key in their entry
+            results[pmid] = "error" not in entry and "title" in entry
+        return results
+    except Exception as e:
+        print(f"⚠️ PMID validation failed: {e}")
+        return {pmid: False for pmid in pmids}
+
 
 def search_pubmed(query: str, max_results: int = None) -> List[str]:
     print(f"   ... Appel API PubMed Search pour: {query}")
@@ -19,7 +48,8 @@ def search_pubmed(query: str, max_results: int = None) -> List[str]:
     }
 
     try:
-        resp = requests.get(f"{BASE_URL}/esearch.fcgi", params=params)
+        time.sleep(_PUBMED_DELAY)
+        resp = requests.get(f"{BASE_URL}/esearch.fcgi", params=params, timeout=15)
         resp.raise_for_status()
         data = resp.json()
         return data.get("esearchresult", {}).get("idlist", [])
@@ -32,20 +62,21 @@ import xml.etree.ElementTree as ET
 def fetch_details(pmids: List[str]) -> List[Dict]:
     if not pmids:
         return []
-    
+
     ids_str = ",".join(pmids)
     print(f"   ... Récupération détails complets (efetch) pour {len(pmids)} ID(s)")
-    
+
     # Use efetch for full records (including abstracts)
     params = {
         "db": "pubmed",
         "id": ids_str,
-        "retmode": "xml", 
+        "retmode": "xml",
         "email": settings.PUBMED_EMAIL
     }
-    
+
     try:
-        resp = requests.get(f"{BASE_URL}/efetch.fcgi", params=params)
+        time.sleep(_PUBMED_DELAY)
+        resp = requests.get(f"{BASE_URL}/efetch.fcgi", params=params, timeout=15)
         resp.raise_for_status()
         
         root = ET.fromstring(resp.content)
@@ -146,6 +177,20 @@ async def ingest_pubmed_results(query: str):
         
     print(f"✅ Ingestion terminée pour {count} articles.")
     return count
+
+def build_pubmed_queries(ingredient: str, mesh_synonyms: list = None) -> list:
+    """Build efficacy + safety PubMed queries with optional MeSH synonym expansion."""
+    terms = [f'"{ingredient}"[Title/Abstract]']
+    for syn in (mesh_synonyms or []):
+        clean = syn.strip()
+        if clean:
+            terms.append(f'"{clean}"[MeSH Terms]')
+    base = f'({" OR ".join(terms)}) AND ("skin"[MeSH Terms] OR "dermatology"[MeSH Terms])'
+    return [
+        f'{base} AND ("efficacy"[Title/Abstract] OR "effectiveness"[Title/Abstract]) AND (Meta-Analysis[pt] OR Systematic Review[pt] OR Randomized Controlled Trial[pt])',
+        f'{base} AND ("safety"[Title/Abstract] OR "adverse effects"[Title/Abstract] OR "toxicity"[Title/Abstract])'
+    ]
+
 
 async def search_claims_for_ingredient(ingredient: str) -> List[Dict]:
     """

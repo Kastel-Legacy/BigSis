@@ -21,6 +21,7 @@ class AnalyzeResponse(BaseModel):
 class GenerateRequest(BaseModel):
     topic: str
     mode: str = "social" # social, diagnostic, recommendation
+    force: bool = False   # Skip cache, create new version
 
 class SocialGenerationRequest(BaseModel):
     topic: str
@@ -135,3 +136,18 @@ class ProcedureRead(ProcedureBase):
     id: UUID
     class Config:
         from_attributes = True
+
+# --- CHAT DIAGNOSTIC ---
+
+class ChatMessage(BaseModel):
+    role: str  # "user" or "assistant"
+    content: str
+
+class DiagnosticRequest(BaseModel):
+    messages: List[ChatMessage]
+    language: str = "fr"
+    context: Optional[Dict[str, str]] = None
+
+class FicheFeedbackRequest(BaseModel):
+    rating: int  # 1 = thumbs down, 5 = thumbs up
+    comment: Optional[str] = None

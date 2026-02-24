@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* BigSIS Design Tokens */
+  --deep-teal: #0D3B4C;
+  --rich-plum: #4B1D3F;
+  --accent-cyan: #22D3EE;
+  --success-green: #10B981;
+  --peachy-coral: #FB7185;
+  --alert-red: #EF4444;
+  --card-bg: #FFFFFF;
+  --text-main: #1F2937;
+  --text-muted: #6B7280;
+  --soft-sage: #E2E8F0;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1c2e 0%, #312e81 100%);
+  /* Deep indigo gradient */
+  background-attachment: fixed;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: rgba(165, 180, 252, 0.5);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.glass-button {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.glass-button:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}

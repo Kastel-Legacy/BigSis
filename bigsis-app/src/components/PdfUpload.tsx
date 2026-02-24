@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useRef } from 'react';
 import { UploadCloud, FileText, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { API_URL } from '../api';

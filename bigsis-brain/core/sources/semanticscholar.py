@@ -19,10 +19,17 @@ def get_influential_studies(query: str) -> List[Dict]:
     structured_studies = []
     
     try:
-        time.sleep(1) # Politesse API
-        resp = requests.get(base_url, params=params)
-        
+        time.sleep(1)  # Politesse API
+        resp = requests.get(base_url, params=params, timeout=15)
+
+        # Retry once on rate limit (429)
+        if resp.status_code == 429:
+            print(f"⚠️ Semantic Scholar rate limited, retrying in 5s...")
+            time.sleep(5)
+            resp = requests.get(base_url, params=params, timeout=15)
+
         if resp.status_code != 200:
+            print(f"⚠️ Semantic Scholar returned {resp.status_code}")
             return []
             
         data = resp.json()

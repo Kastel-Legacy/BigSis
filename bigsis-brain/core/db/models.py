@@ -231,6 +231,20 @@ class SocialGeneration(Base):
     language = Column(String, default="fr")
     content = Column(JSONB, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    status = Column(String, server_default="published", nullable=False, index=True)
+
+
+# --- FICHE FEEDBACK ---
+
+class FicheFeedback(Base):
+    __tablename__ = "fiche_feedbacks"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    fiche_slug = Column(String, nullable=False, index=True)
+    user_id = Column(String, nullable=True)
+    rating = Column(Integer, nullable=False)       # 1 = thumbs down, 5 = thumbs up
+    comment = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
 # --- TREND INTELLIGENCE ---
@@ -273,4 +287,64 @@ class TrendTopic(Base):
 
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+# --- SHARED DIAGNOSTICS (Viral Loop) ---
+
+class SharedDiagnostic(Base):
+    __tablename__ = "shared_diagnostics"
+
+    id = Column(String(8), primary_key=True, default=lambda: uuid.uuid4().hex[:8])
+    area = Column(String, nullable=False)           # front, glabelle, pattes_oie
+    wrinkle_type = Column(String, nullable=False)    # expression, statique
+    uncertainty_level = Column(String)                # low, medium, high
+    score = Column(Integer)                           # 9, 6, or 3
+    top_recommendation = Column(Text)
+    questions_count = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+# --- USER ACCOUNTS & RETENTION ---
+
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    supabase_uid = Column(String, unique=True, index=True, nullable=False)
+    first_name = Column(String)
+    skin_type = Column(String)          # normale, grasse, seche, mixte, sensible
+    age_range = Column(String)          # 18-25, 26-35, 36-45, 46-55, 55+
+    concerns = Column(ARRAY(String))    # ["rides", "taches", "pores"]
+    preferences = Column(JSONB)         # notifications, langue, etc.
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class DiagnosticHistory(Base):
+    __tablename__ = "diagnostic_history"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(String, ForeignKey("user_profiles.supabase_uid"), index=True, nullable=False)
+    area = Column(String, nullable=False)
+    wrinkle_type = Column(String)
+    score = Column(Integer)
+    top_recommendation = Column(Text)
+    chat_messages = Column(JSONB)       # Saved chat conversation
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class JournalEntry(Base):
+    __tablename__ = "journal_entries"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(String, ForeignKey("user_profiles.supabase_uid"), index=True, nullable=False)
+    procedure_name = Column(String, nullable=False)
+    entry_date = Column(DateTime(timezone=True), nullable=False)
+    day_number = Column(Integer)        # J+0, J+1, J+7...
+    pain_level = Column(Integer)        # 0-10
+    swelling_level = Column(Integer)    # 0-10
+    satisfaction = Column(Integer)      # 0-10
+    notes = Column(Text)
+    photo_url = Column(String)          # Optional, Supabase Storage URL
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 

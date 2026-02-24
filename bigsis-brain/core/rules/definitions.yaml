@@ -1,7 +1,9 @@
 rules:
-  # --- FOREHEAD ---
+  # =========================================================================
+  # FRONT (FOREHEAD)
+  # =========================================================================
   - id: "R_FRONT_DYN_01"
-    description: "Suggest Botox for dynamic forehead wrinkles"
+    description: "Dynamic forehead wrinkles - botulinum toxin"
     conditions:
       - field: "area"
         operator: "eq"
@@ -12,15 +14,15 @@ rules:
     outputs:
       - type: "suggestion"
         key: "toxine_botulique"
-        detail: "La toxine botulique est souvent discutée pour les rides dynamiques du front."
+        detail: "La toxine botulique (Botox, Azzalure, Bocouture) est le traitement de reference pour les rides dynamiques du front. Elle relaxe les muscles frontaux et lisse le front au repos."
         weight: 1.0
       - type: "warning"
         key: "ptosis_risk"
-        detail: "Zone délicate : risque de ptosis (chute du sourcil) si mal dosé."
+        detail: "Zone delicate : risque de ptosis (chute du sourcil) si le dosage ou l'injection est mal place. Toujours consulter un praticien experimente."
         weight: 0.8
 
   - id: "R_FRONT_STAT_01"
-    description: "Deep static forehead wrinkles"
+    description: "Static forehead wrinkles - combined approach"
     conditions:
       - field: "area"
         operator: "eq"
@@ -30,24 +32,296 @@ rules:
         value: "statique"
     outputs:
       - type: "suggestion"
-        key: "consultation_advanced"
-        detail: "Pour les rides marquées au repos, le Botox seul peut ne pas suffire (combinaison possible)."
+        key: "combinaison_front"
+        detail: "Pour les rides marquees au repos, le Botox seul peut ne pas suffire. Une combinaison toxine botulique + acide hyaluronique (skinbooster ou comblement leger) est souvent discutee."
+        weight: 0.9
+      - type: "suggestion"
+        key: "laser_front"
+        detail: "Le laser CO2 fractionne ou la radiofrequence microneedling (Morpheus8) peuvent ameliorer la texture et stimuler le collagene sur les rides statiques du front."
+        weight: 0.7
+
+  - id: "R_FRONT_PREV_01"
+    description: "Forehead prevention"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "front"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "prevention"
+    outputs:
+      - type: "suggestion"
+        key: "prevention_front"
+        detail: "En prevention : skinboosters (Profhilo, Juvederm Volite) pour maintenir l'hydratation profonde, micro-doses de toxine botulique ('Baby Botox'), et soins topiques (retinol, vitamine C, SPF quotidien)."
+        weight: 0.8
+      - type: "question"
+        key: "sun_exposure"
+        detail: "Le soleil est le facteur n1 du vieillissement cutane. Demandez a votre praticien un protocole photoprotection adapte."
+        weight: 0.6
+
+  - id: "R_FRONT_RELACH_01"
+    description: "Forehead sagging"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "front"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "relachement"
+    outputs:
+      - type: "suggestion"
+        key: "lifting_front"
+        detail: "Le relachement du front peut etre aborde par fils tenseurs PDO, radiofrequence, ou dans les cas avances, un lifting frontal chirurgical (browlift)."
+        weight: 0.8
+      - type: "uncertainty"
+        key: "chirurgie_incertitude"
+        detail: "L'indication chirurgicale depend fortement de l'examen clinique. Une consultation specialisee est indispensable."
         weight: 0.9
 
-  # --- GLABELLE (Lion) ---
+  # =========================================================================
+  # GLABELLE (FROWN LINES / RIDES DU LION)
+  # =========================================================================
   - id: "R_GLAB_DYN_01"
-    description: "Glabella dynamic wrinkles"
+    description: "Glabella dynamic wrinkles - botulinum toxin"
     conditions:
       - field: "area"
         operator: "eq"
         value: "glabelle"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "expression"
     outputs:
       - type: "suggestion"
-        key: "toxine_botulique"
-        detail: "Zone de prédilection pour la toxine botulique (rides du lion)."
+        key: "toxine_botulique_glabelle"
+        detail: "La glabelle est LA zone de predilection pour la toxine botulique. Les rides du lion (corrugator, procerus) repondent tres bien au traitement. C'est souvent la premiere zone traitee."
         weight: 1.0
 
-  # --- PREGNANCY EXCLUSION ---
+  - id: "R_GLAB_STAT_01"
+    description: "Glabella static deep wrinkles"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "glabelle"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "statique"
+    outputs:
+      - type: "suggestion"
+        key: "combo_glabelle"
+        detail: "Rides du lion marquees au repos : combinaison toxine botulique + comblement leger a l'acide hyaluronique dans le sillon. Attention : zone a risque vasculaire, praticien expert requis."
+        weight: 0.9
+      - type: "warning"
+        key: "risque_vasculaire_glabelle"
+        detail: "La glabelle est une zone a risque vasculaire (artere supratrochleaire). L'injection de filler ici necessite une expertise avancee en anatomie."
+        weight: 1.0
+
+  - id: "R_GLAB_PREV_01"
+    description: "Glabella prevention"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "glabelle"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "prevention"
+    outputs:
+      - type: "suggestion"
+        key: "prevention_glabelle"
+        detail: "Baby Botox preventif sur la glabelle (micro-doses) pour eviter que les rides d'expression ne se creusent avec le temps. Associer a du retinol topique le soir."
+        weight: 0.7
+
+  # =========================================================================
+  # PATTES D'OIE (CROW'S FEET / PERIORBITAL)
+  # =========================================================================
+  - id: "R_YEUX_DYN_01"
+    description: "Crow's feet dynamic wrinkles - botulinum toxin"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "pattes_oie"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "expression"
+    outputs:
+      - type: "suggestion"
+        key: "toxine_pattes_oie"
+        detail: "La toxine botulique sur l'orbiculaire de l'oeil est le traitement de reference des pattes d'oie dynamiques. Resultat visible en 5-10 jours, duree 3-6 mois."
+        weight: 1.0
+      - type: "warning"
+        key: "sourire_naturel"
+        detail: "Un sur-dosage peut figer le sourire. Un bon praticien preserve un resultat naturel ('Bright Eyes' technique)."
+        weight: 0.7
+
+  - id: "R_YEUX_STAT_01"
+    description: "Crow's feet static wrinkles - combined"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "pattes_oie"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "statique"
+    outputs:
+      - type: "suggestion"
+        key: "combo_yeux"
+        detail: "Rides statiques periorbitaires : combiner toxine + skinboosters (injection superficielle d'AH) + eventuellement laser fractionne doux (Erbium ou CO2 light)."
+        weight: 0.9
+      - type: "suggestion"
+        key: "peeling_yeux"
+        detail: "Un peeling moyen (TCA) peut aussi ameliorer la texture de la peau fine periorbitaire."
+        weight: 0.6
+
+  - id: "R_YEUX_PREV_01"
+    description: "Crow's feet prevention"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "pattes_oie"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "prevention"
+    outputs:
+      - type: "suggestion"
+        key: "prevention_yeux"
+        detail: "Zone tres fine et exposee : SPF 50 quotidien, lunettes de soleil, contour des yeux au retinaldehyde, et skinboosters preventifs des 28-30 ans si necessaire."
+        weight: 0.7
+
+  - id: "R_YEUX_RELACH_01"
+    description: "Periorbital sagging / volume loss"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "pattes_oie"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "relachement"
+    outputs:
+      - type: "suggestion"
+        key: "cernes_volume"
+        detail: "Le relachement periorbitaire (cernes creux, poches) peut etre ameliore par injection d'AH dans le cerne ou par blepharoplastie (chirurgie des paupieres)."
+        weight: 0.8
+
+  # =========================================================================
+  # SILLON NASOGENIEN (NASOLABIAL FOLDS)
+  # =========================================================================
+  - id: "R_SILLON_DYN_01"
+    description: "Nasolabial folds expression lines"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "sillon_nasogenien"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "expression"
+    outputs:
+      - type: "suggestion"
+        key: "ah_sillon"
+        detail: "L'acide hyaluronique volumateur (Juvederm Voluma, Restylane Lyft) est le gold standard pour le comblement des sillons nasogeniens. Resultat immediat, duree 12-18 mois."
+        weight: 1.0
+      - type: "warning"
+        key: "naturel_sillon"
+        detail: "Attention au sur-comblement ('pillow face'). Le sillon nasogenien est naturel - l'objectif est de l'attenuer, pas de le supprimer."
+        weight: 0.8
+
+  - id: "R_SILLON_STAT_01"
+    description: "Nasolabial folds deep static"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "sillon_nasogenien"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "statique"
+    outputs:
+      - type: "suggestion"
+        key: "combo_sillon"
+        detail: "Sillons profonds : combinaison AH volumateur + radiofrequence (Thermage, Morpheus8) pour relancer le collagene. La strategie de volumetrie en 3D (pommettes + sillon) est souvent plus efficace."
+        weight: 0.9
+      - type: "suggestion"
+        key: "fils_tenseurs_sillon"
+        detail: "Les fils tenseurs PDO/PLLA peuvent completer le comblement en apportant un effet liftant mecanique sur le tiers moyen du visage."
+        weight: 0.7
+
+  - id: "R_SILLON_PREV_01"
+    description: "Nasolabial prevention"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "sillon_nasogenien"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "prevention"
+    outputs:
+      - type: "suggestion"
+        key: "prevention_sillon"
+        detail: "Prevention du creusement : maintien du volume facial (skinboosters, Profhilo), exercices faciaux, et soins topiques stimulant le collagene (retinol, peptides)."
+        weight: 0.7
+
+  - id: "R_SILLON_RELACH_01"
+    description: "Nasolabial sagging / volume loss"
+    conditions:
+      - field: "area"
+        operator: "eq"
+        value: "sillon_nasogenien"
+      - field: "wrinkle_type"
+        operator: "eq"
+        value: "relachement"
+    outputs:
+      - type: "suggestion"
+        key: "lifting_sillon"
+        detail: "Le relachement marque du tiers moyen (perte de projection malaire) peut necessiter une volumetrie 3D a l'AH ou, dans les cas avances, un lifting cervico-facial."
+        weight: 0.8
+
+  # =========================================================================
+  # REGLES TRANSVERSALES - AGE
+  # =========================================================================
+  - id: "R_AGE_JEUNE_01"
+    description: "Young patients (< 30) - prevention focus"
+    conditions:
+      - field: "age"
+        operator: "lt"
+        value: 30
+    outputs:
+      - type: "suggestion"
+        key: "approche_jeune"
+        detail: "Avant 30 ans, privilegier la prevention : photoprotection (SPF 50), antioxydants topiques (vitamine C), retinol progressif. Les traitements invasifs sont rarement necessaires a cet age."
+        weight: 0.6
+      - type: "question"
+        key: "motivation_jeune"
+        detail: "Demandez a votre praticien si un traitement est reellement indique a votre age, ou si des soins topiques et un bon mode de vie suffisent."
+        weight: 0.5
+
+  - id: "R_AGE_MOYEN_01"
+    description: "Middle-aged patients (30-50) - standard approach"
+    conditions:
+      - field: "age"
+        operator: "gt"
+        value: 29
+    outputs:
+      - type: "suggestion"
+        key: "approche_standard"
+        detail: "Entre 30 et 50 ans, c'est la periode ideale pour les traitements combines : toxine botulique, skinboosters, et eventuellement comblement leger. Les resultats sont optimaux."
+        weight: 0.5
+
+  - id: "R_AGE_SENIOR_01"
+    description: "Senior patients (> 55) - global approach"
+    conditions:
+      - field: "age"
+        operator: "gt"
+        value: 55
+    outputs:
+      - type: "suggestion"
+        key: "approche_globale"
+        detail: "Apres 55 ans, une approche globale est souvent preferable : evaluation du relachement, de la perte de volume, et de la qualite de peau. Un plan de traitement multi-etapes est recommande."
+        weight: 0.7
+      - type: "question"
+        key: "bilan_global"
+        detail: "Demandez a votre praticien un bilan esthetique global plutot qu'un traitement isole d'une seule zone."
+        weight: 0.6
+
+  # =========================================================================
+  # REGLES DE SECURITE
+  # =========================================================================
   - id: "R_SAFETY_PREG"
     description: "Contraindication for pregnancy"
     conditions:
@@ -57,5 +331,9 @@ rules:
     outputs:
       - type: "contraindication"
         key: "pregnancy_stop"
-        detail: "Les procédures esthétiques injectables sont contre-indiquées pendant la grossesse."
+        detail: "Les procedures esthetiques injectables (toxine botulique, acide hyaluronique) sont contre-indiquees pendant la grossesse et l'allaitement. Les peelings chimiques et lasers sont egalement deconseilles."
         weight: 10.0
+      - type: "suggestion"
+        key: "attendre_post_partum"
+        detail: "Attendre minimum 3 mois apres l'arret de l'allaitement avant d'envisager tout traitement esthetique injectable."
+        weight: 5.0

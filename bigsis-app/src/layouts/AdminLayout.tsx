@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
     Search,
     Database,
@@ -7,10 +10,11 @@ import {
     Home,
     Settings,
     Shield,
-    TrendingUp
+    TrendingUp,
+    FileText
 } from 'lucide-react';
 
-const AdminLayout: React.FC = () => {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="flex h-screen bg-[#050912] text-white">
             {/* Sidebar */}
@@ -26,15 +30,16 @@ const AdminLayout: React.FC = () => {
 
                 <div className="flex-1 py-6 px-4 space-y-1">
                     <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Backoffice</p>
-                    <SidebarLink to="/admin/trends" icon={<TrendingUp size={18} />} label="Trend Discovery" />
-                    <SidebarLink to="/admin/research" icon={<Search size={18} />} label="Deep Research" />
-                    <SidebarLink to="/admin/knowledge" icon={<Database size={18} />} label="Knowledge Base" />
-                    <SidebarLink to="/admin/studio" icon={<Sparkles size={18} />} label="Studio (Debug)" />
+                    <SidebarLink href="/admin/trends" icon={<TrendingUp size={18} />} label="Trend Discovery" />
+                    <SidebarLink href="/admin/research" icon={<Search size={18} />} label="Deep Research" />
+                    <SidebarLink href="/admin/knowledge" icon={<Database size={18} />} label="Knowledge Base" />
+                    <SidebarLink href="/admin/studio" icon={<Sparkles size={18} />} label="Studio (Debug)" />
+                    <SidebarLink href="/admin/fiches" icon={<FileText size={18} />} label="Fiches Verite" />
 
                     <div className="my-6 border-t border-white/5" />
 
                     <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">System</p>
-                    <SidebarLink to="/" icon={<Home size={18} />} label="Back to Website" />
+                    <SidebarLink href="/" icon={<Home size={18} />} label="Back to Website" />
                 </div>
 
                 <div className="p-4 border-t border-white/10">
@@ -47,19 +52,19 @@ const AdminLayout: React.FC = () => {
 
             {/* Main Content Area */}
             <main className="flex-1 overflow-auto bg-[#050912]">
-                <Outlet />
+                {children}
             </main>
         </div>
     );
-};
+}
 
-function SidebarLink({ to, icon, label }: { to: string, icon: React.ReactNode, label: string }) {
-    const location = useLocation();
-    const active = location.pathname.startsWith(to) && to !== '/' || (to === '/' && location.pathname === '/');
+function SidebarLink({ href, icon, label }: { href: string, icon: React.ReactNode, label: string }) {
+    const pathname = usePathname();
+    const active = (pathname?.startsWith(href) && href !== '/') || (href === '/' && pathname === '/');
 
     return (
         <Link
-            to={to}
+            href={href}
             className={`
                 flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
                 ${active
@@ -73,5 +78,3 @@ function SidebarLink({ to, icon, label }: { to: string, icon: React.ReactNode, l
         </Link>
     );
 }
-
-export default AdminLayout;

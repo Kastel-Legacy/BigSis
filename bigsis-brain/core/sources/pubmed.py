@@ -1,9 +1,11 @@
 import requests
+import time
 import xml.etree.ElementTree as ET
 from typing import List, Dict
 from core.config import settings
 
 BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
+_PUBMED_DELAY = 0.4  # NCBI allows 3 req/s without API key
 
 def search_pubmed(query: str) -> List[str]:
     """Récupère les ID (Mode Silencieux)."""
@@ -16,7 +18,8 @@ def search_pubmed(query: str) -> List[str]:
         "email": settings.PUBMED_EMAIL
     }
     try:
-        resp = requests.get(f"{BASE_URL}/esearch.fcgi", params=params)
+        time.sleep(_PUBMED_DELAY)
+        resp = requests.get(f"{BASE_URL}/esearch.fcgi", params=params, timeout=15)
         resp.raise_for_status()
         return resp.json().get("esearchresult", {}).get("idlist", [])
     except Exception as e:
@@ -40,7 +43,8 @@ def fetch_details(pmids: List[str]) -> List[Dict]:
     
     docs = []
     try:
-        resp = requests.get(f"{BASE_URL}/efetch.fcgi", params=params)
+        time.sleep(_PUBMED_DELAY)
+        resp = requests.get(f"{BASE_URL}/efetch.fcgi", params=params, timeout=15)
         resp.raise_for_status()
         
         root = ET.fromstring(resp.content)

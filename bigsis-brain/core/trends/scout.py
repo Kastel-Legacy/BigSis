@@ -82,7 +82,7 @@ async def discover_trends(batch_id: str = None) -> Dict:
         chunk_count=chunk_count,
         proc_count=proc_count,
         fiche_topics=", ".join(fiche_topics) if fiche_topics else "Aucune",
-        extra_context=extra_context,
+        extra_context="",
         gt_trends_data=gt_formatted,
     )
 

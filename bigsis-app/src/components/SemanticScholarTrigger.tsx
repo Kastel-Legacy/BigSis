@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Search, GraduationCap, Loader2, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react'; // Changed icon to GraduationCap
 import { API_URL } from '../api';
