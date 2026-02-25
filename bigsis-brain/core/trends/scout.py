@@ -28,7 +28,6 @@ from core.prompts.trends import (
     TREND_USER_PROMPT_TEMPLATE,
     format_recent_signals_for_prompt,
 )
-from core.trends.trs_engine import compute_trs
 from core.sources.crossref import get_crossref_studies
 
 logger = logging.getLogger(__name__)
@@ -269,7 +268,7 @@ async def discover_trends(batch_id: str = None) -> Dict:
         system_prompt=TREND_SCOUT_SYSTEM_PROMPT,
         user_content=user_prompt,
         json_mode=True,
-        model_override="gpt-4o",
+        model_override="gpt-4o-mini",
         temperature_override=0.3,
     )
 
@@ -277,12 +276,13 @@ async def discover_trends(batch_id: str = None) -> Dict:
         logger.error(f"[Scout] LLM returned invalid format: {llm_result}")
         return {"error": "LLM returned invalid format", "raw": llm_result}
 
-    # Phase 4: TRS + persist
-    logger.info("[Scout] Phase 4: Computing TRS and persisting topics...")
-    topics_output = []
+    # Phase 4: Persist topics — TRS computed on-demand when admin clicks "Intéressant"
+    logger.info("[Scout] Phase 4: Persisting topics (TRS deferred to admin approval)...")
+    trending = llm_result["trending_topics"]
 
+    topics_output = []
     async with AsyncSessionLocal() as session:
-        for topic_data in llm_result["trending_topics"]:
+        for topic_data in trending:
             titre = topic_data["titre"]
 
             expertises = topic_data.get("expertises", {})
@@ -291,8 +291,6 @@ async def discover_trends(batch_id: str = None) -> Dict:
             ai_sci = expertises.get("science", {}).get("score", 0)
             ai_know = expertises.get("knowledge_ia", {}).get("score", 0)
             new_composite = round((marketing_score * 0.3) + (ai_sci * 0.4) + (ai_know * 0.3), 1)
-
-            trs_result = await compute_trs(titre)
 
             record = TrendTopic(
                 titre=titre,
@@ -310,8 +308,8 @@ async def discover_trends(batch_id: str = None) -> Dict:
                 score_composite=new_composite,
                 status="proposed",
                 recommandation=topic_data.get("recommandation", "REPORTER"),
-                trs_current=trs_result["trs"],
-                trs_details=trs_result["details"],
+                trs_current=0,
+                trs_details={},
                 learning_iterations=0,
                 learning_log=[],
                 batch_id=batch_id,
@@ -329,9 +327,6 @@ async def discover_trends(batch_id: str = None) -> Dict:
                 "expertises": expertises,
                 "score_composite": new_composite,
                 "recommandation": record.recommandation,
-                "trs_current": trs_result["trs"],
-                "trs_status": trs_result["status"],
-                "trs_details": trs_result["details"],
             })
 
         await session.commit()

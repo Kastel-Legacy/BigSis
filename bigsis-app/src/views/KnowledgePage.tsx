@@ -16,6 +16,7 @@ import { useAuth } from '../context/AuthContext';
 const KnowledgePage: React.FC = () => {
     const { session } = useAuth();
     const [stats, setStats] = useState<any>(null);
+    const [statsError, setStatsError] = useState(false);
     const [showDocs, setShowDocs] = useState(false);
     const [resetting, setResetting] = useState<string | null>(null);
     const [confirmReset, setConfirmReset] = useState<string | null>(null);
@@ -71,11 +72,13 @@ const KnowledgePage: React.FC = () => {
     ]);
 
     const fetchStats = async () => {
+        setStatsError(false);
         try {
             const res = await axios.get(`${API_URL}/knowledge/stats`);
             setStats(res.data);
         } catch (e) {
             console.error("Failed to fetch stats", e);
+            setStatsError(true);
         }
     };
 
@@ -296,9 +299,19 @@ const KnowledgePage: React.FC = () => {
                                     <div className="w-full h-[350px]">
                                         <KnowledgeRadar data={stats.radar_data} />
                                     </div>
+                                ) : statsError ? (
+                                    <div className="h-[350px] flex flex-col items-center justify-center gap-4">
+                                        <p className="text-red-400/70 text-sm italic">Backend injoignable — cold start possible</p>
+                                        <button
+                                            onClick={fetchStats}
+                                            className="px-4 py-2 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-xs font-bold hover:bg-cyan-500/20 transition-colors"
+                                        >
+                                            Réessayer
+                                        </button>
+                                    </div>
                                 ) : (
-                                    <div className="h-[350px] flex items-center justify-center text-gray-600 italic">
-                                        Initialisation des données...
+                                    <div className="h-[350px] flex items-center justify-center">
+                                        <div className="w-8 h-8 rounded-full border-2 border-cyan-500/30 border-t-cyan-400 animate-spin" />
                                     </div>
                                 )}
                             </div>

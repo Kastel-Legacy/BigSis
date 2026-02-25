@@ -185,6 +185,21 @@ const TrendsPage: React.FC = () => {
         }
     };
 
+    // "Intéressant" = approve + immediately start full learning (TRS computed inside learning pipeline)
+    const handleInterested = async (topicId: string) => {
+        setLoadingAction(`${topicId}-learn-full`);
+        try {
+            await axios.post(`${API_URL}/trends/topics/${topicId}/action`, { action: 'approve' }, authHeaders());
+            await saveQueries(topicId);
+            await axios.post(`${API_URL}/trends/topics/${topicId}/learn-full`);
+            await fetchTopics();
+        } catch (e) {
+            console.error('Interested action failed', e);
+        } finally {
+            setLoadingAction(null);
+        }
+    };
+
     const saveQueries = async (topicId: string) => {
         const queries = editingQueries[topicId];
         if (!queries) return;
@@ -354,18 +369,25 @@ const TrendsPage: React.FC = () => {
                                                 <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Score</p>
                                                 <p className={`text-2xl font-black ${scoreColor(topic.score_composite)}`}>{topic.score_composite?.toFixed(1)}</p>
                                             </div>
-                                            <div className="w-28">
-                                                <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 text-center">TRS</p>
-                                                <div className="h-2 bg-white/5 rounded-full overflow-hidden relative">
-                                                    <div className={`h-full rounded-full transition-all duration-700 ${trsBarColor(topic.trs_current)}`} style={{ width: `${Math.min(100, topic.trs_current)}%` }} />
-                                                    {/* Target marker at 70 */}
-                                                    <div className="absolute top-0 bottom-0 w-px bg-white/30" style={{ left: '70%' }} title="Seuil génération (70)" />
+                                            {topic.status === 'proposed' ? (
+                                                <div className="w-28 text-center">
+                                                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">TRS</p>
+                                                    <p className="text-xs text-gray-600 italic mt-2">À évaluer</p>
+                                                    <p className="text-[9px] text-gray-700 mt-0.5">← si intéressant</p>
                                                 </div>
-                                                <p className={`text-center text-sm font-bold mt-1 ${trsColor(topic.trs_current)}`}>
-                                                    {topic.trs_current?.toFixed(0)}/100
-                                                    {topic.trs_current < 70 && <span className="text-[9px] text-gray-600 ml-1">→70</span>}
-                                                </p>
-                                            </div>
+                                            ) : (
+                                                <div className="w-28">
+                                                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 text-center">TRS</p>
+                                                    <div className="h-2 bg-white/5 rounded-full overflow-hidden relative">
+                                                        <div className={`h-full rounded-full transition-all duration-700 ${trsBarColor(topic.trs_current)}`} style={{ width: `${Math.min(100, topic.trs_current)}%` }} />
+                                                        <div className="absolute top-0 bottom-0 w-px bg-white/30" style={{ left: '70%' }} title="Seuil génération (70)" />
+                                                    </div>
+                                                    <p className={`text-center text-sm font-bold mt-1 ${trsColor(topic.trs_current)}`}>
+                                                        {topic.trs_current?.toFixed(0)}/100
+                                                        {topic.trs_current < 70 && <span className="text-[9px] text-gray-600 ml-1">→70</span>}
+                                                    </p>
+                                                </div>
+                                            )}
                                             <button
                                                 onClick={async (e) => {
                                                     e.stopPropagation();
@@ -393,8 +415,20 @@ const TrendsPage: React.FC = () => {
                                         <div className="flex items-center gap-2 flex-wrap justify-end">
                                             {topic.status === 'proposed' && (
                                                 <>
-                                                    <ActionBtn label="Approuver" color="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20" icon={<CheckCircle size={14} />} loading={loadingAction === `${topic.id}-approve`} onClick={() => handleAction(topic.id, 'approve')} />
-                                                    <ActionBtn label="Rejeter" color="bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20" icon={<XCircle size={14} />} loading={loadingAction === `${topic.id}-reject`} onClick={() => handleAction(topic.id, 'reject')} />
+                                                    <ActionBtn
+                                                        label="Intéressant →"
+                                                        color="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20"
+                                                        icon={<Zap size={14} />}
+                                                        loading={loadingAction === `${topic.id}-learn-full`}
+                                                        onClick={() => handleInterested(topic.id)}
+                                                    />
+                                                    <ActionBtn
+                                                        label="Ignorer"
+                                                        color="bg-white/5 text-gray-500 border-white/10 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20"
+                                                        icon={<XCircle size={14} />}
+                                                        loading={loadingAction === `${topic.id}-reject`}
+                                                        onClick={() => handleAction(topic.id, 'reject')}
+                                                    />
                                                 </>
                                             )}
                                             {topic.status === 'approved' && (
@@ -624,7 +658,7 @@ const TrendsPage: React.FC = () => {
                         </div>
                         <div className="space-y-2">
                             <p className="text-white font-bold text-lg">Trend Intelligence en action...</p>
-                            <p className="text-gray-500 text-sm">PubMed signals · Reddit · CrossRef → Évaluation multi-experts → TRS</p>
+                            <p className="text-gray-500 text-sm">PubMed · Reddit · CrossRef → LLM Scout → 5 sujets proposés</p>
                         </div>
                     </div>
                 )}
