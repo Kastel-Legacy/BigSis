@@ -120,6 +120,7 @@ async def list_trend_topics(status: Optional[str] = None, batch_id: Optional[str
                 "learning_iterations": t.learning_iterations,
                 "last_learning_delta": t.last_learning_delta,
                 "learning_log": t.learning_log,
+                "raw_signals": t.raw_signals,
                 "batch_id": t.batch_id,
                 "created_at": t.created_at,
             }
@@ -160,6 +161,7 @@ async def get_trend_topic(topic_id: str):
             "learning_iterations": t.learning_iterations,
             "last_learning_delta": t.last_learning_delta,
             "learning_log": t.learning_log,
+            "raw_signals": t.raw_signals,
             "batch_id": t.batch_id,
             "created_at": t.created_at,
         }

@@ -8,7 +8,7 @@ import {
     TrendingUp, Sparkles, Target, Brain, Megaphone, FlaskConical,
     CheckCircle, XCircle, Clock, Zap, AlertTriangle, ChevronDown,
     ChevronUp, Loader2, RefreshCw, BookOpen, Activity, Trash2,
-    Plus, X, ExternalLink, FileText, PlayCircle,
+    Plus, X, ExternalLink, FileText, PlayCircle, Database, MessageSquare, BookMarked,
 } from 'lucide-react';
 
 // --- TYPES ---
@@ -35,6 +35,11 @@ interface TrendTopic {
     learning_iterations: number;
     last_learning_delta: number;
     learning_log: any[];
+    raw_signals?: {
+        pubmed: { titre: string; annee: string; pmid: string }[];
+        reddit: { titre: string; subreddit: string; score: number; comments: number }[];
+        crossref: { titre: string; annee: string }[];
+    };
     batch_id: string;
     created_at: string;
 }
@@ -490,6 +495,11 @@ const TrendsPage: React.FC = () => {
                                 {isExpanded && (
                                     <div className="border-t border-white/5 bg-white/[0.02] p-6 space-y-6">
 
+                                        {/* RAW SIGNALS — auditable source evidence */}
+                                        {topic.raw_signals && (
+                                            <RawSignalsPanel signals={topic.raw_signals} />
+                                        )}
+
                                         {/* LEARNING PLAN — shown for approved + stagnated */}
                                         {['approved', 'stagnated', 'learning', 'ready'].includes(topic.status) && (
                                             <div>
@@ -714,6 +724,105 @@ function ExpertCard({ icon, title, score, justification, color, references }: {
                             {ref.pmid && `PMID:${ref.pmid} `}{ref.titre} ({ref.annee})
                         </p>
                     ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function RawSignalsPanel({ signals }: {
+    signals: {
+        pubmed: { titre: string; annee: string; pmid: string }[];
+        reddit: { titre: string; subreddit: string; score: number; comments: number }[];
+        crossref: { titre: string; annee: string }[];
+    };
+}) {
+    const [open, setOpen] = React.useState(false);
+    const totalSignals = (signals.pubmed?.length || 0) + (signals.reddit?.length || 0) + (signals.crossref?.length || 0);
+    if (totalSignals === 0) return null;
+
+    return (
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden">
+            <button
+                onClick={() => setOpen(o => !o)}
+                className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/5 transition-colors"
+            >
+                <div className="flex items-center gap-2">
+                    <Database size={14} className="text-cyan-400" />
+                    <span className="text-sm font-semibold text-white">Signaux sources</span>
+                    <span className="text-[10px] text-gray-500 font-normal">
+                        {signals.pubmed?.length || 0} PubMed · {signals.reddit?.length || 0} Reddit · {signals.crossref?.length || 0} CrossRef
+                    </span>
+                </div>
+                {open ? <ChevronUp size={14} className="text-gray-500" /> : <ChevronDown size={14} className="text-gray-500" />}
+            </button>
+
+            {open && (
+                <div className="px-4 pb-4 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-white/5">
+
+                    {/* PubMed */}
+                    {signals.pubmed?.length > 0 && (
+                        <div>
+                            <div className="flex items-center gap-1.5 mt-3 mb-2">
+                                <BookMarked size={12} className="text-blue-400" />
+                                <span className="text-[11px] font-semibold text-blue-400 uppercase tracking-wider">PubMed</span>
+                            </div>
+                            <div className="space-y-2">
+                                {signals.pubmed.map((s, i) => (
+                                    <div key={i} className="text-[11px] text-gray-400 leading-relaxed">
+                                        <span className="text-gray-300">{s.titre}</span>
+                                        <span className="text-gray-600 ml-1">({s.annee})</span>
+                                        {s.pmid && (
+                                            <a href={`https://pubmed.ncbi.nlm.nih.gov/${s.pmid}/`} target="_blank" rel="noreferrer"
+                                                className="ml-1 text-blue-500 hover:text-blue-400 font-mono text-[10px]">
+                                                PMID:{s.pmid} ↗
+                                            </a>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Reddit */}
+                    {signals.reddit?.length > 0 && (
+                        <div>
+                            <div className="flex items-center gap-1.5 mt-3 mb-2">
+                                <MessageSquare size={12} className="text-orange-400" />
+                                <span className="text-[11px] font-semibold text-orange-400 uppercase tracking-wider">Reddit</span>
+                            </div>
+                            <div className="space-y-2">
+                                {signals.reddit.map((s, i) => (
+                                    <div key={i} className="text-[11px] text-gray-400 leading-relaxed">
+                                        <span className="text-gray-300">{s.titre}</span>
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                            <span className="text-gray-600 font-mono">r/{s.subreddit}</span>
+                                            <span className="text-orange-500">↑{s.score}</span>
+                                            <span className="text-gray-600">{s.comments} comments</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* CrossRef */}
+                    {signals.crossref?.length > 0 && (
+                        <div>
+                            <div className="flex items-center gap-1.5 mt-3 mb-2">
+                                <BookOpen size={12} className="text-purple-400" />
+                                <span className="text-[11px] font-semibold text-purple-400 uppercase tracking-wider">CrossRef</span>
+                            </div>
+                            <div className="space-y-2">
+                                {signals.crossref.map((s, i) => (
+                                    <div key={i} className="text-[11px] text-gray-400 leading-relaxed">
+                                        <span className="text-gray-300">{s.titre}</span>
+                                        <span className="text-gray-600 ml-1">({s.annee})</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

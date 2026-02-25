@@ -285,6 +285,9 @@ class TrendTopic(Base):
     # Batch tracking
     batch_id = Column(String, index=True)  # Groups topics from same discovery session
 
+    # Raw signals that informed this discovery (auditable source evidence)
+    raw_signals = Column(JSONB, nullable=True)  # {pubmed: [...], reddit: [...], crossref: [...]}
+
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 

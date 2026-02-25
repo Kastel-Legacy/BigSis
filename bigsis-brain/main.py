@@ -71,6 +71,7 @@ async def startup():
         await conn.execute(text("ALTER TABLE procedures ADD COLUMN IF NOT EXISTS embedding vector(1536)"))
         await conn.execute(text("ALTER TABLE procedures ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW()"))
         await conn.execute(text("ALTER TABLE social_generations ADD COLUMN IF NOT EXISTS status VARCHAR NOT NULL DEFAULT 'published'"))
+        await conn.execute(text("ALTER TABLE trend_topics ADD COLUMN IF NOT EXISTS raw_signals JSONB"))
         await conn.run_sync(Base.metadata.create_all)
         logger.info("Auto-Migration complete.")
 

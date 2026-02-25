@@ -280,6 +280,22 @@ async def discover_trends(batch_id: str = None) -> Dict:
     logger.info("[Scout] Phase 4: Persisting topics (TRS deferred to admin approval)...")
     trending = llm_result["trending_topics"]
 
+    # Build auditable signals summary (top 5 per source)
+    signals_summary = {
+        "pubmed": [
+            {"titre": s["titre"], "annee": s.get("annee", ""), "pmid": s.get("pmid", "")}
+            for s in signals if s.get("source") == "PubMed"
+        ][:5],
+        "reddit": [
+            {"titre": s["titre"], "subreddit": s.get("subreddit", ""), "score": s.get("score", 0), "comments": s.get("comments", 0)}
+            for s in signals if s.get("source") == "Reddit"
+        ][:5],
+        "crossref": [
+            {"titre": s["titre"], "annee": s.get("annee", "")}
+            for s in signals if s.get("source") == "CrossRef"
+        ][:5],
+    }
+
     topics_output = []
     async with AsyncSessionLocal() as session:
         for topic_data in trending:
@@ -312,6 +328,7 @@ async def discover_trends(batch_id: str = None) -> Dict:
                 trs_details={},
                 learning_iterations=0,
                 learning_log=[],
+                raw_signals=signals_summary,
                 batch_id=batch_id,
             )
             session.add(record)
