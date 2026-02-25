@@ -438,19 +438,21 @@ class SocialContentGenerator:
 
         # Step 1: Check existing knowledge (RAG)
         print(f"[SocialAgent] Checking RAG for: {topic}")
-        # Search queries adapted to the topic
+        # Search queries adapted to the topic — one per TRS section for better coverage
         sub_queries = [
-            f"efficacy and mechanism of {topic}",
-            f"side effects, risks and recovery downtime for {topic}",
+            f"efficacy mechanism clinical outcome {topic}",
+            f"side effects safety adverse events {topic}",
+            f"recovery downtime healing bruising swelling {topic}",
+            f"contraindications drug interactions {topic}",
         ]
-        
+
         corpus_parts = []
         seen_chunks = set()
         # Track real URLs from RAG for post-correction of LLM output
         _source_url_map: dict[str, str] = {}  # title -> url
 
         for q in sub_queries:
-            chunks = await retrieve_evidence(q, limit=5)
+            chunks = await retrieve_evidence(q, limit=10)
             for c in chunks:
                 if c['chunk_id'] not in seen_chunks:
                     url_line = f"\nURL: {c['url']}" if c.get('url') else ""
@@ -475,7 +477,7 @@ class SocialContentGenerator:
                 await ingest_pubmed_results(q)
 
             # Re-retrieve after ingestion
-            new_chunks = await retrieve_evidence(f"clinical data for {topic}", limit=5)
+            new_chunks = await retrieve_evidence(f"clinical data for {topic}", limit=10)
             for c in new_chunks:
                 if c['chunk_id'] not in seen_chunks:
                     url_line = f"\nURL: {c['url']}" if c.get('url') else ""
@@ -517,6 +519,7 @@ class SocialContentGenerator:
         scout_fda = ""
         scout_trials = ""
         scout_chem = ""
+        scoring_parts = []  # English-enriched corpus used only for TRS scoring
         scout_scholar: list = []
         scout_crossref = ""
 
@@ -567,10 +570,34 @@ class SocialContentGenerator:
         coherence_report = {}
         if not is_recommendation and specialized_context:
             try:
+                # Build a scoring corpus using English queries so methodology
+                # keywords (meta-analysis, RCT, recovery) are actually found.
+                # corpus_parts uses the French topic which may miss English chunks.
+                scoring_parts = list(corpus_parts)  # start with FR corpus, then enrich
+                if english_term and english_term.lower() != re.sub(r'^\[.*?\]\s*', '', topic).lower():
+                    scoring_queries = [
+                        f"meta-analysis systematic review {english_term}",
+                        f"randomized controlled trial efficacy {english_term}",
+                        f"recovery downtime healing {english_term}",
+                        f"drug interactions contraindications {english_term}",
+                    ]
+                    seen_scoring = set(seen_chunks)
+                    for q in scoring_queries:
+                        extra = await retrieve_evidence(q, limit=10)
+                        for c in extra:
+                            if c['chunk_id'] not in seen_scoring:
+                                url_line = f"\nURL: {c['url']}" if c.get('url') else ""
+                                scoring_parts.append(f"Source: {c['source']}{url_line}\nContent: {c['text']}\n---")
+                                seen_scoring.add(c['chunk_id'])
+                    print(f"[SocialAgent] 📊 Scoring corpus: {len(scoring_parts)} chunks ({len(scoring_parts)-len(corpus_parts)} EN added for TRS)")
+
                 preliminary_meta = self._build_evidence_metadata(
-                    scout_fda, scout_trials, scout_scholar, corpus_parts, scout_chem,
+                    scout_fda, scout_trials, scout_scholar, scoring_parts, scout_chem,
                     has_crossref=bool(scout_crossref)
                 )
+                sc = preliminary_meta.get("section_confidence", {})
+                print(f"[SocialAgent] 📊 TRS debug — meta:{sum(1 for p in scoring_parts if 'meta-anal' in p.lower() or 'systematic review' in p.lower())} rct:{sum(1 for p in scoring_parts if 'randomized controlled' in p.lower() or '[rct]' in p.lower())} safety:{sum(1 for p in scoring_parts if any(k in p.lower() for k in ['safety','adverse','side effect']))} recovery:{sum(1 for p in scoring_parts if any(k in p.lower() for k in ['recovery','downtime','healing']))} interaction:{sum(1 for p in scoring_parts if 'interaction' in p.lower() or 'contraindication' in p.lower())}")
+                print(f"[SocialAgent] 📊 TRS sections — eff:{sc.get('efficacite',{}).get('score')} sec:{sc.get('securite',{}).get('score')} rec:{sc.get('recuperation',{}).get('score')} int:{sc.get('interactions',{}).get('score')} → TRS:{preliminary_meta.get('trs_score')}")
                 coherence_report = self._cross_validate(preliminary_meta, corpus_parts, scout_trials)
                 if coherence_report.get("flags"):
                     print(f"[SocialAgent] 🔍 Coherence flags: {coherence_report['flags']}")
@@ -626,8 +653,10 @@ class SocialContentGenerator:
 
             # Step 6a: Attach evidence_metadata (for fiches only)
             if is_valid and not is_recommendation and isinstance(response_data, dict):
+                # Use scoring_parts (FR + EN enriched) for accurate TRS calculation
+                _scoring = scoring_parts if scoring_parts else corpus_parts
                 response_data["evidence_metadata"] = self._build_evidence_metadata(
-                    scout_fda, scout_trials, scout_scholar, corpus_parts, scout_chem,
+                    scout_fda, scout_trials, scout_scholar, _scoring, scout_chem,
                     has_crossref=bool(scout_crossref)
                 )
                 # Attach coherence report from cross-validation
