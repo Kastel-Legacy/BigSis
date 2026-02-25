@@ -264,6 +264,20 @@ const TrendsPage: React.FC = () => {
         try {
             const res = await axios.post(`${API_URL}/trends/topics/${topicId}/generate-fiche`, {}, authHeaders());
             const slug = res.data.slug || makeSlug(titre);
+            // Backend returns immediately — poll until the fiche is actually in DB (max 3min)
+            let attempts = 0;
+            while (attempts < 45) {
+                await new Promise(r => setTimeout(r, 4000));
+                attempts++;
+                try {
+                    const check = await axios.get(`${API_URL}/fiches/${slug}`);
+                    if (check.status === 200) {
+                        setFicheState(prev => ({ ...prev, [topicId]: slug }));
+                        return;
+                    }
+                } catch { /* fiche not ready yet */ }
+            }
+            // Timeout — show link anyway, fiche might be ready soon
             setFicheState(prev => ({ ...prev, [topicId]: slug }));
         } catch (e) {
             console.error('Fiche generation failed', e);
