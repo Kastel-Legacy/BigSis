@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { API_URL } from '../api';
+import { useAuth } from '../context/AuthContext';
 import {
     TrendingUp, Sparkles, Target, Brain, Megaphone, FlaskConical,
     CheckCircle, XCircle, Clock, Zap, AlertTriangle, ChevronDown,
@@ -91,6 +92,7 @@ function scoreColor(score: number): string {
 // --- MAIN COMPONENT ---
 
 const TrendsPage: React.FC = () => {
+    const { session } = useAuth();
     const [topics, setTopics] = useState<TrendTopic[]>([]);
     const [isDiscovering, setIsDiscovering] = useState(false);
     const [expandedTopic, setExpandedTopic] = useState<string | null>(null);
@@ -153,10 +155,14 @@ const TrendsPage: React.FC = () => {
         }
     };
 
+    const authHeaders = () => ({
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
+
     const handleAction = async (topicId: string, action: string) => {
         setLoadingAction(`${topicId}-${action}`);
         try {
-            await axios.post(`${API_URL}/trends/topics/${topicId}/action`, { action });
+            await axios.post(`${API_URL}/trends/topics/${topicId}/action`, { action }, authHeaders());
             await fetchTopics();
         } catch (e) {
             console.error(`Action ${action} failed`, e);
@@ -187,7 +193,7 @@ const TrendsPage: React.FC = () => {
         const changed = JSON.stringify(queries) !== JSON.stringify(original);
         if (!changed) return;
         try {
-            await axios.patch(`${API_URL}/trends/topics/${topicId}/queries`, { queries });
+            await axios.patch(`${API_URL}/trends/topics/${topicId}/queries`, { queries }, authHeaders());
         } catch (e) {
             console.error('Failed to save queries', e);
         }
@@ -215,7 +221,7 @@ const TrendsPage: React.FC = () => {
     const handleGenerateFiche = async (topicId: string, titre: string) => {
         setFicheState(prev => ({ ...prev, [topicId]: 'generating' }));
         try {
-            const res = await axios.post(`${API_URL}/trends/topics/${topicId}/generate-fiche`);
+            const res = await axios.post(`${API_URL}/trends/topics/${topicId}/generate-fiche`, {}, authHeaders());
             const slug = res.data.slug || makeSlug(titre);
             setFicheState(prev => ({ ...prev, [topicId]: slug }));
         } catch (e) {
@@ -260,7 +266,7 @@ const TrendsPage: React.FC = () => {
                         <button
                             type="button"
                             onClick={async () => {
-                                try { await axios.delete(`${API_URL}/trends/cleanup`); await fetchTopics(); }
+                                try { await axios.delete(`${API_URL}/trends/cleanup`, authHeaders()); await fetchTopics(); }
                                 catch (e) { console.error('Cleanup failed', e); }
                             }}
                             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all text-sm font-medium border border-transparent hover:border-red-500/20"
@@ -364,7 +370,7 @@ const TrendsPage: React.FC = () => {
                                                 onClick={async (e) => {
                                                     e.stopPropagation();
                                                     setLoadingAction(`${topic.id}-delete`);
-                                                    try { await axios.delete(`${API_URL}/trends/topics/${topic.id}`); await fetchTopics(); }
+                                                    try { await axios.delete(`${API_URL}/trends/topics/${topic.id}`, authHeaders()); await fetchTopics(); }
                                                     catch (e) { console.error('Delete failed', e); }
                                                     finally { setLoadingAction(null); }
                                                 }}
