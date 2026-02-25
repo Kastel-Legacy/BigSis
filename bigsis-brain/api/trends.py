@@ -223,16 +223,37 @@ async def trigger_learning(topic_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/trends/topics/{topic_id}/learn-full")
-async def trigger_full_learning(topic_id: str):
-    """
-    Run the full learning pipeline: iterate until ready, stagnated, or max iterations.
-    """
+async def run_full_learning_bg(topic_id: str):
+    logger = logging.getLogger("uvicorn.error")
     try:
         result = await run_full_learning(topic_id)
-        return result
+        logger.info(f"[Learning] Done for {topic_id}: status={result.get('final_status')}, trs={result.get('final_trs')}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"[Learning] Failed for {topic_id}: {e}")
+
+
+@router.post("/trends/topics/{topic_id}/learn-full")
+async def trigger_full_learning(topic_id: str, background_tasks: BackgroundTasks):
+    """
+    Launch full learning pipeline in BACKGROUND.
+    Immediately sets status='learning' and returns. Client should poll GET /trends/topics/{id}.
+    """
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(TrendTopic).where(TrendTopic.id == topic_id))
+        topic = result.scalar_one_or_none()
+        if not topic:
+            raise HTTPException(status_code=404, detail="Topic not found")
+        if topic.status not in ("approved", "learning", "ready", "stagnated"):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Status '{topic.status}' does not allow learning."
+            )
+        # Pre-set to learning so frontend overlay appears immediately
+        topic.status = "learning"
+        await session.commit()
+
+    background_tasks.add_task(run_full_learning_bg, topic_id)
+    return {"status": "processing", "topic_id": topic_id, "message": "Learning pipeline started in background"}
 
 
 

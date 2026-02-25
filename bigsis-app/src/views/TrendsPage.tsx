@@ -176,13 +176,33 @@ const TrendsPage: React.FC = () => {
         }
     };
 
+    const pollUntilLearningDone = async (topicId: string) => {
+        // Poll every 4s until status leaves 'learning' (max 8 minutes)
+        let attempts = 0;
+        while (attempts < 120) {
+            await new Promise(r => setTimeout(r, 4000));
+            attempts++;
+            try {
+                const res = await axios.get(`${API_URL}/trends/topics`);
+                const data = Array.isArray(res.data) ? res.data : [];
+                const updated = data.find((t: TrendTopic) => t.id === topicId);
+                if (updated && updated.status !== 'learning') {
+                    setTopics(data);
+                    return;
+                }
+            } catch { /* continue polling */ }
+        }
+        await fetchTopics(); // fallback
+    };
+
     const handleLearnFull = async (topicId: string) => {
-        // Save queries first if modified
         await saveQueries(topicId);
         setLoadingAction(`${topicId}-learn-full`);
         try {
+            // Returns immediately — backend sets status='learning' and runs in background
             await axios.post(`${API_URL}/trends/topics/${topicId}/learn-full`);
-            await fetchTopics();
+            await fetchTopics(); // refresh once to show overlay via topic.status='learning'
+            await pollUntilLearningDone(topicId);
         } catch (e) {
             console.error('Full learning failed', e);
         } finally {
@@ -197,7 +217,8 @@ const TrendsPage: React.FC = () => {
             await axios.post(`${API_URL}/trends/topics/${topicId}/action`, { action: 'approve' }, authHeaders());
             await saveQueries(topicId);
             await axios.post(`${API_URL}/trends/topics/${topicId}/learn-full`);
-            await fetchTopics();
+            await fetchTopics(); // refresh once to show overlay
+            await pollUntilLearningDone(topicId);
         } catch (e) {
             console.error('Interested action failed', e);
         } finally {
