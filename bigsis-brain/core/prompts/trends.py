@@ -300,6 +300,7 @@ def format_gt_trends_for_prompt(ranked_trends: list) -> str:
         seeds_info = ", ".join(t["seeds"][:3])
         gt_score = _gt_aggregate_to_marketing_score(t["aggregate_score"])
 
+        pubmed_info = f" | PubMed: {t['pubmed_count']} études" if t.get("pubmed_count") is not None else ""
         lines.append(
             f"{i}. \"{t['query']}\" "
             f"[{t['best_type'].upper()}] "
@@ -307,5 +308,6 @@ def format_gt_trends_for_prompt(ranked_trends: list) -> str:
             f"| Langue: {t['language']} "
             f"| Sources: {seeds_info} "
             f"| GT Score: {gt_score}/10"
+            f"{pubmed_info}"
         )
     return "\n".join(lines)

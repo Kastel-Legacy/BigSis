@@ -8,12 +8,32 @@ from pydantic import BaseModel
 from typing import Optional
 from sqlalchemy import select, func
 
+import re
+import unicodedata
+from urllib.parse import unquote
+
 from core.auth import AuthUser, require_admin
 from core.db.database import AsyncSessionLocal
 from core.db.models import TrendTopic
 from core.trends.scout import discover_trends
 from core.trends.learning_pipeline import run_learning_iteration, run_full_learning
 from core.trends.trs_engine import compute_trs
+from core.social.generator import SocialContentGenerator
+
+_fiche_generator = SocialContentGenerator()
+
+
+def _make_slug(text: str) -> str:
+    decoded = text
+    for _ in range(3):
+        prev = decoded
+        decoded = unquote(decoded)
+        if decoded == prev:
+            break
+    normalized = unicodedata.normalize("NFKD", decoded)
+    ascii_text = normalized.encode("ascii", "ignore").decode("ascii").lower()
+    slug = re.sub(r'[^a-z0-9]+', '-', ascii_text).strip('-')
+    return re.sub(r'-+', '-', slug)
 
 router = APIRouter()
 
@@ -22,6 +42,10 @@ router = APIRouter()
 
 class TopicActionRequest(BaseModel):
     action: str  # approve, reject, defer
+
+
+class UpdateQueriesRequest(BaseModel):
+    queries: List[str]
 
 
 class TRSCheckRequest(BaseModel):
@@ -221,6 +245,53 @@ async def check_trs(request: TRSCheckRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.patch("/trends/topics/{topic_id}/queries")
+async def update_topic_queries(topic_id: str, request: UpdateQueriesRequest, admin: AuthUser = Depends(require_admin)):
+    """
+    Update the learning query list for a topic.
+    Replaces the existing search_queries array.
+    """
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(TrendTopic).where(TrendTopic.id == topic_id))
+        topic = result.scalar_one_or_none()
+        if not topic:
+            raise HTTPException(status_code=404, detail="Topic not found")
+        cleaned = [q.strip() for q in request.queries if q.strip()]
+        topic.search_queries = cleaned
+        await session.commit()
+        return {"id": str(topic.id), "search_queries": cleaned}
+
+
+async def _run_generate_fiche_bg(titre: str):
+    logger = logging.getLogger("uvicorn.error")
+    try:
+        await _fiche_generator.generate_social_content(titre, force=True)
+        logger.info(f"[Trends] Fiche generated for: {titre}")
+    except Exception as e:
+        logger.error(f"[Trends] Fiche generation failed for '{titre}': {e}")
+
+
+@router.post("/trends/topics/{topic_id}/generate-fiche")
+async def generate_fiche_for_topic(topic_id: str, background_tasks: BackgroundTasks, admin: AuthUser = Depends(require_admin)):
+    """
+    Trigger fiche generation for an approved/ready trend topic.
+    Runs in background. Returns the expected fiche slug immediately.
+    """
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(TrendTopic).where(TrendTopic.id == topic_id))
+        topic = result.scalar_one_or_none()
+        if not topic:
+            raise HTTPException(status_code=404, detail="Topic not found")
+
+    slug = _make_slug(topic.titre)
+    background_tasks.add_task(_run_generate_fiche_bg, topic.titre)
+    return {
+        "status": "generating",
+        "slug": slug,
+        "message": f"Génération de la fiche '{topic.titre}' en cours.",
+    }
 
 
 @router.delete("/trends/topics/{topic_id}")

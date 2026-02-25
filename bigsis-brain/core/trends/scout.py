@@ -70,7 +70,13 @@ async def discover_trends(batch_id: str = None) -> Dict:
     doc_count, chunk_count, proc_count, fiche_topics = await _gather_brain_stats()
 
     # ===== PHASE 3: PUBMED SIGNALS =====
-
+    logger.info("[Scout] Phase 3: Fetching PubMed signals for top trends...")
+    for trend in ranked[:8]:
+        try:
+            results = await run_in_threadpool(search_pubmed, trend["query"], max_results=3)
+            trend["pubmed_count"] = len(results)
+        except Exception:
+            trend["pubmed_count"] = 0
 
     # ===== PHASE 4: LLM EVALUATES REAL GT DATA =====
     logger.info("[Scout] Phase 4: LLM evaluating real Google Trends data...")
