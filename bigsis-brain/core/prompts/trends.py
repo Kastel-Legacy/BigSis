@@ -111,7 +111,7 @@ FORMAT JSON STRICT :
 """
 
 TREND_USER_PROMPT_TEMPLATE = """
-Analyse le paysage actuel des tendances en esthetique medicale pour le scope BigSIS.
+Identifie exactement 5 sujets tendance en esthetique medicale faciale pour BigSIS.
 
 CONTEXTE DU BRAIN ACTUEL :
 - Documents dans la base : {doc_count}
@@ -119,12 +119,61 @@ CONTEXTE DU BRAIN ACTUEL :
 - Procedures dans l'atlas : {proc_count}
 - Fiches deja generees : {fiche_topics}
 
-DONNEES SUPPLEMENTAIRES (si disponibles) :
+SIGNAUX TEMPS REEL (publications scientifiques + discussions patients) :
+Les donnees ci-dessous viennent de 3 sources en temps reel :
+- PubMed/CrossRef : ce que la communaute scientifique publie (6 derniers mois)
+- Reddit : ce que les patients DEMANDENT et DISCUTENT EN CE MOMENT (signal 2026 reel)
+Le score marketing doit integrer les signaux Reddit (engagement = interet patient reel).
+
 {extra_context}
 
-Genere exactement 5 sujets trending avec l'evaluation complete des 3 expertises.
-Retourne UNIQUEMENT du JSON valide, sans texte avant ou apres.
+CONSIGNES :
+- Base-toi sur les signaux ci-dessus pour identifier les sujets emergents.
+- Les posts Reddit avec beaucoup d'upvotes/comments = forte demande patient → score marketing eleve.
+- Les publications scientifiques recentes = sujet en emergence → score science.
+- Diversifie les types (procedure, ingredient, mythe, comparatif).
+- Genere 3 requetes PubMed optimisees par sujet pour alimenter le pipeline d'apprentissage.
+- Retourne UNIQUEMENT du JSON valide, sans texte avant ou apres.
 """
+
+
+def format_recent_signals_for_prompt(signals: list) -> str:
+    """Format recent signals into a readable block for the LLM.
+    Handles 3 source types: PubMed/CrossRef (scientific), Reddit (patient interest).
+    """
+    if not signals:
+        return "Aucun signal recent disponible — base-toi sur tes connaissances generales."
+
+    pubmed_lines = []
+    reddit_lines = []
+
+    for s in signals[:30]:
+        source = s.get("source", "PubMed")
+        titre = s.get("titre", "")
+        if not titre:
+            continue
+        if source == "Reddit":
+            sub = s.get("subreddit", "")
+            score = s.get("score", 0)
+            comments = s.get("comments", 0)
+            reddit_lines.append(
+                f"- [Reddit r/{sub}] 👥 {score} upvotes · {comments} comments — \"{titre}\""
+            )
+        else:
+            annee = s.get("annee", "2025")
+            pubmed_lines.append(f"- [{source}] ({annee}) {titre}")
+
+    sections = []
+    if pubmed_lines:
+        sections.append("=== PUBLICATIONS SCIENTIFIQUES RECENTES ===")
+        sections.extend(pubmed_lines[:20])
+    if reddit_lines:
+        sections.append("\n=== SIGNAUX PATIENTS REDDIT (2026, temps reel) ===")
+        sections.append("Ces posts refletent CE QUE LES PATIENTS CHERCHENT ET DISCUTENT MAINTENANT.")
+        sections.append("Utilise-les pour evaluer l'interet patient reel (score marketing).")
+        sections.extend(reddit_lines[:15])
+
+    return "\n".join(sections)
 
 
 # ==========================================================================

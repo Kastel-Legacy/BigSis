@@ -295,7 +295,7 @@ const TrendsPage: React.FC = () => {
                     {filteredTopics.map(topic => {
                         const isExpanded = expandedTopic === topic.id;
                         const sc = statusConfig[topic.status] || statusConfig.proposed;
-                        const isGTLive = topic.justification_marketing?.includes('[GT:');
+                        const isGTLive = topic.justification_marketing?.includes('[PUBMED SIGNALS]') || topic.justification_marketing?.includes('[PUBMED+REDDIT SIGNALS]') || topic.justification_marketing?.includes('[GT:');
                         const queries = editingQueries[topic.id] || topic.search_queries || [];
                         const fiche = ficheState[topic.id];
                         const isLearning = loadingAction === `${topic.id}-learn-full` || topic.status === 'learning';
@@ -331,8 +331,8 @@ const TrendsPage: React.FC = () => {
                                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider text-gray-400 bg-white/5 border border-white/10">
                                                     {typeLabels[topic.type] || topic.type}
                                                 </span>
-                                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${isGTLive ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' : 'bg-purple-500/20 text-purple-300 border-purple-500/30'}`}>
-                                                    {isGTLive ? 'GT LIVE' : 'AI SCOUT'}
+                                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${isGTLive ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' : 'bg-purple-500/20 text-purple-300 border-purple-500/30'}`}>
+                                                    {isGTLive ? 'LIVE SIGNALS' : 'AI SCOUT'}
                                                 </span>
                                                 {topic.zones?.map(z => (
                                                     <span key={z} className="px-2 py-0.5 rounded text-[10px] text-gray-500 bg-white/3 font-mono">{z}</span>
@@ -618,7 +618,7 @@ const TrendsPage: React.FC = () => {
                         </div>
                         <div className="space-y-2">
                             <p className="text-white font-bold text-lg">Trend Intelligence en action...</p>
-                            <p className="text-gray-500 text-sm">Google Trends → PubMed signals → Évaluation multi-experts → TRS</p>
+                            <p className="text-gray-500 text-sm">PubMed signals · Reddit · CrossRef → Évaluation multi-experts → TRS</p>
                         </div>
                     </div>
                 )}
