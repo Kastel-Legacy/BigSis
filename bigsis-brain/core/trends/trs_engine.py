@@ -58,7 +58,7 @@ async def compute_trs(topic: str, search_queries: List[str] = None) -> Dict:
             .join(DocumentVersion, Chunk.document_version_id == DocumentVersion.id)
             .join(Document, DocumentVersion.document_id == Document.id)
             .order_by(Chunk.embedding.cosine_distance(query_embedding))
-            .limit(50)
+            .limit(200)
         )
         result = await session.execute(stmt)
         rows = result.all()

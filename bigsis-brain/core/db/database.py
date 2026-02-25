@@ -1,6 +1,10 @@
+from pathlib import Path
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
+from dotenv import load_dotenv
 import os
+
+load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
 
 # Fix Render's DATABASE_URL for asyncpg
 raw_db_url = os.getenv("DATABASE_URL", "postgresql+asyncpg://bigsis_user:bigsis_password@localhost:5432/bigsis")
