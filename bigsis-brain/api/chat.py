@@ -7,6 +7,7 @@ Chat Diagnostic API — BigSis conversational diagnostic with:
 - LLM-based context extraction (replaces fragile keyword matching)
 """
 
+import asyncio
 import json
 import logging
 from typing import Optional
@@ -20,6 +21,7 @@ from core.auth import AuthUser, get_optional_user
 from core.orchestrator import Orchestrator
 from core.db.database import AsyncSessionLocal
 from core.db.models import Procedure, SocialGeneration, UserProfile, TrendTopic
+from core.trends.learning_pipeline import run_full_learning
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -383,6 +385,96 @@ MAX 2 phrases au total.
 
 
 # ---------------------------------------------------------------------------
+# Auto-learning: create TrendTopic + trigger learning for unknown procedures
+# ---------------------------------------------------------------------------
+
+async def _trigger_auto_learning(slugs: list[str], slug_map: dict) -> list[dict]:
+    """For procedures without fiches, find or create a TrendTopic and kick off
+    learning in the background. Returns list of {slug, name, status} for
+    the frontend to display a 'learning in progress' state."""
+    triggered = []
+
+    async with AsyncSessionLocal() as session:
+        for slug in slugs:
+            entry = slug_map.get(slug)
+            if not entry:
+                continue
+            name = entry["name"]
+
+            # Check if a TrendTopic already exists for this procedure
+            result = await session.execute(
+                select(TrendTopic).filter(
+                    TrendTopic.titre.ilike(f"%{name}%")
+                ).limit(1)
+            )
+            topic = result.scalar_one_or_none()
+
+            if topic:
+                # Already exists — only trigger learning if it's not already done
+                if topic.status in ("approved", "learning"):
+                    triggered.append({
+                        "slug": slug,
+                        "name": name,
+                        "status": "learning",
+                        "topic_id": str(topic.id),
+                    })
+                    # Fire and forget learning in background
+                    asyncio.create_task(_run_learning_bg(str(topic.id), name))
+                elif topic.status == "ready":
+                    # Already ready but no fiche yet — just inform
+                    triggered.append({
+                        "slug": slug,
+                        "name": name,
+                        "status": "ready",
+                        "topic_id": str(topic.id),
+                    })
+                # stagnated/rejected → skip
+            else:
+                # Create a new TrendTopic for this procedure
+                new_topic = TrendTopic(
+                    titre=name,
+                    topic_type="procedure",
+                    description=f"Auto-créé par le diagnostic — apprentissage déclenché pour '{name}'",
+                    search_queries=[
+                        f"{name} aesthetic medicine",
+                        f"{name} efficacy systematic review",
+                        f"{name} safety adverse effects",
+                    ],
+                    status="approved",
+                    score_composite=50.0,  # default score for auto-created topics
+                    batch_id="auto-diagnostic",
+                )
+                session.add(new_topic)
+                await session.flush()  # get the id
+
+                triggered.append({
+                    "slug": slug,
+                    "name": name,
+                    "status": "learning",
+                    "topic_id": str(new_topic.id),
+                })
+                await session.commit()
+
+                # Fire and forget learning in background
+                asyncio.create_task(_run_learning_bg(str(new_topic.id), name))
+
+    return triggered
+
+
+async def _run_learning_bg(topic_id: str, name: str):
+    """Background task to run full learning for a topic."""
+    try:
+        logger.info(f"Auto-learning started for '{name}' (topic_id={topic_id})")
+        result = await run_full_learning(topic_id)
+        logger.info(
+            f"Auto-learning finished for '{name}': "
+            f"status={result.get('final_status')}, trs={result.get('final_trs')}"
+        )
+    except Exception as e:
+        logger.error(f"Auto-learning failed for '{name}': {e}")
+
+
+# ---------------------------------------------------------------------------
 # Main endpoint
 # ---------------------------------------------------------------------------
 
@@ -492,14 +584,32 @@ Reponds maintenant. Si tu generes la synthese, inclus OBLIGATOIREMENT le bloc $$
 
             # P1: Send enrichment metadata after stream (slug_map for TRS badges)
             enrichment = {}
+            learning_slugs = []
             for slug, entry in slug_map.items():
-                if entry.get("has_fiche") or entry.get("trs"):
+                has_fiche = entry.get("has_fiche", False)
+                trs = entry.get("trs")
+                if has_fiche or trs:
                     enrichment[slug] = {
-                        "has_fiche": entry.get("has_fiche", False),
-                        "trs": entry.get("trs"),
+                        "has_fiche": has_fiche,
+                        "trs": trs,
                     }
+                else:
+                    # No fiche, no TRS → candidate for auto-learning
+                    enrichment[slug] = {
+                        "has_fiche": False,
+                        "trs": None,
+                        "learning": True,
+                    }
+                    learning_slugs.append(slug)
+
             if enrichment:
                 yield f"data: {json.dumps({'enrichment': enrichment})}\n\n"
+
+            # Auto-learning: trigger background learning for procedures without fiches
+            if learning_slugs:
+                triggered = await _trigger_auto_learning(learning_slugs, slug_map)
+                if triggered:
+                    yield f"data: {json.dumps({'learning_triggered': triggered})}\n\n"
 
             yield f"data: {json.dumps({'done': True})}\n\n"
 

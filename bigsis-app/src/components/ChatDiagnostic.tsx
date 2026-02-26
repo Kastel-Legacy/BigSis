@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Send, Loader2, ArrowRight, AlertTriangle, RotateCcw, Save, Check, ThumbsUp, ThumbsDown, BookOpen, FlaskConical } from 'lucide-react';
+import { Send, Loader2, ArrowRight, AlertTriangle, RotateCcw, Save, Check, ThumbsUp, ThumbsDown, BookOpen, FlaskConical, Brain } from 'lucide-react';
 import { API_URL } from '../api';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -30,12 +30,20 @@ interface DiagnosticData {
   safety_warnings?: string[];
 }
 
-// P1: Enrichment data from backend (TRS badges, fiche availability)
+// P1: Enrichment data from backend (TRS badges, fiche availability, learning status)
 interface EnrichmentData {
   [slug: string]: {
     has_fiche: boolean;
     trs?: number | null;
+    learning?: boolean;
   };
+}
+
+interface LearningTriggered {
+  slug: string;
+  name: string;
+  status: string;
+  topic_id: string;
 }
 
 const DEFAULT_GREETING: Message = {
@@ -94,8 +102,8 @@ function parseDiagnosticData(text: string): { cleanText: string; data: Diagnosti
 }
 
 // P1: TRS Badge component
-function TrsBadge({ trs, hasFiche }: { trs?: number | null; hasFiche: boolean }) {
-  if (!hasFiche && !trs) return null;
+function TrsBadge({ trs, hasFiche, learning }: { trs?: number | null; hasFiche: boolean; learning?: boolean }) {
+  if (!hasFiche && !trs && !learning) return null;
   return (
     <div className="flex items-center gap-1.5">
       {hasFiche && (
@@ -112,11 +120,18 @@ function TrsBadge({ trs, hasFiche }: { trs?: number | null; hasFiche: boolean })
           TRS {trs}
         </span>
       )}
+      {learning && !hasFiche && (
+        <span className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25 animate-pulse">
+          <Brain size={10} /> Apprentissage en cours
+        </span>
+      )}
     </div>
   );
 }
 
 function DiagnosticCard({ data, enrichment }: { data: DiagnosticData; enrichment: EnrichmentData }) {
+  const hasLearning = Object.values(enrichment).some(e => e.learning);
+
   return (
     <div className="mt-4 space-y-3">
       {/* Score bar */}
@@ -139,30 +154,46 @@ function DiagnosticCard({ data, enrichment }: { data: DiagnosticData; enrichment
           <span className="text-xs text-blue-200/60 uppercase tracking-wider font-medium px-1">Options a explorer</span>
           {data.options.map((opt, j) => {
             const slugEnrichment = opt.slug ? enrichment[opt.slug] : undefined;
+            const isLearning = slugEnrichment?.learning && !slugEnrichment?.has_fiche;
             return (
-              <Link
-                key={j}
-                href={opt.slug ? `/fiches/${opt.slug}` : '/fiches'}
-                className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-cyan-500/30 transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                    opt.pertinence === 'haute' ? 'bg-green-400 shadow-[0_0_6px_theme(colors.green.400)]' :
-                    opt.pertinence === 'moyenne' ? 'bg-yellow-400' : 'bg-white/30'
-                  }`} />
-                  <div>
-                    <span className="text-sm text-white font-medium">{opt.name}</span>
-                    {slugEnrichment && (
-                      <div className="mt-1">
-                        <TrsBadge trs={slugEnrichment.trs} hasFiche={slugEnrichment.has_fiche} />
-                      </div>
-                    )}
+              <div key={j}>
+                <Link
+                  href={opt.slug && slugEnrichment?.has_fiche ? `/fiches/${opt.slug}` : '/fiches'}
+                  className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-cyan-500/30 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                      opt.pertinence === 'haute' ? 'bg-green-400 shadow-[0_0_6px_theme(colors.green.400)]' :
+                      opt.pertinence === 'moyenne' ? 'bg-yellow-400' : 'bg-white/30'
+                    }`} />
+                    <div>
+                      <span className="text-sm text-white font-medium">{opt.name}</span>
+                      {slugEnrichment && (
+                        <div className="mt-1">
+                          <TrsBadge trs={slugEnrichment.trs} hasFiche={slugEnrichment.has_fiche} learning={slugEnrichment.learning} />
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <ArrowRight size={14} className="text-white/30 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
-              </Link>
+                  <ArrowRight size={14} className="text-white/30 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
+                </Link>
+              </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Auto-learning banner */}
+      {hasLearning && (
+        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+          <div className="flex items-center gap-2">
+            <Brain size={14} className="text-amber-400 animate-pulse" />
+            <span className="text-xs font-medium text-amber-300">BigSis apprend sur ces sujets</span>
+          </div>
+          <p className="text-[11px] text-amber-200/60 mt-1 ml-5">
+            Je n'ai pas encore de fiche detaillee pour certaines procedures recommandees.
+            J'ai lance l'apprentissage automatique — reviens bientot pour une fiche complete !
+          </p>
         </div>
       )}
 
@@ -340,9 +371,13 @@ export default function ChatDiagnostic({ initialContext, onBack }: ChatDiagnosti
                     return updated;
                   });
                 }
-                // P1: Capture enrichment data (TRS badges)
+                // P1: Capture enrichment data (TRS badges + learning status)
                 if (payload.enrichment) {
                   setEnrichment(payload.enrichment);
+                }
+                // Auto-learning: log triggered topics (informational)
+                if (payload.learning_triggered) {
+                  console.log('[BigSis] Auto-learning triggered:', payload.learning_triggered);
                 }
                 if (payload.done) break;
               } catch { /* skip malformed SSE lines */ }
