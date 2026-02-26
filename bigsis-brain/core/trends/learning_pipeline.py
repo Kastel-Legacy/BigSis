@@ -72,9 +72,10 @@ async def run_learning_iteration(topic_id: str) -> Dict:
         topic.status = "learning"
         iteration = topic.learning_iterations + 1
 
-        # Step 1: TRS before
+        # Step 1: TRS before (use stored TRS as absolute floor — never regress)
+        trs_floor = topic.trs_current or 0
         trs_before = await compute_trs(topic.titre)
-        trs_before_score = trs_before["trs"]
+        trs_before_score = max(trs_before["trs"], trs_floor)
 
         # Step 2: Run ingestion with the topic's pre-generated queries
         queries_used = []
