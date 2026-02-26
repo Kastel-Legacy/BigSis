@@ -1,6 +1,7 @@
 """
 Learning Pipeline - Automated knowledge acquisition for approved trend topics.
-Includes stagnation detection and coverage-oriented query diversification.
+Includes stagnation detection, coverage-oriented query diversification,
+and cumulative TRS (v2) that never regresses.
 """
 
 from typing import Dict, List
@@ -38,13 +39,13 @@ async def run_learning_iteration(topic_id: str) -> Dict:
     Execute one learning iteration for an approved TrendTopic.
 
     Flow:
-    1. Load the topic and its search queries
-    2. Compute TRS before
+    1. Load the topic and its cumulative TRS state
+    2. Compute TRS before (cumulative — merges with stored state)
     3. Run PubMed + Semantic Scholar ingestion using the topic's queries
     4. If coverage gaps exist, run targeted queries for missing dimensions
-    5. Compute TRS after
+    5. Compute TRS after (cumulative — chains from before-state)
     6. Detect stagnation (delta < threshold)
-    7. Update the topic record
+    7. Update the topic record with new cumulative state
 
     Returns a status dict with before/after TRS and stagnation info.
     """
@@ -72,9 +73,9 @@ async def run_learning_iteration(topic_id: str) -> Dict:
         topic.status = "learning"
         iteration = topic.learning_iterations + 1
 
-        # Step 1: TRS before (use stored TRS as absolute floor — never regress)
+        # Step 1: TRS before (cumulative — merges fresh search with stored state)
         trs_floor = topic.trs_current or 0
-        trs_before = await compute_trs(topic.titre)
+        trs_before = await compute_trs(topic.titre, stored_details=topic.trs_details)
         trs_before_score = max(trs_before["trs"], trs_floor)
 
         # Step 2: Run ingestion with the topic's pre-generated queries
@@ -99,13 +100,13 @@ async def run_learning_iteration(topic_id: str) -> Dict:
             queries_used.append({"source": "semantic_scholar", "query": topic.titre, "error": str(e)})
 
         # Step 3: Coverage-gap oriented queries
-        trs_mid = await compute_trs(topic.titre)
-        coverage = trs_mid["details"].get("coverage", {})
+        # Use coverage flags from the before-computation (cumulative — includes all prior knowledge)
+        coverage_flags = trs_before["details"].get("seen_coverage_flags", {})
 
         for dimension, has_it in [
-            ("efficacy", coverage.get("efficacy", False)),
-            ("safety", coverage.get("safety", False)),
-            ("recovery", coverage.get("recovery", False)),
+            ("efficacy", coverage_flags.get("efficacy", False)),
+            ("safety", coverage_flags.get("safety", False)),
+            ("recovery", coverage_flags.get("recovery", False)),
         ]:
             if not has_it and dimension in COVERAGE_QUERIES:
                 for q_template in COVERAGE_QUERIES[dimension]:
@@ -127,10 +128,10 @@ async def run_learning_iteration(topic_id: str) -> Dict:
                             "gap_fill": dimension,
                         })
 
-        # Step 4: TRS after (monotonic — never regress due to ranking artifacts)
-        trs_after = await compute_trs(topic.titre)
+        # Step 4: TRS after (cumulative — chains from before-state so all prior discoveries persist)
+        trs_after = await compute_trs(topic.titre, stored_details=trs_before["details"])
         trs_after_raw = trs_after["trs"]
-        trs_after_score = max(trs_before_score, trs_after_raw)
+        trs_after_score = max(trs_before_score, trs_after_raw, trs_floor)
         delta = trs_after_score - trs_before_score  # always >= 0
 
         # Step 5: Stagnation detection
@@ -144,7 +145,7 @@ async def run_learning_iteration(topic_id: str) -> Dict:
         else:
             new_status = "learning"
 
-        # Step 7: Update topic record
+        # Step 7: Update topic record with cumulative state
         log_entry = {
             "iteration": iteration,
             "queries": queries_used,
@@ -163,7 +164,7 @@ async def run_learning_iteration(topic_id: str) -> Dict:
         topic.last_learning_delta = round(delta, 1)
         topic.learning_log = existing_log
         topic.trs_current = trs_after_score
-        topic.trs_details = trs_after["details"]
+        topic.trs_details = trs_after["details"]  # Full cumulative v2 state
         topic.status = new_status
 
         await session.commit()

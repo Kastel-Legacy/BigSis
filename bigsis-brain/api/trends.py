@@ -17,7 +17,7 @@ from core.db.database import AsyncSessionLocal
 from core.db.models import TrendTopic
 from core.trends.scout import discover_trends
 from core.trends.learning_pipeline import run_full_learning
-from core.trends.trs_engine import compute_trs
+from core.trends.trs_engine import compute_trs, TRS_MINIMUM_FOR_GENERATION
 from core.social.generator import SocialContentGenerator
 
 _fiche_generator = SocialContentGenerator()
@@ -185,6 +185,14 @@ async def topic_action(topic_id: str, request: TopicActionRequest, admin: AuthUs
 
         if request.action == "approve":
             topic.status = "approved"
+
+            # Pre-check TRS: if existing knowledge already covers the topic, skip learning
+            trs_result = await compute_trs(topic.titre, stored_details=topic.trs_details)
+            topic.trs_current = trs_result["trs"]
+            topic.trs_details = trs_result["details"]
+            if trs_result["trs"] >= TRS_MINIMUM_FOR_GENERATION:
+                topic.status = "ready"
+
         elif request.action == "reject":
             topic.status = "rejected"
         elif request.action == "defer":
@@ -193,7 +201,12 @@ async def topic_action(topic_id: str, request: TopicActionRequest, admin: AuthUs
             raise HTTPException(status_code=400, detail=f"Unknown action: {request.action}")
 
         await session.commit()
-        return {"id": str(topic.id), "status": topic.status, "action": request.action}
+        return {
+            "id": str(topic.id),
+            "status": topic.status,
+            "action": request.action,
+            "trs_current": topic.trs_current,
+        }
 
 
 async def run_full_learning_bg(topic_id: str):
