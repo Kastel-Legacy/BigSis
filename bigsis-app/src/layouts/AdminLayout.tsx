@@ -4,9 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-    Search,
     Database,
-    Sparkles,
     Home,
     Settings,
     Shield,
@@ -31,9 +29,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <div className="flex-1 py-6 px-4 space-y-1">
                     <p className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Backoffice</p>
                     <SidebarLink href="/admin/trends" icon={<TrendingUp size={18} />} label="Trend Discovery" />
-                    <SidebarLink href="/admin/research" icon={<Search size={18} />} label="Deep Research" />
                     <SidebarLink href="/admin/knowledge" icon={<Database size={18} />} label="Knowledge Base" />
-                    <SidebarLink href="/admin/studio" icon={<Sparkles size={18} />} label="Studio (Debug)" />
                     <SidebarLink href="/admin/fiches" icon={<FileText size={18} />} label="Fiches Verite" />
 
                     <div className="my-6 border-t border-white/5" />

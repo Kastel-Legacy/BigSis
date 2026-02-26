@@ -16,7 +16,7 @@ from core.auth import AuthUser, require_admin
 from core.db.database import AsyncSessionLocal
 from core.db.models import TrendTopic
 from core.trends.scout import discover_trends
-from core.trends.learning_pipeline import run_learning_iteration, run_full_learning
+from core.trends.learning_pipeline import run_full_learning
 from core.trends.trs_engine import compute_trs
 from core.social.generator import SocialContentGenerator
 
@@ -196,33 +196,6 @@ async def topic_action(topic_id: str, request: TopicActionRequest, admin: AuthUs
         return {"id": str(topic.id), "status": topic.status, "action": request.action}
 
 
-@router.post("/trends/topics/{topic_id}/learn")
-async def trigger_learning(topic_id: str):
-    """
-    Trigger one learning iteration for an approved topic.
-    Runs PubMed + Semantic Scholar ingestion, then re-computes TRS.
-    Detects stagnation if delta < threshold.
-    """
-    async with AsyncSessionLocal() as session:
-        result = await session.execute(
-            select(TrendTopic).where(TrendTopic.id == topic_id)
-        )
-        topic = result.scalar_one_or_none()
-        if not topic:
-            raise HTTPException(status_code=404, detail="Topic not found")
-        if topic.status not in ("approved", "learning", "ready", "stagnated"):
-            raise HTTPException(
-                status_code=400,
-                detail=f"Topic status '{topic.status}' does not allow learning. Allowed: approved, learning, ready, stagnated."
-            )
-
-    try:
-        result = await run_learning_iteration(topic_id)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 async def run_full_learning_bg(topic_id: str):
     logger = logging.getLogger("uvicorn.error")
     try:
@@ -248,6 +221,9 @@ async def trigger_full_learning(topic_id: str, background_tasks: BackgroundTasks
                 status_code=400,
                 detail=f"Status '{topic.status}' does not allow learning."
             )
+        # Reset iteration counter so the pipeline gets fresh attempts
+        topic.learning_iterations = 0
+        topic.learning_log = []
         # Pre-set to learning so frontend overlay appears immediately
         topic.status = "learning"
         await session.commit()

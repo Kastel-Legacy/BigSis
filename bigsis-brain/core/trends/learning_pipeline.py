@@ -126,10 +126,11 @@ async def run_learning_iteration(topic_id: str) -> Dict:
                             "gap_fill": dimension,
                         })
 
-        # Step 4: TRS after
+        # Step 4: TRS after (monotonic — never regress due to ranking artifacts)
         trs_after = await compute_trs(topic.titre)
-        trs_after_score = trs_after["trs"]
-        delta = trs_after_score - trs_before_score
+        trs_after_raw = trs_after["trs"]
+        trs_after_score = max(trs_before_score, trs_after_raw)
+        delta = trs_after_score - trs_before_score  # always >= 0
 
         # Step 5: Stagnation detection
         is_stagnated = delta < STAGNATION_DELTA_THRESHOLD and iteration >= 2
@@ -149,6 +150,7 @@ async def run_learning_iteration(topic_id: str) -> Dict:
             "new_chunks": new_chunks_total,
             "trs_before": trs_before_score,
             "trs_after": trs_after_score,
+            "trs_after_raw": trs_after_raw,
             "delta": round(delta, 1),
             "stagnated": is_stagnated,
         }
@@ -171,6 +173,7 @@ async def run_learning_iteration(topic_id: str) -> Dict:
             "iteration": iteration,
             "trs_before": trs_before_score,
             "trs_after": trs_after_score,
+            "trs_after_raw": trs_after_raw,
             "delta": round(delta, 1),
             "new_chunks": new_chunks_total,
             "queries_used": len(queries_used),

@@ -104,6 +104,7 @@ const TrendsPage: React.FC = () => {
     const [loadingAction, setLoadingAction] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState<string>('all');
     const [error, setError] = useState<string | null>(null);
+    const [actionError, setActionError] = useState<{ topicId: string; message: string } | null>(null);
 
     // Per-topic query editing state
     const [editingQueries, setEditingQueries] = useState<Record<string, string[]>>({});
@@ -145,7 +146,7 @@ const TrendsPage: React.FC = () => {
                     await new Promise(r => setTimeout(r, 3000));
                     attempts++;
                     try {
-                        const check = await axios.get(`${API_URL}/trends/topics?batch_id=${batchId}`);
+                        const check = await axios.get(`${API_URL}/trends/topics?batch_id=${batchId}`, authHeaders());
                         if (check.data?.length > 0) { await fetchTopics(); found = true; break; }
                     } catch { /* continue polling */ }
                 }
@@ -164,13 +165,23 @@ const TrendsPage: React.FC = () => {
         headers: { Authorization: `Bearer ${session?.access_token}` },
     });
 
+    const getErrorMessage = (e: any, fallback: string): string => {
+        if (e?.response?.status === 401) return 'Session expirée. Veuillez vous reconnecter.';
+        if (e?.response?.status === 403) return 'Accès refusé. Droits administrateur requis.';
+        if (e?.response?.data?.detail) return e.response.data.detail;
+        if (e?.message?.includes('Network Error')) return 'Erreur réseau — le serveur backend est-il lancé ?';
+        return fallback;
+    };
+
     const handleAction = async (topicId: string, action: string) => {
         setLoadingAction(`${topicId}-${action}`);
+        setActionError(null);
         try {
             await axios.post(`${API_URL}/trends/topics/${topicId}/action`, { action }, authHeaders());
             await fetchTopics();
-        } catch (e) {
+        } catch (e: any) {
             console.error(`Action ${action} failed`, e);
+            setActionError({ topicId, message: getErrorMessage(e, `Action "${action}" échouée.`) });
         } finally {
             setLoadingAction(null);
         }
@@ -183,7 +194,7 @@ const TrendsPage: React.FC = () => {
             await new Promise(r => setTimeout(r, 4000));
             attempts++;
             try {
-                const res = await axios.get(`${API_URL}/trends/topics`);
+                const res = await axios.get(`${API_URL}/trends/topics`, authHeaders());
                 const data = Array.isArray(res.data) ? res.data : [];
                 const updated = data.find((t: TrendTopic) => t.id === topicId);
                 if (updated && updated.status !== 'learning') {
@@ -198,13 +209,14 @@ const TrendsPage: React.FC = () => {
     const handleLearnFull = async (topicId: string) => {
         await saveQueries(topicId);
         setLoadingAction(`${topicId}-learn-full`);
+        setActionError(null);
         try {
-            // Returns immediately — backend sets status='learning' and runs in background
-            await axios.post(`${API_URL}/trends/topics/${topicId}/learn-full`);
-            await fetchTopics(); // refresh once to show overlay via topic.status='learning'
+            await axios.post(`${API_URL}/trends/topics/${topicId}/learn-full`, {}, authHeaders());
+            await fetchTopics();
             await pollUntilLearningDone(topicId);
-        } catch (e) {
+        } catch (e: any) {
             console.error('Full learning failed', e);
+            setActionError({ topicId, message: getErrorMessage(e, "Échec du lancement de l'apprentissage.") });
         } finally {
             setLoadingAction(null);
         }
@@ -213,14 +225,16 @@ const TrendsPage: React.FC = () => {
     // "Intéressant" = approve + immediately start full learning (TRS computed inside learning pipeline)
     const handleInterested = async (topicId: string) => {
         setLoadingAction(`${topicId}-learn-full`);
+        setActionError(null);
         try {
             await axios.post(`${API_URL}/trends/topics/${topicId}/action`, { action: 'approve' }, authHeaders());
             await saveQueries(topicId);
-            await axios.post(`${API_URL}/trends/topics/${topicId}/learn-full`);
-            await fetchTopics(); // refresh once to show overlay
+            await axios.post(`${API_URL}/trends/topics/${topicId}/learn-full`, {}, authHeaders());
+            await fetchTopics();
             await pollUntilLearningDone(topicId);
-        } catch (e) {
+        } catch (e: any) {
             console.error('Interested action failed', e);
+            setActionError({ topicId, message: getErrorMessage(e, 'Échec de l\'action "Intéressant".') });
         } finally {
             setLoadingAction(null);
         }
@@ -264,7 +278,7 @@ const TrendsPage: React.FC = () => {
         try {
             const res = await axios.post(`${API_URL}/trends/topics/${topicId}/generate-fiche`, {}, authHeaders());
             const slug = res.data.slug || makeSlug(titre);
-            // Backend returns immediately — poll until the fiche is actually in DB (max 3min)
+            // Poll the fiche endpoint until it exists (max 3min)
             let attempts = 0;
             while (attempts < 45) {
                 await new Promise(r => setTimeout(r, 4000));
@@ -277,11 +291,12 @@ const TrendsPage: React.FC = () => {
                     }
                 } catch { /* fiche not ready yet */ }
             }
-            // Timeout — show link anyway, fiche might be ready soon
-            setFicheState(prev => ({ ...prev, [topicId]: slug }));
-        } catch (e) {
+            // Timeout — mark as error instead of showing a potentially stale link
+            setFicheState(prev => ({ ...prev, [topicId]: 'error' }));
+        } catch (e: any) {
             console.error('Fiche generation failed', e);
             setFicheState(prev => ({ ...prev, [topicId]: 'error' }));
+            setActionError({ topicId, message: getErrorMessage(e, 'Échec de la génération de la fiche.') });
         }
     };
 
@@ -380,6 +395,18 @@ const TrendsPage: React.FC = () => {
                                     </div>
                                 )}
 
+                                {/* PER-TOPIC ERROR BANNER */}
+                                {actionError?.topicId === topic.id && (
+                                    <div className="mx-6 mt-4 bg-red-500/10 border border-red-500/20 rounded-xl p-3 flex items-center justify-between">
+                                        <p className="text-red-400 text-xs font-medium flex items-center gap-2">
+                                            <AlertTriangle size={14} />{actionError.message}
+                                        </p>
+                                        <button onClick={() => setActionError(null)} className="text-red-400/60 hover:text-red-400 transition-colors">
+                                            <X size={14} />
+                                        </button>
+                                    </div>
+                                )}
+
                                 {/* CARD HEADER */}
                                 <div className="p-6">
                                     <div className="flex items-start justify-between gap-4">
@@ -433,7 +460,7 @@ const TrendsPage: React.FC = () => {
                                                     e.stopPropagation();
                                                     setLoadingAction(`${topic.id}-delete`);
                                                     try { await axios.delete(`${API_URL}/trends/topics/${topic.id}`, authHeaders()); await fetchTopics(); }
-                                                    catch (e) { console.error('Delete failed', e); }
+                                                    catch (err: any) { console.error('Delete failed', err); setActionError({ topicId: topic.id, message: getErrorMessage(err, 'Suppression échouée.') }); }
                                                     finally { setLoadingAction(null); }
                                                 }}
                                                 disabled={loadingAction === `${topic.id}-delete`}
@@ -481,13 +508,33 @@ const TrendsPage: React.FC = () => {
                                                 />
                                             )}
                                             {topic.status === 'stagnated' && (
-                                                <ActionBtn
-                                                    label="Relancer apprentissage"
-                                                    color="bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/20"
-                                                    icon={<RefreshCw size={14} />}
-                                                    loading={isLearning}
-                                                    onClick={() => handleLearnFull(topic.id)}
-                                                />
+                                                <>
+                                                    {fiche === 'generating' ? (
+                                                        <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                                            <Loader2 size={14} className="animate-spin" />Génération en cours...
+                                                        </span>
+                                                    ) : fiche && fiche !== 'error' ? (
+                                                        <a href={`/fiches/${fiche}`} target="_blank" rel="noreferrer"
+                                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors">
+                                                            <ExternalLink size={14} />Voir la fiche
+                                                        </a>
+                                                    ) : (
+                                                        <ActionBtn
+                                                            label={`Générer la fiche (TRS ${topic.trs_current?.toFixed(0)})`}
+                                                            color="bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20"
+                                                            icon={<AlertTriangle size={14} />}
+                                                            loading={false}
+                                                            onClick={() => handleGenerateFiche(topic.id, topic.titre)}
+                                                        />
+                                                    )}
+                                                    <ActionBtn
+                                                        label="Relancer apprentissage"
+                                                        color="bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/20"
+                                                        icon={<RefreshCw size={14} />}
+                                                        loading={isLearning}
+                                                        onClick={() => handleLearnFull(topic.id)}
+                                                    />
+                                                </>
                                             )}
                                             {topic.status === 'ready' && (
                                                 <>
