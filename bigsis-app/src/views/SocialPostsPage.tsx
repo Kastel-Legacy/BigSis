@@ -651,18 +651,11 @@ function PreviewModal({
                         </button>
                     )}
                     <button
-                        onClick={() => onExportSlide(slideIndex)}
-                        className="px-4 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-sm font-medium transition-all"
-                    >
-                        <Download size={14} className="inline mr-1.5" />
-                        Slide {slideIndex + 1}
-                    </button>
-                    <button
                         onClick={onExportAll}
                         className="px-4 py-1.5 bg-gradient-to-r from-pink-500/20 to-violet-500/20 hover:from-pink-500/30 hover:to-violet-500/30 border border-pink-500/30 rounded-lg text-sm font-medium transition-all"
                     >
                         <Download size={14} className="inline mr-1.5" />
-                        Tout
+                        Tout ({slides.length} slides)
                     </button>
                     <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg ml-2">
                         <X size={18} />
