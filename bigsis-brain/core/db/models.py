@@ -234,6 +234,23 @@ class SocialGeneration(Base):
     status = Column(String, server_default="published", nullable=False, index=True)
 
 
+# --- SOCIAL POSTS (Instagram Carousel) ---
+
+class SocialPost(Base):
+    __tablename__ = "social_posts"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    fiche_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    template_type = Column(String, nullable=False, index=True)  # verdict | vrai_faux | chiffres | face_a_face
+    title = Column(String, nullable=False)
+    slides = Column(JSONB, nullable=False)      # Array of slide objects
+    caption = Column(Text)                       # Instagram caption text
+    hashtags = Column(ARRAY(String))             # ["#bigsis", "#esthetique", ...]
+    status = Column(String, server_default="draft", nullable=False, index=True)  # draft | approved | published
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
 # --- FICHE FEEDBACK ---
 
 class FicheFeedback(Base):

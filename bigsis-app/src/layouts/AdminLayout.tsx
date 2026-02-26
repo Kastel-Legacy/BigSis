@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
     Database,
     Home,
+    Instagram,
     Settings,
     Shield,
     TrendingUp,
@@ -31,6 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <SidebarLink href="/admin/trends" icon={<TrendingUp size={18} />} label="Trend Discovery" />
                     <SidebarLink href="/admin/knowledge" icon={<Database size={18} />} label="Knowledge Base" />
                     <SidebarLink href="/admin/fiches" icon={<FileText size={18} />} label="Fiches Verite" />
+                    <SidebarLink href="/admin/social" icon={<Instagram size={18} />} label="Social Posts" />
 
                     <div className="my-6 border-t border-white/5" />
 
