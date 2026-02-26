@@ -222,16 +222,22 @@ const TrendsPage: React.FC = () => {
         }
     };
 
-    // "Intéressant" = approve + immediately start full learning (TRS computed inside learning pipeline)
+    // "Intéressant" = approve (with TRS pre-check) + learn if needed
     const handleInterested = async (topicId: string) => {
         setLoadingAction(`${topicId}-learn-full`);
         setActionError(null);
         try {
-            await axios.post(`${API_URL}/trends/topics/${topicId}/action`, { action: 'approve' }, authHeaders());
+            const approveRes = await axios.post(`${API_URL}/trends/topics/${topicId}/action`, { action: 'approve' }, authHeaders());
             await saveQueries(topicId);
-            await axios.post(`${API_URL}/trends/topics/${topicId}/learn-full`, {}, authHeaders());
-            await fetchTopics();
-            await pollUntilLearningDone(topicId);
+
+            // If TRS pre-check already found enough knowledge, skip learning
+            if (approveRes.data.status === 'ready') {
+                await fetchTopics();
+            } else {
+                await axios.post(`${API_URL}/trends/topics/${topicId}/learn-full`, {}, authHeaders());
+                await fetchTopics();
+                await pollUntilLearningDone(topicId);
+            }
         } catch (e: any) {
             console.error('Interested action failed', e);
             setActionError({ topicId, message: getErrorMessage(e, 'Échec de l\'action "Intéressant".') });
@@ -626,23 +632,27 @@ const TrendsPage: React.FC = () => {
                                                     </div>
                                                 )}
                                                 {/* Coverage gaps from TRS if stagnated */}
-                                                {topic.status === 'stagnated' && topic.trs_details?.coverage && (
+                                                {topic.status === 'stagnated' && (topic.trs_details?.seen_coverage_flags || topic.trs_details?.coverage) && (() => {
+                                                    const cov = topic.trs_details.seen_coverage_flags || topic.trs_details.coverage;
+                                                    const hasGaps = !cov.efficacy || !cov.safety || !cov.recovery;
+                                                    if (!hasGaps) return null;
+                                                    return (
                                                     <div className="mt-3 p-3 bg-orange-500/5 border border-orange-500/20 rounded-lg">
                                                         <p className="text-[11px] text-orange-400 font-semibold mb-2">Lacunes détectées — ajoute des requêtes ciblées :</p>
                                                         <div className="flex flex-wrap gap-2">
-                                                            {!topic.trs_details.coverage.efficacy && (
+                                                            {!cov.efficacy && (
                                                                 <button onClick={() => setNewQueryInput(prev => ({ ...prev, [topic.id]: (prev[topic.id] ? prev[topic.id] + '\n' : '') + `${topic.titre} efficacy systematic review` }))}
                                                                     className="px-2 py-1 text-[10px] rounded bg-orange-500/10 text-orange-300 border border-orange-500/20 hover:bg-orange-500/20 transition-colors">
                                                                     + Efficacité
                                                                 </button>
                                                             )}
-                                                            {!topic.trs_details.coverage.safety && (
+                                                            {!cov.safety && (
                                                                 <button onClick={() => setNewQueryInput(prev => ({ ...prev, [topic.id]: (prev[topic.id] ? prev[topic.id] + '\n' : '') + `${topic.titre} adverse effects safety profile` }))}
                                                                     className="px-2 py-1 text-[10px] rounded bg-orange-500/10 text-orange-300 border border-orange-500/20 hover:bg-orange-500/20 transition-colors">
                                                                     + Sécurité
                                                                 </button>
                                                             )}
-                                                            {!topic.trs_details.coverage.recovery && (
+                                                            {!cov.recovery && (
                                                                 <button onClick={() => setNewQueryInput(prev => ({ ...prev, [topic.id]: (prev[topic.id] ? prev[topic.id] + '\n' : '') + `${topic.titre} downtime recovery patient satisfaction` }))}
                                                                     className="px-2 py-1 text-[10px] rounded bg-orange-500/10 text-orange-300 border border-orange-500/20 hover:bg-orange-500/20 transition-colors">
                                                                     + Récupération
@@ -650,7 +660,8 @@ const TrendsPage: React.FC = () => {
                                                             )}
                                                         </div>
                                                     </div>
-                                                )}
+                                                    );
+                                                })()}
                                             </div>
                                         )}
 
@@ -663,8 +674,8 @@ const TrendsPage: React.FC = () => {
                                                     <span className="text-[10px] text-gray-500 font-normal">Seuil génération : 70/100</span>
                                                 </h4>
                                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                                                    {Object.entries(topic.trs_details).map(([key, val]: [string, any]) => (
-                                                        <TRSDetail key={key} label={key} score={val.score} max={val.max} />
+                                                    {Object.entries(topic.trs_details.scores || topic.trs_details).filter(([key]) => !['schema_version', 'seen_chunk_ids', 'seen_doc_ids', 'seen_diversity_flags', 'seen_coverage_flags', 'seen_recency_chunk_ids', 'scores'].includes(key)).map(([key, val]: [string, any]) => (
+                                                        <TRSDetail key={key} label={key} score={val?.score} max={val?.max} />
                                                     ))}
                                                 </div>
                                             </div>
