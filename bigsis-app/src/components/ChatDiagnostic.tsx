@@ -39,6 +39,12 @@ interface EnrichmentData {
   };
 }
 
+interface ScoreDetails {
+  total: number;
+  scientific: number;
+  personal: number;
+}
+
 interface LearningTriggered {
   slug: string;
   name: string;
@@ -129,54 +135,99 @@ function TrsBadge({ trs, hasFiche, learning }: { trs?: number | null; hasFiche: 
   );
 }
 
-function DiagnosticCard({ data, enrichment }: { data: DiagnosticData; enrichment: EnrichmentData }) {
+function DiagnosticCard({ data, enrichment, scoreDetails }: { data: DiagnosticData; enrichment: EnrichmentData; scoreDetails?: ScoreDetails | null }) {
   const hasLearning = Object.values(enrichment).some(e => e.learning);
+  const sciScore = scoreDetails?.scientific ?? Math.round(data.score_confiance * 0.5);
+  const persScore = scoreDetails?.personal ?? Math.round(data.score_confiance * 0.5);
 
   return (
     <div className="mt-4 space-y-3">
-      {/* Score bar */}
-      <div className="glass-panel p-4 rounded-xl">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs text-blue-200/60 uppercase tracking-wider font-medium">Niveau de confiance</span>
-          <span className="text-sm font-bold text-cyan-400">{data.score_confiance}/100</span>
+      {/* Split score bars */}
+      <div className="glass-panel p-4 rounded-xl space-y-3">
+        {/* Scientific score */}
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[11px] text-cyan-300/70 uppercase tracking-wider font-medium">Base scientifique</span>
+            <span className="text-xs font-bold text-cyan-400">{sciScore}/50</span>
+          </div>
+          <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full transition-all duration-1000"
+              style={{ width: `${(sciScore / 50) * 100}%` }}
+            />
+          </div>
         </div>
-        <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-1000"
-            style={{ width: `${data.score_confiance}%` }}
-          />
+        {/* Personalization score */}
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[11px] text-purple-300/70 uppercase tracking-wider font-medium">Personnalisation</span>
+            <span className="text-xs font-bold text-purple-400">{persScore}/50</span>
+          </div>
+          <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-1000"
+              style={{ width: `${(persScore / 50) * 100}%` }}
+            />
+          </div>
+          {persScore < 25 && (
+            <p className="text-[10px] text-purple-300/50 mt-1">Donne ton age et type de peau pour affiner</p>
+          )}
         </div>
       </div>
 
-      {/* Procedure cards with TRS badges */}
+      {/* Procedure cards with TRS badges — Fix 1+3: conditional link vs div */}
       {data.options.length > 0 && (
         <div className="space-y-2">
           <span className="text-xs text-blue-200/60 uppercase tracking-wider font-medium px-1">Options a explorer</span>
           {data.options.map((opt, j) => {
             const slugEnrichment = opt.slug ? enrichment[opt.slug] : undefined;
-            const isLearning = slugEnrichment?.learning && !slugEnrichment?.has_fiche;
-            return (
-              <div key={j}>
-                <Link
-                  href={opt.slug && slugEnrichment?.has_fiche ? `/fiches/${opt.slug}` : '/fiches'}
-                  className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-cyan-500/30 transition-all group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                      opt.pertinence === 'haute' ? 'bg-green-400 shadow-[0_0_6px_theme(colors.green.400)]' :
-                      opt.pertinence === 'moyenne' ? 'bg-yellow-400' : 'bg-white/30'
-                    }`} />
-                    <div>
-                      <span className="text-sm text-white font-medium">{opt.name}</span>
-                      {slugEnrichment && (
-                        <div className="mt-1">
-                          <TrsBadge trs={slugEnrichment.trs} hasFiche={slugEnrichment.has_fiche} learning={slugEnrichment.learning} />
-                        </div>
+            const hasFiche = slugEnrichment?.has_fiche ?? false;
+            const trs = slugEnrichment?.trs;
+            const isLearning = slugEnrichment?.learning && !hasFiche;
+
+            const cardContent = (
+              <>
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                    opt.pertinence === 'haute' ? 'bg-green-400 shadow-[0_0_6px_theme(colors.green.400)]' :
+                    opt.pertinence === 'moyenne' ? 'bg-yellow-400' : 'bg-white/30'
+                  }`} />
+                  <div>
+                    <span className="text-sm text-white font-medium">{opt.name}</span>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <TrsBadge trs={trs} hasFiche={hasFiche} learning={isLearning} />
+                      {!hasFiche && trs && trs >= 40 && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/25">
+                          Fiche bientot
+                        </span>
                       )}
                     </div>
                   </div>
+                </div>
+                {hasFiche && (
                   <ArrowRight size={14} className="text-white/30 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
-                </Link>
+                )}
+              </>
+            );
+
+            // Only link if fiche is published
+            if (hasFiche && opt.slug) {
+              return (
+                <div key={j}>
+                  <Link
+                    href={`/fiches/${opt.slug}`}
+                    className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-cyan-500/30 transition-all group"
+                  >
+                    {cardContent}
+                  </Link>
+                </div>
+              );
+            }
+
+            // No fiche: non-clickable card
+            return (
+              <div key={j} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                {cardContent}
               </div>
             );
           })}
@@ -191,8 +242,8 @@ function DiagnosticCard({ data, enrichment }: { data: DiagnosticData; enrichment
             <span className="text-xs font-medium text-amber-300">BigSis apprend sur ces sujets</span>
           </div>
           <p className="text-[11px] text-amber-200/60 mt-1 ml-5">
-            Je n'ai pas encore de fiche detaillee pour certaines procedures recommandees.
-            J'ai lance l'apprentissage automatique — reviens bientot pour une fiche complete !
+            Je n&#39;ai pas encore de fiche detaillee pour certaines procedures recommandees.
+            J&#39;ai lance l&#39;apprentissage automatique — reviens bientot pour une fiche complete !
           </p>
         </div>
       )}
@@ -236,7 +287,7 @@ function DiagnosticCard({ data, enrichment }: { data: DiagnosticData; enrichment
   );
 }
 
-function ChatBubble({ msg, isLast, isStreaming, enrichment }: { msg: Message; isLast: boolean; isStreaming: boolean; enrichment: EnrichmentData }) {
+function ChatBubble({ msg, isLast, isStreaming, enrichment, scoreDetails }: { msg: Message; isLast: boolean; isStreaming: boolean; enrichment: EnrichmentData; scoreDetails?: ScoreDetails | null }) {
   return (
     <div>
       <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -253,7 +304,7 @@ function ChatBubble({ msg, isLast, isStreaming, enrichment }: { msg: Message; is
           {msg.content || (isStreaming ? '...' : '')}
         </div>
       </div>
-      {msg.diagnosticData && <DiagnosticCard data={msg.diagnosticData} enrichment={enrichment} />}
+      {msg.diagnosticData && <DiagnosticCard data={msg.diagnosticData} enrichment={enrichment} scoreDetails={scoreDetails} />}
     </div>
   );
 }
@@ -300,6 +351,7 @@ export default function ChatDiagnostic({ initialContext, onBack }: ChatDiagnosti
   const [savingDiag, setSavingDiag] = useState(false);
   const [savedDiag, setSavedDiag] = useState(false);
   const [enrichment, setEnrichment] = useState<EnrichmentData>({});
+  const [scoreDetails, setScoreDetails] = useState<ScoreDetails | null>(null);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [savedDiagId, setSavedDiagId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -374,6 +426,10 @@ export default function ChatDiagnostic({ initialContext, onBack }: ChatDiagnosti
                 // P1: Capture enrichment data (TRS badges + learning status)
                 if (payload.enrichment) {
                   setEnrichment(payload.enrichment);
+                }
+                // Capture split score details
+                if (payload.score_details) {
+                  setScoreDetails(payload.score_details);
                 }
                 // Auto-learning: log triggered topics (informational)
                 if (payload.learning_triggered) {
@@ -504,7 +560,7 @@ export default function ChatDiagnostic({ initialContext, onBack }: ChatDiagnosti
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg, i) => (
-          <ChatBubble key={i} msg={msg} isLast={i === messages.length - 1} isStreaming={isStreaming} enrichment={enrichment} />
+          <ChatBubble key={i} msg={msg} isLast={i === messages.length - 1} isStreaming={isStreaming} enrichment={enrichment} scoreDetails={scoreDetails} />
         ))}
         <div ref={messagesEndRef} />
       </div>
@@ -536,7 +592,7 @@ export default function ChatDiagnostic({ initialContext, onBack }: ChatDiagnosti
               <button
                 onClick={() => {
                   if (onBack) { onBack(); }
-                  else { setMessages([DEFAULT_GREETING]); setInput(''); setSavedDiag(false); setSavedDiagId(null); setFeedbackSubmitted(false); setEnrichment({}); }
+                  else { setMessages([DEFAULT_GREETING]); setInput(''); setSavedDiag(false); setSavedDiagId(null); setFeedbackSubmitted(false); setEnrichment({}); setScoreDetails(null); }
                 }}
                 className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 border border-white/10 text-blue-200 hover:bg-white/10 hover:text-white transition-all text-sm font-medium"
               >

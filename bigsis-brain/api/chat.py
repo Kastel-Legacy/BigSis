@@ -235,10 +235,38 @@ def _compute_confidence_score(
     evidence_chunks: int,
     slug_map: dict,
     profile: Optional[dict] = None,
-) -> int:
-    """Compute a formulaic confidence score (0-100) based on objective criteria."""
+) -> dict:
+    """Compute a formulaic confidence score (0-100) with scientific/personal split."""
 
-    # 1. Context completeness (max 30 points)
+    # --- A. SCIENTIFIC SCORE (max 50) = evidence + procedure match ---
+    # Evidence strength (max 30 points)
+    evi_score = 0
+    evi_score += min(15, evidence_chunks * 5)  # 5 pts per chunk, max 15
+    best_trs = 0
+    for slug, entry in slug_map.items():
+        trs_val = entry.get("trs") or 0
+        best_trs = max(best_trs, trs_val)
+    if best_trs >= 70:
+        evi_score += 15
+    elif best_trs >= 40:
+        evi_score += 10
+    elif best_trs > 0:
+        evi_score += 5
+
+    # Procedure match quality (max 20 points)
+    proc_score = 0
+    has_any_procedure = len(slug_map) > 0
+    has_any_fiche = any(e.get("has_fiche") for e in slug_map.values())
+    has_any_ready = any((e.get("trs") or 0) >= 70 for e in slug_map.values())
+    if has_any_procedure:
+        proc_score += 10
+    if has_any_fiche or has_any_ready:
+        proc_score += 10
+
+    scientific_score = evi_score + proc_score  # max 50
+
+    # --- B. PERSONALIZATION SCORE (max 50) = context + rules ---
+    # Context completeness (max 30 points)
     ctx_score = 0
     if context.get("area"):
         ctx_score += 10
@@ -249,35 +277,17 @@ def _compute_confidence_score(
     if context.get("skin_type") or (profile and profile.get("skin_type")):
         ctx_score += 6
 
-    # 2. Evidence strength (max 30 points)
-    evi_score = 0
-    evi_score += min(15, evidence_chunks * 5)  # 5 pts per chunk, max 15
-    # Check if recommended procedures have fiches with TRS
-    best_trs = 0
-    for slug, entry in slug_map.items():
-        if entry.get("has_fiche") and entry.get("trs"):
-            best_trs = max(best_trs, entry["trs"])
-    if best_trs >= 70:
-        evi_score += 15
-    elif best_trs >= 40:
-        evi_score += 10
-    elif best_trs > 0:
-        evi_score += 5
+    # Rules coverage (max 20 points)
+    rules_score = min(20, rules_triggered * 5)
 
-    # 3. Rules coverage (max 20 points)
-    rules_score = min(20, rules_triggered * 5)  # 5 pts per rule, max 20
+    personal_score = ctx_score + rules_score  # max 50
 
-    # 4. Procedure match quality (max 20 points)
-    proc_score = 0
-    has_any_procedure = len(slug_map) > 0
-    has_any_fiche = any(e.get("has_fiche") for e in slug_map.values())
-    if has_any_procedure:
-        proc_score += 10
-    if has_any_fiche:
-        proc_score += 10
-
-    total = ctx_score + evi_score + rules_score + proc_score
-    return max(20, min(95, total))  # Clamp to 20-95
+    total = scientific_score + personal_score
+    return {
+        "total": max(20, min(95, total)),
+        "scientific": min(50, scientific_score),
+        "personal": min(50, personal_score),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -326,6 +336,15 @@ def _format_profile_context(profile: dict) -> str:
 # System prompt builder (combines all improvements)
 # ---------------------------------------------------------------------------
 
+# Zone-specific safety notes (injected regardless of wrinkle_type)
+_ZONE_SAFETY: dict[str, str] = {
+    "pattes_oie": "Zone perioculaire : risque ptosis si injection trop proche orbiculaire. Ecchymoses frequentes (zone tres vasculaire). Distance de securite a respecter par rapport a l'orbite.",
+    "front": "Zone frontale : risque ptosis sourcils si injection trop basse. Effet 'Spock' (sourcils pointus) si muscles lateraux non traites. Dosage progressif recommande.",
+    "glabelle": "Zone glabellaire : zone vasculaire a risque. Risque rare mais serieux d'occlusion vasculaire retinienne. Injection superficielle uniquement. Praticien experimente obligatoire.",
+    "sillon_nasogenien": "Sillons nasogeniens : risque compression vasculaire. Ne jamais injecter dans l'artere faciale. Risque necrose si injection intra-arterielle. Technique canule preferee.",
+}
+
+
 def _build_chat_system_prompt(
     language: str,
     context: dict,
@@ -339,12 +358,29 @@ def _build_chat_system_prompt(
     has_concern = "concern" in context
     has_enough = has_zone or has_concern or msg_count >= 2
 
-    base_prompt = """Tu es BigSis, la grande soeur bienveillante et experte en esthetique medicale.
+    # Fix 4: Enriched BigSIS personality
+    base_prompt = """Tu es BigSis, la grande soeur qui dit la verite sur l'esthetique medicale.
 
-PERSONNALITE :
-- Ton direct, chaleureux, sans bullshit. Tu tutoies.
-- Tu ne diagnostiques PAS et tu ne prescris PAS. Tu informes.
-- ECONOMIE DE TOKENS : sois concise, va droit au but.
+PERSONNALITE — TU ES :
+- Cash et directe : tu dis les choses franchement, pas de langue de bois.
+- Protectrice : tu veux que ta petite soeur prenne la meilleure decision, pas la plus chere.
+- Experte mais accessible : tu vulgarises la science sans condescendre.
+- Un peu piquante : une touche d'humour, jamais corporate.
+- Tu tutoies TOUJOURS.
+
+EXEMPLES DE TON (reproduis ce style) :
+- "Les pattes d'oie, c'est LE classique. Bonne nouvelle : c'est aussi l'une des zones les mieux etudiees en esthetique."
+- "Le botox la-dessus, ca marche vraiment bien — mais faut savoir a quoi s'attendre, et surtout ce que ca ne fait PAS."
+- "Je te previens : si ton praticien te promet zero ecchymose, change de praticien."
+- "La verite ? La plupart des rides fines repondent bien au traitement. Les profondes, c'est une autre histoire."
+
+TU NE FAIS JAMAIS :
+- Du remplissage : "Pas de souci", "On va voir ca ensemble", "N'hesite pas a demander"
+- Du corporate : "Je vous recommande de consulter", "Il est important de noter que"
+- Du generique : "Les etudes montrent que", "La science prouve que" (cite plutot un chiffre ou un fait precis)
+
+Tu ne diagnostiques PAS et tu ne prescris PAS. Tu informes avec des donnees concretes.
+ECONOMIE DE TOKENS : chaque phrase doit apporter une info utile. Zero remplissage.
 
 """
 
@@ -354,31 +390,48 @@ PERSONNALITE :
     if has_enough:
         zone_label = context.get("area", "non precisee")
         concern_label = context.get("concern", "esthetique generale")
+
+        # Fix 6: Inject zone-specific safety warnings
+        zone_safety = _ZONE_SAFETY.get(zone_label, "")
+        safety_section = ""
+        if zone_safety:
+            safety_section = f"""
+=== SECURITE ZONE (OBLIGATOIRE — inclus au moins 1 safety_warning) ===
+{zone_safety}
+"""
+
         base_prompt += f"""GENERE LA SYNTHESE MAINTENANT. Zone: {zone_label}. Sujet: {concern_label}.
 
 === CATALOGUE PROCEDURES (utilise UNIQUEMENT ces slugs) ===
 {catalogue_text}
-
+{safety_section}
 Format OBLIGATOIRE de ta reponse :
-1. UNE phrase d'accroche personnalisee (max 20 mots)
+1. UNE phrase d'accroche percutante et specifique a la zone (max 25 mots, style BigSis cash)
 2. Le bloc JSON ci-dessous (OBLIGATOIRE, meme si les infos sont partielles)
+3. UNE phrase de conclusion apres le JSON (optionnelle, un conseil concret)
 
 $$DIAGNOSTIC_JSON$$
-{{"score_confiance": {confidence_score}, "zone": "{zone_label}", "concern": "{concern_label}", "options": [{{"name": "Nom procedure", "pertinence": "haute", "slug": "slug-du-catalogue"}}], "risques": ["risque 1"], "questions_praticien": ["question 1"], "safety_warnings": []}}
+{{"score_confiance": {confidence_score}, "zone": "{zone_label}", "concern": "{concern_label}", "options": [{{"name": "Procedure 1", "pertinence": "haute", "slug": "slug-1"}}, {{"name": "Procedure 2", "pertinence": "moyenne", "slug": "slug-2"}}, {{"name": "Procedure 3", "pertinence": "moyenne", "slug": "slug-3"}}, {{"name": "Procedure 4", "pertinence": "basse", "slug": "slug-4"}}], "risques": ["risque specifique 1"], "questions_praticien": ["question praticien 1", "question praticien 2"], "safety_warnings": ["warning zone 1"]}}
 $$DIAGNOSTIC_JSON$$
 
 REGLES CRITIQUES :
-- score_confiance DOIT etre exactement {confidence_score} (calcule par le systeme, pas par toi).
-- Les slugs DOIVENT venir du catalogue ci-dessus. Ne jamais inventer un slug.
-- Si une procedure a [FICHE DISPONIBLE], mentionne-le dans la synthese.
-- Propose 2-3 options pertinentes, triees par pertinence (haute > moyenne > basse).
-- La phrase d'accroche doit etre utile, pas du remplissage.
+- score_confiance DOIT etre exactement {confidence_score}.
+- Les slugs DOIVENT venir du catalogue ci-dessus. Ne jamais inventer.
+- OBLIGATOIRE : inclus entre 4 et 6 options. Passe en revue TOUT le catalogue et inclus chaque procedure pertinente.
+  - haute = traitement de reference pour cette zone/probleme
+  - moyenne = option valable en complement ou alternative
+  - basse = peut aider mais pas le traitement principal
+- safety_warnings : au moins 1 warning si la zone a des risques connus (voir section SECURITE ZONE).
+- questions_praticien : 2-3 questions que SEUL un praticien peut repondre (pas des infos generales).
+  BONNES questions : "Combien d'unites me faudrait-il ?", "A quelle frequence dois-je revenir ?", "Est-ce compatible avec mon traitement actuel ?"
+  MAUVAISES questions : "Combien de temps ca dure ?" (on a l'info), "Est-ce que ca marche ?" (on a le TRS)
+- La phrase d'accroche doit etre specifique a la zone, pas generique.
 """
     else:
-        base_prompt += """L'utilisatrice vient d'arriver. Tu n'as ni zone ni preoccupation.
-Reponds en UNE phrase + UNE question directe pour obtenir l'info.
-Exemple : "Hello ! C'est quoi ta preoccupation principale — des rides, un traitement qui t'intrigue, ou autre chose ?"
-MAX 2 phrases au total.
+        base_prompt += """L'utilisatrice vient d'arriver. Tu n'as ni zone ni preoccupation precise.
+Reponds en UNE phrase percutante (style BigSis) + UNE question directe.
+Exemple : "Salut ! Alors, c'est quoi le sujet — une zone qui te gene, un traitement dont tu as entendu parler, ou tu veux juste comprendre tes options ?"
+MAX 2 phrases au total. Pas de blabla.
 """
 
     return base_prompt
@@ -608,12 +661,13 @@ async def chat_diagnostic(
             # P0: Dynamic procedure catalogue
             catalogue_text, slug_map = await _load_procedure_catalogue()
 
-            # P0: Formulaic confidence score
+            # P0: Formulaic confidence score (now returns dict with split scores)
             user_msg_count = sum(1 for m in messages if m.role == "user")
-            confidence_score = _compute_confidence_score(
+            score_data = _compute_confidence_score(
                 context, rules_count, evidence_count, slug_map,
                 profile=profile,
             )
+            confidence_score = score_data["total"]
 
             # Build system prompt (integrates all improvements)
             system_prompt = _build_chat_system_prompt(
@@ -662,6 +716,9 @@ Reponds maintenant. Si tu generes la synthese, inclus OBLIGATOIREMENT le bloc $$
 
             if enrichment:
                 yield f"data: {json.dumps({'enrichment': enrichment})}\n\n"
+
+            # Send split score data for frontend display
+            yield f"data: {json.dumps({'score_details': score_data})}\n\n"
 
             # Auto-learning: trigger background learning for procedures without fiches
             if learning_slugs:
