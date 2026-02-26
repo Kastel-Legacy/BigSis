@@ -195,18 +195,24 @@ export default function SocialPostsPage() {
         const slideRef = slideRefs.current[index];
         if (!slideRef) return;
         try {
-            const { toPng } = await import('html-to-image');
-            const dataUrl = await toPng(slideRef, {
+            const { toBlob } = await import('html-to-image');
+            const blob = await toBlob(slideRef, {
                 width: 1080,
                 height: 1350,
                 pixelRatio: 2,
             });
+            if (!blob) { setError('Erreur export PNG'); return; }
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = dataUrl;
+            a.href = url;
             const name = previewPost?.title?.replace(/[^a-zA-Z0-9]/g, '-') || 'slide';
             a.download = `bigsis-${name}-slide-${index + 1}.png`;
+            document.body.appendChild(a);
             a.click();
-        } catch {
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        } catch (err) {
+            console.error('[export]', err);
             setError('Erreur export PNG');
         }
     };

@@ -147,29 +147,47 @@ function HookLayout({ slide, emojiIcon }: { slide: SlideData; emojiIcon: React.R
 
 function ContentLayout({ slide, emojiIcon }: { slide: SlideData; emojiIcon: React.ReactNode }) {
     return (
-        <div className="space-y-8 max-w-[900px] w-full">
-            <div className="flex items-center gap-4">
-                {emojiIcon && <div>{emojiIcon}</div>}
-                <h2 className="text-5xl font-bold leading-tight">
+        <div className="w-full px-8" style={{ maxWidth: 960 }}>
+            {/* Header with emoji + headline */}
+            <div className="flex items-center gap-6 mb-12">
+                {emojiIcon && (
+                    <div className="shrink-0 w-20 h-20 rounded-2xl bg-white/15 flex items-center justify-center">
+                        {emojiIcon}
+                    </div>
+                )}
+                <h2 className="text-6xl font-black leading-none tracking-tight">
                     {slide.headline}
                 </h2>
             </div>
+
+            {/* Accent text */}
             {slide.accent_text && (
-                <div className="text-6xl font-black text-white/90">
+                <div className="text-7xl font-black text-white/90 mb-12">
                     {slide.accent_text}
                 </div>
             )}
+
+            {/* Bullet points — card style */}
             {slide.bullet_points && slide.bullet_points.length > 0 ? (
-                <ul className="space-y-6 mt-8">
+                <div className="space-y-6">
                     {slide.bullet_points.map((point, i) => (
-                        <li key={i} className="flex items-start gap-4">
-                            <div className="w-3 h-3 rounded-full bg-white/60 mt-3 shrink-0" />
-                            <span className="text-3xl leading-relaxed opacity-90">{point}</span>
-                        </li>
+                        <div
+                            key={i}
+                            className="flex items-center gap-6 rounded-2xl px-8 py-7"
+                            style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                        >
+                            <div
+                                className="shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-black text-2xl"
+                                style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+                            >
+                                {i + 1}
+                            </div>
+                            <span className="text-3xl font-semibold leading-snug">{point}</span>
+                        </div>
                     ))}
-                </ul>
+                </div>
             ) : slide.body ? (
-                <p className="text-3xl opacity-80 leading-relaxed mt-4">
+                <p className="text-4xl opacity-85 leading-relaxed font-medium">
                     {slide.body}
                 </p>
             ) : null}
@@ -214,28 +232,28 @@ function ComparisonLayout({ slide }: { slide: SlideData }) {
 
 function CTALayout({ slide, emojiIcon }: { slide: SlideData; emojiIcon: React.ReactNode }) {
     return (
-        <div className="text-center space-y-8 max-w-[900px]">
+        <div className="text-center space-y-10 max-w-[900px]">
             {emojiIcon && (
                 <div className="flex justify-center">{emojiIcon}</div>
             )}
-            <h2 className="text-5xl font-bold">
+            <h2 className="text-6xl font-black leading-tight">
                 {slide.headline}
             </h2>
             {slide.accent_text && (
-                <div className="text-7xl font-black text-white/90 my-4">
+                <div className="text-8xl font-black text-white/90 my-6">
                     {slide.accent_text}
                 </div>
             )}
             {slide.body && (
-                <p className="text-3xl opacity-80 leading-relaxed">
+                <p className="text-3xl opacity-80 leading-relaxed font-medium">
                     {slide.body}
                 </p>
             )}
-            <div className="mt-12 pt-8 border-t border-white/20">
-                <p className="text-2xl font-semibold opacity-70">
+            <div className="mt-16 pt-10 border-t border-white/20">
+                <p className="text-2xl font-semibold opacity-60">
                     Lien en bio pour la fiche complete
                 </p>
-                <p className="text-3xl font-bold mt-2">@bigsis.app</p>
+                <p className="text-4xl font-black mt-3">@bigsis.app</p>
             </div>
         </div>
     );
