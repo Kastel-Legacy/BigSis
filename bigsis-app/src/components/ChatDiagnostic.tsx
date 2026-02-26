@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Send, Loader2, ArrowRight, AlertTriangle, RotateCcw, Save, Check } from 'lucide-react';
+import { Send, Loader2, ArrowRight, AlertTriangle, RotateCcw, Save, Check, ThumbsUp, ThumbsDown, BookOpen, FlaskConical } from 'lucide-react';
 import { API_URL } from '../api';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -30,9 +30,17 @@ interface DiagnosticData {
   safety_warnings?: string[];
 }
 
+// P1: Enrichment data from backend (TRS badges, fiche availability)
+interface EnrichmentData {
+  [slug: string]: {
+    has_fiche: boolean;
+    trs?: number | null;
+  };
+}
+
 const DEFAULT_GREETING: Message = {
   role: 'assistant',
-  content: "Salut ! Je suis BigSis, ta grande soeur en esthetique. Dis-moi ce qui t'amene — une zone qui te gene, un traitement qui t'intrigue, ou juste une question. On en parle \uD83D\uDCAC",
+  content: "Salut ! Je suis BigSis, ta grande soeur en esthetique. Dis-moi ce qui t'amene \u2014 une zone qui te gene, un traitement qui t'intrigue, ou juste une question. On en parle \uD83D\uDCAC",
 };
 
 const ZONE_GREETINGS: Record<string, string> = {
@@ -85,7 +93,30 @@ function parseDiagnosticData(text: string): { cleanText: string; data: Diagnosti
   return { cleanText: text, data: null };
 }
 
-function DiagnosticCard({ data }: { data: DiagnosticData }) {
+// P1: TRS Badge component
+function TrsBadge({ trs, hasFiche }: { trs?: number | null; hasFiche: boolean }) {
+  if (!hasFiche && !trs) return null;
+  return (
+    <div className="flex items-center gap-1.5">
+      {hasFiche && (
+        <span className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+          <FlaskConical size={10} /> Fiche
+        </span>
+      )}
+      {trs && (
+        <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${
+          trs >= 70 ? 'bg-green-500/15 text-green-400 border-green-500/25' :
+          trs >= 40 ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/25' :
+          'bg-white/5 text-white/40 border-white/10'
+        }`}>
+          TRS {trs}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function DiagnosticCard({ data, enrichment }: { data: DiagnosticData; enrichment: EnrichmentData }) {
   return (
     <div className="mt-4 space-y-3">
       {/* Score bar */}
@@ -102,26 +133,36 @@ function DiagnosticCard({ data }: { data: DiagnosticData }) {
         </div>
       </div>
 
-      {/* Procedure cards */}
+      {/* Procedure cards with TRS badges */}
       {data.options.length > 0 && (
         <div className="space-y-2">
           <span className="text-xs text-blue-200/60 uppercase tracking-wider font-medium px-1">Options a explorer</span>
-          {data.options.map((opt, j) => (
-            <Link
-              key={j}
-              href={opt.slug ? `/fiches/${opt.slug}` : '/fiches'}
-              className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-cyan-500/30 transition-all group"
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-2 h-2 rounded-full ${
-                  opt.pertinence === 'haute' ? 'bg-green-400 shadow-[0_0_6px_theme(colors.green.400)]' :
-                  opt.pertinence === 'moyenne' ? 'bg-yellow-400' : 'bg-white/30'
-                }`} />
-                <span className="text-sm text-white font-medium">{opt.name}</span>
-              </div>
-              <ArrowRight size={14} className="text-white/30 group-hover:text-cyan-400 transition-colors" />
-            </Link>
-          ))}
+          {data.options.map((opt, j) => {
+            const slugEnrichment = opt.slug ? enrichment[opt.slug] : undefined;
+            return (
+              <Link
+                key={j}
+                href={opt.slug ? `/fiches/${opt.slug}` : '/fiches'}
+                className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-cyan-500/30 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                    opt.pertinence === 'haute' ? 'bg-green-400 shadow-[0_0_6px_theme(colors.green.400)]' :
+                    opt.pertinence === 'moyenne' ? 'bg-yellow-400' : 'bg-white/30'
+                  }`} />
+                  <div>
+                    <span className="text-sm text-white font-medium">{opt.name}</span>
+                    {slugEnrichment && (
+                      <div className="mt-1">
+                        <TrsBadge trs={slugEnrichment.trs} hasFiche={slugEnrichment.has_fiche} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <ArrowRight size={14} className="text-white/30 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
+              </Link>
+            );
+          })}
         </div>
       )}
 
@@ -151,11 +192,20 @@ function DiagnosticCard({ data }: { data: DiagnosticData }) {
           </ul>
         </div>
       )}
+
+      {/* P1: CTA Journal */}
+      <Link
+        href="/journal"
+        className="flex items-center justify-center gap-2 p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all text-sm text-purple-300 font-medium"
+      >
+        <BookOpen size={14} />
+        Tu as fait une procedure ? Suis ta recuperation
+      </Link>
     </div>
   );
 }
 
-function ChatBubble({ msg, isLast, isStreaming }: { msg: Message; isLast: boolean; isStreaming: boolean }) {
+function ChatBubble({ msg, isLast, isStreaming, enrichment }: { msg: Message; isLast: boolean; isStreaming: boolean; enrichment: EnrichmentData }) {
   return (
     <div>
       <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -172,7 +222,37 @@ function ChatBubble({ msg, isLast, isStreaming }: { msg: Message; isLast: boolea
           {msg.content || (isStreaming ? '...' : '')}
         </div>
       </div>
-      {msg.diagnosticData && <DiagnosticCard data={msg.diagnosticData} />}
+      {msg.diagnosticData && <DiagnosticCard data={msg.diagnosticData} enrichment={enrichment} />}
+    </div>
+  );
+}
+
+// P2: Feedback component
+function FeedbackWidget({ onFeedback, submitted }: { onFeedback: (rating: number) => void; submitted: boolean }) {
+  if (submitted) {
+    return (
+      <div className="flex items-center gap-2 text-xs text-emerald-400">
+        <Check size={14} /> Merci pour ton retour !
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-xs text-blue-200/50">Ce diagnostic t'a aide ?</span>
+      <button
+        onClick={() => onFeedback(5)}
+        className="p-1.5 rounded-lg bg-white/5 border border-white/10 text-green-400 hover:bg-green-500/20 hover:border-green-500/30 transition-all"
+        title="Utile"
+      >
+        <ThumbsUp size={14} />
+      </button>
+      <button
+        onClick={() => onFeedback(1)}
+        className="p-1.5 rounded-lg bg-white/5 border border-white/10 text-red-400 hover:bg-red-500/20 hover:border-red-500/30 transition-all"
+        title="Pas utile"
+      >
+        <ThumbsDown size={14} />
+      </button>
     </div>
   );
 }
@@ -188,6 +268,9 @@ export default function ChatDiagnostic({ initialContext, onBack }: ChatDiagnosti
   const [isStreaming, setIsStreaming] = useState(false);
   const [savingDiag, setSavingDiag] = useState(false);
   const [savedDiag, setSavedDiag] = useState(false);
+  const [enrichment, setEnrichment] = useState<EnrichmentData>({});
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [savedDiagId, setSavedDiagId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { user, session } = useAuth();
@@ -216,9 +299,14 @@ export default function ChatDiagnostic({ initialContext, onBack }: ChatDiagnosti
     setMessages([...updatedMessages, assistantMessage]);
 
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch(`${API_URL}/chat/diagnostic`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
           language: 'fr',
@@ -251,6 +339,10 @@ export default function ChatDiagnostic({ initialContext, onBack }: ChatDiagnosti
                     updated[updated.length - 1] = { role: 'assistant', content: fullText };
                     return updated;
                   });
+                }
+                // P1: Capture enrichment data (TRS badges)
+                if (payload.enrichment) {
+                  setEnrichment(payload.enrichment);
                 }
                 if (payload.done) break;
               } catch { /* skip malformed SSE lines */ }
@@ -305,7 +397,7 @@ export default function ChatDiagnostic({ initialContext, onBack }: ChatDiagnosti
 
     setSavingDiag(true);
     try {
-      await fetch(`${API_URL}/users/diagnostics`, {
+      const res = await fetch(`${API_URL}/users/diagnostics`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -319,11 +411,41 @@ export default function ChatDiagnostic({ initialContext, onBack }: ChatDiagnosti
           chat_messages: messages.map(m => ({ role: m.role, content: m.content })),
         }),
       });
+      const data = await res.json();
       setSavedDiag(true);
+      setSavedDiagId(data.id || null);
     } catch {
       // silently fail
     } finally {
       setSavingDiag(false);
+    }
+  };
+
+  // P2: Feedback handler
+  const handleFeedback = async (rating: number) => {
+    if (!session?.access_token || !savedDiagId) {
+      // Save first, then submit feedback
+      if (!savedDiag) {
+        await handleSaveDiagnostic();
+      }
+    }
+
+    setFeedbackSubmitted(true);
+
+    // Send feedback to backend if we have a diagnostic ID
+    if (savedDiagId && session?.access_token) {
+      try {
+        await fetch(`${API_URL}/users/diagnostics/${savedDiagId}/feedback`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ rating }),
+        });
+      } catch {
+        // silently fail — feedback is best-effort
+      }
     }
   };
 
@@ -347,7 +469,7 @@ export default function ChatDiagnostic({ initialContext, onBack }: ChatDiagnosti
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg, i) => (
-          <ChatBubble key={i} msg={msg} isLast={i === messages.length - 1} isStreaming={isStreaming} />
+          <ChatBubble key={i} msg={msg} isLast={i === messages.length - 1} isStreaming={isStreaming} enrichment={enrichment} />
         ))}
         <div ref={messagesEndRef} />
       </div>
@@ -367,30 +489,36 @@ export default function ChatDiagnostic({ initialContext, onBack }: ChatDiagnosti
         </div>
       )}
 
-      {/* Input */}
+      {/* Input / Actions */}
       <div className="p-4 border-t border-white/10">
         {hasDiagnostic ? (
-          <div className="flex gap-2">
-            <button
-              onClick={() => {
-                if (onBack) { onBack(); }
-                else { setMessages([DEFAULT_GREETING]); setInput(''); setSavedDiag(false); }
-              }}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 border border-white/10 text-blue-200 hover:bg-white/10 hover:text-white transition-all text-sm font-medium"
-            >
-              <RotateCcw size={14} /> Nouveau diagnostic
-            </button>
-            <button
-              onClick={handleSaveDiagnostic}
-              disabled={savingDiag || savedDiag}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-medium transition-all ${
-                savedDiag
-                  ? 'bg-green-500/20 border-green-500/30 text-green-400'
-                  : 'bg-cyan-500/20 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/30'
-              } disabled:opacity-70`}
-            >
-              {savedDiag ? <><Check size={14} /> Sauvegarde !</> : savingDiag ? <><Loader2 size={14} className="animate-spin" /> Sauvegarde...</> : <><Save size={14} /> Sauvegarder</>}
-            </button>
+          <div className="space-y-3">
+            {/* P2: Feedback widget */}
+            <div className="flex items-center justify-center">
+              <FeedbackWidget onFeedback={handleFeedback} submitted={feedbackSubmitted} />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  if (onBack) { onBack(); }
+                  else { setMessages([DEFAULT_GREETING]); setInput(''); setSavedDiag(false); setSavedDiagId(null); setFeedbackSubmitted(false); setEnrichment({}); }
+                }}
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 border border-white/10 text-blue-200 hover:bg-white/10 hover:text-white transition-all text-sm font-medium"
+              >
+                <RotateCcw size={14} /> Nouveau diagnostic
+              </button>
+              <button
+                onClick={handleSaveDiagnostic}
+                disabled={savingDiag || savedDiag}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-medium transition-all ${
+                  savedDiag
+                    ? 'bg-green-500/20 border-green-500/30 text-green-400'
+                    : 'bg-cyan-500/20 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/30'
+                } disabled:opacity-70`}
+              >
+                {savedDiag ? <><Check size={14} /> Sauvegarde !</> : savingDiag ? <><Loader2 size={14} className="animate-spin" /> Sauvegarde...</> : <><Save size={14} /> Sauvegarder</>}
+              </button>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex gap-2">

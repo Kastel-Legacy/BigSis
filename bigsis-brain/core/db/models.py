@@ -333,6 +333,7 @@ class DiagnosticHistory(Base):
     score = Column(Integer)
     top_recommendation = Column(Text)
     chat_messages = Column(JSONB)       # Saved chat conversation
+    feedback = Column(JSONB)             # {rating: 1|5, comment?: str, created_at: str}
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
