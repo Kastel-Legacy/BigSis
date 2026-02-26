@@ -258,16 +258,16 @@ const KnowledgePage: React.FC = () => {
     }, [batchJobId]);
 
     return (
-        <div className="min-h-screen bg-transparent pt-6 px-6">
+        <div className="min-h-screen bg-transparent pt-4 sm:pt-6 px-4 sm:px-6">
 
 
-            <main className="max-w-7xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <main className="max-w-7xl mx-auto space-y-6 sm:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 {/* Hero Header */}
-                <div className="text-center space-y-4">
-                    <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-purple-200 drop-shadow-lg tracking-tight">
+                <div className="text-center space-y-3 sm:space-y-4">
+                    <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-purple-200 drop-shadow-lg tracking-tight">
                         Brain Dashboard
                     </h1>
-                    <p className="text-lg text-gray-400 max-w-2xl mx-auto font-light">
+                    <p className="text-sm sm:text-lg text-gray-400 max-w-2xl mx-auto font-light">
                         Visualisez et gérez l'intelligence collective de <span className="text-cyan-400 font-medium">Big SIS</span> en temps réel.
                     </p>
                 </div>
@@ -276,13 +276,13 @@ const KnowledgePage: React.FC = () => {
                     {/* LEFT AREA: Analytics & State (8 cols) */}
                     <div className="lg:col-span-8 space-y-8">
                         {/* Radar Graph Card */}
-                        <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl relative overflow-hidden group shadow-2xl">
-                            <div className="absolute top-0 right-0 p-6 opacity-20 group-hover:opacity-40 transition-opacity">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-8 backdrop-blur-xl relative overflow-hidden group shadow-2xl">
+                            <div className="absolute top-0 right-0 p-6 opacity-20 group-hover:opacity-40 transition-opacity hidden sm:block">
                                 <BrainCircuit size={120} />
                             </div>
 
                             <div className="relative z-10 flex flex-col items-center">
-                                <div className="w-full flex justify-between items-center mb-8">
+                                <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-4 sm:mb-8">
                                     <div>
                                         <h3 className="text-xl font-bold text-white flex items-center gap-2">
                                             <ShieldCheck className="text-cyan-400" size={20} />
@@ -340,8 +340,8 @@ const KnowledgePage: React.FC = () => {
                     </div>
 
                     {/* RIGHT AREA: Control Panel & Actions (4 cols) */}
-                    <div className="lg:col-span-4 space-y-6">
-                        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md space-y-6">
+                    <div className="lg:col-span-4 space-y-4 sm:space-y-6">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 backdrop-blur-md space-y-4 sm:space-y-6">
                             <div className="pb-2 border-b border-white/5">
                                 <h3 className="text-lg font-bold text-white uppercase tracking-wider">Ingestion de Savoir</h3>
                                 <p className="text-xs text-gray-500">Alimentez le cerveau en données brutes</p>
@@ -362,7 +362,7 @@ const KnowledgePage: React.FC = () => {
 
                         {/* Open Document List Button - Prominent Card */}
                         <div
-                            className="bg-gradient-to-br from-cyan-900/20 to-purple-900/20 border border-cyan-500/30 rounded-3xl p-8 backdrop-blur-md hover:from-cyan-900/40 hover:to-purple-900/40 transition-all group cursor-pointer shadow-xl relative overflow-hidden"
+                            className="bg-gradient-to-br from-cyan-900/20 to-purple-900/20 border border-cyan-500/30 rounded-2xl sm:rounded-3xl p-6 sm:p-8 backdrop-blur-md hover:from-cyan-900/40 hover:to-purple-900/40 transition-all group cursor-pointer shadow-xl relative overflow-hidden"
                             onClick={() => setShowDocs(true)}
                         >
                             <div className="absolute -right-4 -bottom-4 text-cyan-500/10 group-hover:scale-110 transition-transform">
@@ -385,16 +385,16 @@ const KnowledgePage: React.FC = () => {
                 </div>
 
                 {/* Batch Ingestion — Remplissage Intelligent */}
-                <div className="bg-gradient-to-br from-cyan-900/10 to-purple-900/10 border border-cyan-500/20 rounded-3xl p-8 backdrop-blur-xl shadow-2xl">
-                    <div className="flex items-center justify-between mb-6">
+                <div className="bg-gradient-to-br from-cyan-900/10 to-purple-900/10 border border-cyan-500/20 rounded-2xl sm:rounded-3xl p-4 sm:p-8 backdrop-blur-xl shadow-2xl">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
                         <div className="flex items-center gap-3">
-                            <Zap className="text-amber-400" size={24} />
+                            <Zap className="text-amber-400 flex-shrink-0" size={24} />
                             <div>
-                                <h3 className="text-xl font-bold text-white">Remplissage Intelligent</h3>
-                                <p className="text-sm text-gray-500">Alimentez la base avec des delais automatiques entre chaque requete</p>
+                                <h3 className="text-lg sm:text-xl font-bold text-white">Remplissage Intelligent</h3>
+                                <p className="text-xs sm:text-sm text-gray-500">Alimentez la base avec des delais automatiques entre chaque requete</p>
                             </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 self-start sm:self-center">
                             <button
                                 onClick={() => setBatchMode('ingest')}
                                 className={`text-xs font-bold py-1.5 px-3 rounded-lg transition-colors ${batchMode === 'ingest' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'bg-white/5 text-gray-500 border border-white/10'}`}
@@ -424,7 +424,7 @@ const KnowledgePage: React.FC = () => {
                                         <p className="text-xs text-gray-600 mt-1">~10-30 etudes par requete</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 pl-7">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pl-7">
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input
                                             type="checkbox"
@@ -633,12 +633,12 @@ const KnowledgePage: React.FC = () => {
                 </div>
 
                 {/* Scout Testers — Test each data source live */}
-                <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl shadow-2xl">
-                    <div className="flex items-center gap-3 mb-6">
-                        <Radar className="text-purple-400" size={24} />
+                <div className="bg-white/5 border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-8 backdrop-blur-xl shadow-2xl">
+                    <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                        <Radar className="text-purple-400 flex-shrink-0" size={24} />
                         <div>
-                            <h3 className="text-xl font-bold text-white">Scout Lab</h3>
-                            <p className="text-sm text-gray-500">Testez chaque source en direct — voyez ce que le Brain recoit</p>
+                            <h3 className="text-lg sm:text-xl font-bold text-white">Scout Lab</h3>
+                            <p className="text-xs sm:text-sm text-gray-500">Testez chaque source en direct — voyez ce que le Brain recoit</p>
                         </div>
                     </div>
 
@@ -679,18 +679,18 @@ const KnowledgePage: React.FC = () => {
                 </div>
 
                 {/* Catalogue Procedures */}
-                <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl shadow-2xl">
-                    <div className="flex items-center justify-between mb-6">
+                <div className="bg-white/5 border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-8 backdrop-blur-xl shadow-2xl">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
                         <div className="flex items-center gap-3">
-                            <Syringe className="text-green-400" size={24} />
+                            <Syringe className="text-green-400 flex-shrink-0" size={24} />
                             <div>
-                                <h3 className="text-xl font-bold text-white">Catalogue Procedures</h3>
-                                <p className="text-sm text-gray-500">Actes esthetiques references — injectes dans le contexte LLM</p>
+                                <h3 className="text-lg sm:text-xl font-bold text-white">Catalogue Procedures</h3>
+                                <p className="text-xs sm:text-sm text-gray-500">Actes esthetiques references — injectes dans le contexte LLM</p>
                             </div>
                         </div>
                         <button
                             onClick={() => setShowAddProc(!showAddProc)}
-                            className="flex items-center gap-1.5 bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 text-green-400 text-xs font-bold py-2 px-4 rounded-lg transition-colors"
+                            className="flex items-center gap-1.5 bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 text-green-400 text-xs font-bold py-2 px-4 rounded-lg transition-colors self-start sm:self-center"
                         >
                             <Plus size={14} /> Ajouter
                         </button>
@@ -796,12 +796,12 @@ const KnowledgePage: React.FC = () => {
                 </div>
 
                 {/* Sources Reference — All data sources used by BigSIS */}
-                <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-xl shadow-2xl">
-                    <div className="flex items-center gap-3 mb-6">
-                        <Globe className="text-cyan-400" size={24} />
+                <div className="bg-white/5 border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-8 backdrop-blur-xl shadow-2xl">
+                    <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                        <Globe className="text-cyan-400 flex-shrink-0" size={24} />
                         <div>
-                            <h3 className="text-xl font-bold text-white">Sources de Donnees</h3>
-                            <p className="text-sm text-gray-500">Toutes les sources interrogees par le Brain lors de la generation des fiches</p>
+                            <h3 className="text-lg sm:text-xl font-bold text-white">Sources de Donnees</h3>
+                            <p className="text-xs sm:text-sm text-gray-500">Toutes les sources interrogees par le Brain lors de la generation des fiches</p>
                         </div>
                     </div>
 
@@ -872,12 +872,12 @@ const KnowledgePage: React.FC = () => {
                 </div>
 
                 {/* Admin Reset — Zone Danger */}
-                <div className="bg-red-500/5 border border-red-500/20 rounded-3xl p-8 backdrop-blur-xl">
-                    <div className="flex items-center gap-3 mb-6">
-                        <AlertTriangle className="text-red-400" size={24} />
+                <div className="bg-red-500/5 border border-red-500/20 rounded-2xl sm:rounded-3xl p-4 sm:p-8 backdrop-blur-xl">
+                    <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                        <AlertTriangle className="text-red-400 flex-shrink-0" size={24} />
                         <div>
-                            <h3 className="text-xl font-bold text-red-300">Zone Danger</h3>
-                            <p className="text-sm text-gray-500">Actions irreversibles — reinitialisation des donnees</p>
+                            <h3 className="text-lg sm:text-xl font-bold text-red-300">Zone Danger</h3>
+                            <p className="text-xs sm:text-sm text-gray-500">Actions irreversibles — reinitialisation des donnees</p>
                         </div>
                     </div>
 
@@ -967,16 +967,16 @@ const KnowledgePage: React.FC = () => {
                 {/* MODAL for Document List */}
                 {showDocs && (
                     <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300"
+                        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm sm:p-4 animate-in fade-in duration-300"
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="library-modal-title"
                     >
-                        <div className="bg-[#0f172a] border border-white/10 rounded-2xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-300">
-                            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5 rounded-t-2xl">
-                                <div className="flex items-center gap-3 text-cyan-400">
-                                    <List size={24} />
-                                    <h2 id="library-modal-title" className="text-xl font-bold">Bibliothèque des Sources ({stats?.documents_read})</h2>
+                        <div className="bg-[#0f172a] border border-white/10 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-5xl h-[95vh] sm:h-[85vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-300">
+                            <div className="p-4 sm:p-6 border-b border-white/5 flex justify-between items-center bg-white/5 rounded-t-2xl">
+                                <div className="flex items-center gap-2 sm:gap-3 text-cyan-400 min-w-0">
+                                    <List size={20} className="flex-shrink-0" />
+                                    <h2 id="library-modal-title" className="text-base sm:text-xl font-bold truncate">Bibliothèque ({stats?.documents_read})</h2>
                                 </div>
                                 <button
                                     onClick={() => setShowDocs(false)}
@@ -987,7 +987,7 @@ const KnowledgePage: React.FC = () => {
                                 </button>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-6 bg-[#0B1221]">
+                            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#0B1221]">
                                 <DocumentList />
                             </div>
                         </div>
@@ -996,17 +996,17 @@ const KnowledgePage: React.FC = () => {
                 {/* MODAL for Procedure Detail/Edit */}
                 {selectedProc && editProc && (
                     <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300"
+                        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm sm:p-4 animate-in fade-in duration-300"
                         role="dialog"
                         aria-modal="true"
                         onClick={() => setSelectedProc(null)}
                     >
                         <div
-                            className="bg-[#0f172a] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-300"
+                            className="bg-[#0f172a] border border-white/10 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg shadow-2xl animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto"
                             onClick={e => e.stopPropagation()}
                         >
                             {/* Header */}
-                            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5 rounded-t-2xl">
+                            <div className="p-4 sm:p-6 border-b border-white/5 flex justify-between items-center bg-white/5 rounded-t-2xl">
                                 <div className="flex items-center gap-3 text-green-400">
                                     <Syringe size={22} />
                                     <h2 className="text-lg font-bold">Procedure</h2>

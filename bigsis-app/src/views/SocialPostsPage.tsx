@@ -231,36 +231,26 @@ export default function SocialPostsPage() {
         navigator.clipboard.writeText(text);
     };
 
-    // ---- Filter counts ----
-    const statusCounts = {
-        all: posts.length,
-        draft: 0,
-        approved: 0,
-        published: 0,
-    };
-    // We need unfiltered counts, so let's count from loaded posts
-    // (filtering is done server-side, but counts are useful for display)
-
     // ---- Render ----
     return (
         <div className="min-h-screen bg-[#050912] text-white">
             {/* Hero */}
-            <div className="px-8 pt-10 pb-6">
-                <div className="flex items-center justify-between">
+            <div className="px-4 sm:px-8 pt-6 sm:pt-10 pb-4 sm:pb-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <Instagram className="w-8 h-8 text-pink-400" />
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent">
+                        <div className="flex items-center gap-3 mb-1 sm:mb-2">
+                            <Instagram className="w-7 h-7 sm:w-8 sm:h-8 text-pink-400" />
+                            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent">
                                 Social Posts
                             </h1>
                         </div>
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-gray-400 text-xs sm:text-sm">
                             Generez du contenu Instagram depuis vos Fiches Verite
                         </p>
                     </div>
                     <button
                         onClick={() => setShowGenerateModal(true)}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 rounded-xl font-medium text-sm transition-all"
+                        className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 rounded-xl font-medium text-sm transition-all w-full sm:w-auto"
                     >
                         <Plus size={18} />
                         Nouveau Post
@@ -270,23 +260,23 @@ export default function SocialPostsPage() {
 
             {/* Error */}
             {error && (
-                <div className="mx-8 mb-4 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-sm flex items-center justify-between">
-                    {error}
-                    <button onClick={() => setError('')} className="hover:text-white">
+                <div className="mx-4 sm:mx-8 mb-4 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-sm flex items-center justify-between">
+                    <span className="mr-2 break-words min-w-0">{error}</span>
+                    <button onClick={() => setError('')} className="hover:text-white shrink-0">
                         <X size={16} />
                     </button>
                 </div>
             )}
 
             {/* Filters */}
-            <div className="px-8 mb-6 space-y-3">
-                {/* Status tabs */}
-                <div className="flex gap-2">
+            <div className="px-4 sm:px-8 mb-4 sm:mb-6 space-y-3">
+                {/* Status tabs — horizontal scroll on mobile */}
+                <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
                     {(Object.keys(STATUS_LABELS) as StatusFilter[]).map((s) => (
                         <button
                             key={s}
                             onClick={() => setStatusFilter(s)}
-                            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap shrink-0 ${
                                 statusFilter === s
                                     ? 'bg-white/10 text-white border border-white/20'
                                     : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
@@ -297,12 +287,12 @@ export default function SocialPostsPage() {
                     ))}
                 </div>
                 {/* Template tabs */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
                     {(Object.keys(TEMPLATE_LABELS) as TemplateFilter[]).map((t) => (
                         <button
                             key={t}
                             onClick={() => setTemplateFilter(t)}
-                            className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                            className={`px-3 py-1 rounded-lg text-xs font-medium transition-all whitespace-nowrap shrink-0 ${
                                 templateFilter === t
                                     ? 'bg-white/10 text-white border border-white/20'
                                     : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
@@ -315,7 +305,7 @@ export default function SocialPostsPage() {
             </div>
 
             {/* Post list */}
-            <div className="px-8 pb-8">
+            <div className="px-4 sm:px-8 pb-8">
                 {loading ? (
                     <div className="flex items-center justify-center py-20">
                         <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
@@ -332,7 +322,7 @@ export default function SocialPostsPage() {
                         </button>
                     </div>
                 ) : (
-                    <div className="grid gap-4">
+                    <div className="grid gap-3 sm:gap-4">
                         {posts.map((post) => (
                             <PostCard
                                 key={post.id}
@@ -383,7 +373,7 @@ export default function SocialPostsPage() {
 }
 
 // ---------------------------------------------------------------------------
-// PostCard
+// PostCard — responsive: stacks on mobile
 // ---------------------------------------------------------------------------
 function PostCard({
     post,
@@ -401,17 +391,15 @@ function PostCard({
     onDelete: () => void;
 }) {
     return (
-        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5 hover:bg-white/[0.05] transition-all">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 min-w-0">
-                    {/* Template badge */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4 sm:p-5 hover:bg-white/[0.05] transition-all">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                {/* Left: badge + title */}
+                <div className="flex items-center gap-3 min-w-0">
                     <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold border shrink-0 ${
                         TEMPLATE_COLORS[post.template_type] || 'bg-gray-500/20 text-gray-300 border-gray-500/30'
                     }`}>
                         {post.template_label || post.template_type}
                     </span>
-
-                    {/* Title & meta */}
                     <div className="min-w-0">
                         <h3 className="font-medium text-sm truncate">{post.title}</h3>
                         <p className="text-xs text-gray-500 mt-0.5 truncate">
@@ -421,15 +409,13 @@ function PostCard({
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3 shrink-0">
-                    {/* Status badge */}
+                {/* Right: status + actions */}
+                <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
                     <span className={`px-2.5 py-1 rounded-lg text-xs font-medium border ${
                         STATUS_COLORS[post.status] || ''
                     }`}>
                         {post.status}
                     </span>
-
-                    {/* Actions */}
                     <div className="flex gap-1.5">
                         <ActionBtn icon={<Eye size={15} />} label="Preview" onClick={onPreview} loading={loading} />
                         {post.status === 'draft' && (
@@ -475,7 +461,7 @@ function ActionBtn({
 }
 
 // ---------------------------------------------------------------------------
-// GenerateModal
+// GenerateModal — full-screen on mobile
 // ---------------------------------------------------------------------------
 function GenerateModal({
     fiches,
@@ -496,7 +482,6 @@ function GenerateModal({
     onGenerate: () => void;
     onClose: () => void;
 }) {
-    // All fiches with valid content (already deduplicated by backend)
     const availableFiches = fiches;
 
     const templates = [
@@ -507,12 +492,12 @@ function GenerateModal({
     ];
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-            <div className="bg-[#0f1419] border border-white/10 rounded-2xl w-full max-w-lg p-6 shadow-2xl">
-                <div className="flex items-center justify-between mb-6">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm">
+            <div className="bg-[#0f1419] border border-white/10 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between mb-5 sm:mb-6">
                     <div className="flex items-center gap-3">
                         <Sparkles className="w-5 h-5 text-pink-400" />
-                        <h2 className="text-lg font-bold">Nouveau Post Instagram</h2>
+                        <h2 className="text-base sm:text-lg font-bold">Nouveau Post Instagram</h2>
                     </div>
                     <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-lg">
                         <X size={18} />
@@ -543,7 +528,7 @@ function GenerateModal({
                     <label className="block text-sm font-medium text-gray-400 mb-2">
                         Template
                     </label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
                         {templates.map((t) => (
                             <button
                                 key={t.id}
@@ -555,7 +540,7 @@ function GenerateModal({
                                 }`}
                             >
                                 <div className="text-sm font-medium">{t.label}</div>
-                                <div className="text-xs text-gray-500 mt-0.5">{t.desc}</div>
+                                <div className="text-xs text-gray-500 mt-0.5 hidden sm:block">{t.desc}</div>
                             </button>
                         ))}
                     </div>
@@ -585,7 +570,7 @@ function GenerateModal({
 }
 
 // ---------------------------------------------------------------------------
-// PreviewModal — Carousel preview with export
+// PreviewModal — responsive carousel preview with export
 // ---------------------------------------------------------------------------
 function PreviewModal({
     post,
@@ -620,29 +605,34 @@ function PreviewModal({
         slideRefs.current = slideRefs.current.slice(0, slides.length);
     }, [slides.length, slideRefs]);
 
+    // Responsive scale: smaller on mobile
+    const slideScale = typeof window !== 'undefined' && window.innerWidth < 640 ? 0.28 : 0.45;
+
     return (
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-                <div className="flex items-center gap-3">
-                    <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold border ${
+            {/* Header — wraps on mobile */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/10 gap-2 sm:gap-0">
+                {/* Left: title + badges */}
+                <div className="flex items-center gap-2 min-w-0">
+                    <span className={`px-2 py-0.5 rounded-lg text-xs font-semibold border shrink-0 ${
                         TEMPLATE_COLORS[post.template_type] || ''
                     }`}>
                         {post.template_label}
                     </span>
-                    <h2 className="font-medium">{post.title}</h2>
-                    <span className={`px-2 py-0.5 rounded text-xs border ${STATUS_COLORS[post.status]}`}>
+                    <h2 className="font-medium text-sm sm:text-base truncate">{post.title}</h2>
+                    <span className={`px-2 py-0.5 rounded text-xs border shrink-0 ${STATUS_COLORS[post.status]}`}>
                         {post.status}
                     </span>
                 </div>
-                <div className="flex items-center gap-2">
+                {/* Right: actions */}
+                <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
                     {post.status === 'draft' && (
                         <button
                             onClick={onApprove}
                             disabled={loading}
-                            className="px-4 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30 rounded-lg text-sm font-medium transition-all disabled:opacity-40"
+                            className="px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30 rounded-lg text-xs sm:text-sm font-medium transition-all disabled:opacity-40 whitespace-nowrap shrink-0"
                         >
-                            <CheckCircle size={14} className="inline mr-1.5" />
+                            <CheckCircle size={14} className="inline mr-1" />
                             Approuver
                         </button>
                     )}
@@ -650,20 +640,20 @@ function PreviewModal({
                         <button
                             onClick={onPublish}
                             disabled={loading}
-                            className="px-4 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-sm font-medium transition-all disabled:opacity-40"
+                            className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs sm:text-sm font-medium transition-all disabled:opacity-40 whitespace-nowrap shrink-0"
                         >
-                            <Send size={14} className="inline mr-1.5" />
+                            <Send size={14} className="inline mr-1" />
                             Publier
                         </button>
                     )}
                     <button
                         onClick={onExportAll}
-                        className="px-4 py-1.5 bg-gradient-to-r from-pink-500/20 to-violet-500/20 hover:from-pink-500/30 hover:to-violet-500/30 border border-pink-500/30 rounded-lg text-sm font-medium transition-all"
+                        className="px-3 py-1.5 bg-gradient-to-r from-pink-500/20 to-violet-500/20 hover:from-pink-500/30 hover:to-violet-500/30 border border-pink-500/30 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap shrink-0"
                     >
-                        <Download size={14} className="inline mr-1.5" />
-                        Tout ({slides.length} slides)
+                        <Download size={14} className="inline mr-1" />
+                        Tout ({slides.length})
                     </button>
-                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg ml-2">
+                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg shrink-0">
                         <X size={18} />
                     </button>
                 </div>
@@ -675,21 +665,21 @@ function PreviewModal({
                 {slideIndex > 0 && (
                     <button
                         onClick={() => onSlideChange(slideIndex - 1)}
-                        className="absolute left-4 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all"
+                        className="absolute left-2 sm:left-4 z-10 p-2 sm:p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all"
                     >
-                        <ChevronLeft size={24} />
+                        <ChevronLeft size={20} />
                     </button>
                 )}
 
-                {/* Slide display */}
+                {/* Slide display — responsive scale */}
                 <div className="flex items-center justify-center">
                     {currentSlide && (
-                        <div style={{ width: 1080 * 0.45, height: 1350 * 0.45 }}>
+                        <div style={{ width: 1080 * slideScale, height: 1350 * slideScale }}>
                             <InstagramSlide
                                 slide={currentSlide}
                                 slideIndex={slideIndex}
                                 totalSlides={slides.length}
-                                scale={0.45}
+                                scale={slideScale}
                             />
                         </div>
                     )}
@@ -699,9 +689,9 @@ function PreviewModal({
                 {slideIndex < slides.length - 1 && (
                     <button
                         onClick={() => onSlideChange(slideIndex + 1)}
-                        className="absolute right-4 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all"
+                        className="absolute right-2 sm:right-4 z-10 p-2 sm:p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all"
                     >
-                        <ChevronRight size={24} />
+                        <ChevronRight size={20} />
                     </button>
                 )}
 
@@ -721,7 +711,7 @@ function PreviewModal({
             </div>
 
             {/* Slide indicator */}
-            <div className="flex justify-center gap-2 py-3">
+            <div className="flex justify-center gap-2 py-2 sm:py-3">
                 {slides.map((_, i) => (
                     <button
                         key={i}
@@ -733,11 +723,11 @@ function PreviewModal({
                 ))}
             </div>
 
-            {/* Caption & Hashtags */}
-            <div className="border-t border-white/10 px-6 py-4 max-h-48 overflow-auto">
-                <div className="flex items-start gap-6 max-w-4xl mx-auto">
+            {/* Caption & Hashtags — stacks on mobile */}
+            <div className="border-t border-white/10 px-4 sm:px-6 py-3 sm:py-4 max-h-48 overflow-auto">
+                <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 max-w-4xl mx-auto">
                     <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
                             <h4 className="text-xs font-semibold text-gray-400 uppercase">Caption</h4>
                             <button
                                 onClick={onCopyCaption}
@@ -747,12 +737,12 @@ function PreviewModal({
                                 <Copy size={12} />
                             </button>
                         </div>
-                        <p className="text-sm text-gray-300 whitespace-pre-line leading-relaxed">
+                        <p className="text-xs sm:text-sm text-gray-300 whitespace-pre-line leading-relaxed">
                             {post.caption}
                         </p>
                     </div>
                     <div className="shrink-0">
-                        <h4 className="text-xs font-semibold text-gray-400 uppercase mb-2">Hashtags</h4>
+                        <h4 className="text-xs font-semibold text-gray-400 uppercase mb-1.5 sm:mb-2">Hashtags</h4>
                         <div className="flex flex-wrap gap-1.5">
                             {(post.hashtags || []).map((tag, i) => (
                                 <span key={i} className="text-xs text-pink-300/80 bg-pink-500/10 px-2 py-0.5 rounded">
