@@ -196,6 +196,42 @@ async def save_diagnostic(
         return {"id": str(entry.id), "status": "saved"}
 
 
+# --- Diagnostic Feedback ---
+
+class DiagnosticFeedbackRequest(BaseModel):
+    rating: int = Field(..., ge=1, le=5)
+    comment: Optional[str] = None
+
+
+@router.patch("/diagnostics/{diagnostic_id}/feedback")
+async def submit_diagnostic_feedback(
+    diagnostic_id: UUID,
+    data: DiagnosticFeedbackRequest,
+    user: AuthUser = Depends(get_current_user),
+):
+    """Submit feedback (thumbs up/down) on a saved diagnostic."""
+    from datetime import datetime
+
+    async with async_session() as session:
+        result = await session.execute(
+            select(DiagnosticHistory).where(
+                DiagnosticHistory.id == diagnostic_id,
+                DiagnosticHistory.user_id == user.sub,
+            )
+        )
+        diag = result.scalar_one_or_none()
+        if not diag:
+            raise HTTPException(status_code=404, detail="Diagnostic non trouve")
+
+        diag.feedback = {
+            "rating": data.rating,
+            "comment": data.comment,
+            "created_at": datetime.utcnow().isoformat(),
+        }
+        await session.commit()
+        return {"status": "feedback_saved", "rating": data.rating}
+
+
 # --- Journal ---
 
 @router.get("/journal")
