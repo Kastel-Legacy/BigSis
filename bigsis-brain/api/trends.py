@@ -266,7 +266,8 @@ async def update_topic_queries(topic_id: str, request: UpdateQueriesRequest, adm
 async def _run_generate_fiche_bg(titre: str):
     logger = logging.getLogger("uvicorn.error")
     try:
-        await _fiche_generator.generate_social_content(titre, force=True)
+        cache_topic = f"[SOCIAL] {titre}"
+        await _fiche_generator.generate_social_content(cache_topic, force=True)
         logger.info(f"[Trends] Fiche generated for: {titre}")
     except Exception as e:
         logger.error(f"[Trends] Fiche generation failed for '{titre}': {e}")
