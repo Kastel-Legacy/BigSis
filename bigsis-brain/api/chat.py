@@ -388,6 +388,50 @@ MAX 2 phrases au total.
 # Auto-learning: create TrendTopic + trigger learning for unknown procedures
 # ---------------------------------------------------------------------------
 
+# Procedure-specific search queries to avoid noise (HA ≠ hydroxyapatite, etc.)
+_QUERY_OVERRIDES: dict[str, list[str]] = {
+    "Skinbooster (HA)": [
+        "skinbooster hyaluronic acid facial skin rejuvenation hydration",
+        "injectable skin booster aesthetic efficacy clinical trial",
+        "skinbooster dermal hydration safety patient satisfaction",
+    ],
+    "LED Phototherapie": [
+        "LED phototherapy facial skin rejuvenation anti-aging",
+        "light emitting diode photobiomodulation dermatology acne",
+        "LED red blue light therapy aesthetic clinical efficacy",
+    ],
+    "Acide Hyaluronique (Volumateur)": [
+        "hyaluronic acid dermal filler facial volumizing aesthetic",
+        "injectable hyaluronic acid augmentation cheek lip nasolabial",
+        "HA dermal filler safety complications aesthetic medicine",
+    ],
+    "Microneedling": [
+        "microneedling facial skin rejuvenation collagen induction",
+        "microneedling aesthetic dermatology acne scars clinical trial",
+        "radiofrequency microneedling skin tightening safety efficacy",
+    ],
+}
+
+# Default scores for atlas procedures (well-known, well-documented)
+_ATLAS_SCORES = {
+    "score_marketing": 7.0,     # Procedures in atlas = commercially relevant
+    "score_science": 7.0,       # In atlas = established evidence base
+    "score_knowledge": 5.0,     # Needs learning (that's why we're here)
+}
+
+
+def _build_search_queries(name: str) -> list[str]:
+    """Build targeted PubMed search queries for a procedure name."""
+    if name in _QUERY_OVERRIDES:
+        return _QUERY_OVERRIDES[name]
+    # Default: add aesthetic/dermatology qualifiers to avoid cross-domain noise
+    return [
+        f"{name} facial aesthetic dermatology rejuvenation",
+        f"{name} cosmetic procedure efficacy clinical trial",
+        f"{name} aesthetic medicine safety patient satisfaction",
+    ]
+
+
 async def _trigger_auto_learning(slugs: list[str], slug_map: dict) -> list[dict]:
     """For procedures without fiches, find or create a TrendTopic and kick off
     learning in the background. Returns list of {slug, name, status} for
@@ -430,18 +474,32 @@ async def _trigger_auto_learning(slugs: list[str], slug_map: dict) -> list[dict]
                     })
                 # stagnated/rejected → skip
             else:
-                # Create a new TrendTopic for this procedure
+                # Build procedure-specific search queries
+                queries = _build_search_queries(name)
+
+                # Compute composite score: (marketing*0.3) + (science*0.4) + (knowledge*0.3)
+                composite = round(
+                    _ATLAS_SCORES["score_marketing"] * 0.3
+                    + _ATLAS_SCORES["score_science"] * 0.4
+                    + _ATLAS_SCORES["score_knowledge"] * 0.3,
+                    1,
+                )
+
+                # Create a new TrendTopic with proper scores
                 new_topic = TrendTopic(
                     titre=name,
                     topic_type="procedure",
-                    description=f"Auto-créé par le diagnostic — apprentissage déclenché pour '{name}'",
-                    search_queries=[
-                        f"{name} aesthetic medicine",
-                        f"{name} efficacy systematic review",
-                        f"{name} safety adverse effects",
-                    ],
+                    description=f"Procédure de l'atlas — apprentissage déclenché par le diagnostic",
+                    search_queries=queries,
+                    score_marketing=_ATLAS_SCORES["score_marketing"],
+                    justification_marketing="Procédure de l'atlas BigSis — demande patient établie",
+                    score_science=_ATLAS_SCORES["score_science"],
+                    justification_science="Procédure référencée dans l'atlas — littérature abondante",
+                    score_knowledge=_ATLAS_SCORES["score_knowledge"],
+                    justification_knowledge="Apprentissage nécessaire — chunks à ingérer depuis PubMed",
+                    score_composite=composite,
                     status="approved",
-                    score_composite=50.0,  # default score for auto-created topics
+                    recommandation="APPROUVER",
                     batch_id="auto-diagnostic",
                 )
                 session.add(new_topic)

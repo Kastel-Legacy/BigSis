@@ -1,16 +1,22 @@
 """
-TRS Engine - Topic Readiness Score Calculator (v2 — cumulative)
+TRS Engine - Topic Readiness Score Calculator (v3 — pertinence-based)
 Measures how ready the BigSIS brain is to generate content on a given topic.
 
-v2: Scores are monotonically increasing by design. Each computation merges
-newly discovered chunks/docs with the previously stored cumulative state
-(set union). Since a set union can only grow, TRS never regresses.
+v3: Scoring based on PERTINENCE, not quantity.
+  - Semantic relevance threshold: only chunks with cosine similarity >= 0.30
+    to the topic embedding are counted.
+  - Higher thresholds: require more relevant docs/chunks/recent papers.
+  - Recency based on publication year (not ingestion date).
+  - Coverage verified only on pertinent chunks.
+
+v2 (inherited): Scores are monotonically increasing by design via set union.
 """
 
+import re
 from typing import Dict, List, Optional, Set, Tuple
 from dataclasses import dataclass, field
 from sqlalchemy import select, func
-from datetime import datetime, timedelta
+from datetime import datetime
 import uuid as _uuid
 
 from core.db.database import AsyncSessionLocal
@@ -26,12 +32,16 @@ TRS_MINIMUM_FOR_GENERATION = 70
 # Semantic dedup threshold: chunks with cosine similarity > this are near-duplicates
 SEMANTIC_DEDUP_THRESHOLD = 0.90
 
+# Relevance threshold: only chunks with cosine similarity >= this to the topic
+# are counted in scoring. Filters out noise (e.g. "Ha Giang" for "Botox" topic).
+RELEVANCE_THRESHOLD = 0.30
+
 # Stagnation: if a learning iteration adds less than this TRS delta, stop
 STAGNATION_DELTA_THRESHOLD = 3.0
 MAX_LEARNING_ITERATIONS = 3
 
-# Schema version for trs_details JSONB
-TRS_SCHEMA_VERSION = 2
+# Schema version for trs_details JSONB — bump to reset cumulative state on upgrade
+TRS_SCHEMA_VERSION = 3
 
 
 def trs_status_label(trs: float) -> str:
@@ -115,17 +125,21 @@ async def _validate_stored_ids(session, chunk_ids: Set[str], doc_ids: Set[str]) 
 
 async def compute_trs(topic: str, stored_details: Optional[Dict] = None, search_queries: List[str] = None) -> Dict:
     """
-    Compute the Topic Readiness Score for a given topic (cumulative v2).
+    Compute the Topic Readiness Score for a given topic (v3 — pertinence-based).
 
-    When stored_details is provided (from a previous computation), the engine
-    merges newly discovered chunks/docs with the stored cumulative state.
-    Since set union can only grow, TRS is monotonically increasing by design.
+    v3 changes:
+    - Relevance threshold: only chunks with cosine similarity >= 0.30 are counted
+    - Higher scoring thresholds: 15 docs, 40 chunks, 8 recent for max scores
+    - Recency based on publication year (not ingestion date)
+    - Coverage verified only on pertinent chunks
+
+    Cumulative: merges newly discovered chunks/docs with stored state (set union).
 
     TRS components (max 100):
-    - documents:  /20  (unique docs matching the topic)
+    - documents:  /20  (unique pertinent docs)
     - chunks:     /20  (semantically relevant chunks, deduplicated)
     - diversity:  /15  (evidence types: meta-analysis, RCT, etc.)
-    - recency:    /15  (papers from last 3 years)
+    - recency:    /15  (papers published in last 3 years)
     - coverage:   /15  (efficacy + safety + recovery dimensions)
     - atlas:      /15  (procedure exists in atlas)
     """
@@ -146,16 +160,24 @@ async def compute_trs(topic: str, stored_details: Optional[Dict] = None, search_
         result = await session.execute(stmt)
         rows = result.all()
 
-        # 2. Semantic deduplication on fresh results
+        # 2. Relevance filtering + semantic deduplication on fresh results
         fresh_unique_chunks = []
         fresh_unique_embeddings = []
         fresh_chunk_texts = []
         fresh_doc_titles = []
+        _skipped_irrelevant = 0
 
         for chunk, version, doc in rows:
             if chunk.embedding is None:
                 continue
 
+            # Relevance gate: skip chunks not semantically close to the topic
+            relevance = _cosine_similarity(chunk.embedding, query_embedding)
+            if relevance < RELEVANCE_THRESHOLD:
+                _skipped_irrelevant += 1
+                continue
+
+            # Semantic dedup among surviving chunks
             is_duplicate = False
             for existing_emb in fresh_unique_embeddings:
                 sim = _cosine_similarity(chunk.embedding, existing_emb)
@@ -187,24 +209,24 @@ async def compute_trs(topic: str, stored_details: Optional[Dict] = None, search_
 
         # --- SCORING on merged sets ---
 
-        # 1. Documents (/20)
+        # 1. Documents (/20) — only pertinent docs counted
         n_docs = len(all_doc_ids)
-        if n_docs >= 8:
+        if n_docs >= 15:
             score_docs = 20
-        elif n_docs >= 5:
+        elif n_docs >= 10:
             score_docs = 12
-        elif n_docs >= 3:
+        elif n_docs >= 5:
             score_docs = 6
         else:
             score_docs = 0
 
-        # 2. Chunks (/20) - cumulative unique chunks
+        # 2. Chunks (/20) — only pertinent unique chunks counted
         n_chunks = len(all_chunk_ids)
-        if n_chunks >= 20:
+        if n_chunks >= 40:
             score_chunks = 20
-        elif n_chunks >= 10:
+        elif n_chunks >= 20:
             score_chunks = 12
-        elif n_chunks >= 5:
+        elif n_chunks >= 10:
             score_chunks = 6
         else:
             score_chunks = 0
@@ -218,11 +240,13 @@ async def compute_trs(topic: str, stored_details: Optional[Dict] = None, search_
         }
         score_diversity = _score_diversity(merged_diversity)
 
-        # 4. Recency (/15) - union of recency chunk IDs
-        three_years_ago = datetime.utcnow() - timedelta(days=3 * 365)
+        # 4. Recency (/15) — based on PUBLICATION YEAR, not ingestion date
+        current_year = datetime.utcnow().year
+        recency_window = 3  # papers from last 3 years
         fresh_recency_ids = set()
         for chunk, version, doc in fresh_unique_chunks:
-            if version.created_at and version.created_at.replace(tzinfo=None) >= three_years_ago:
+            pub_year = _extract_pub_year(chunk.text or "")
+            if pub_year is not None and pub_year >= (current_year - recency_window):
                 fresh_recency_ids.add(str(chunk.id))
 
         all_recency_ids = state.seen_recency_chunk_ids | fresh_recency_ids
@@ -231,11 +255,11 @@ async def compute_trs(topic: str, stored_details: Optional[Dict] = None, search_
             all_recency_ids = (valid_stored_chunks & state.seen_recency_chunk_ids) | fresh_recency_ids if state.seen_chunk_ids else all_recency_ids
 
         recent_count = len(all_recency_ids)
-        if recent_count >= 3:
+        if recent_count >= 8:
             score_recency = 15
-        elif recent_count >= 2:
+        elif recent_count >= 4:
             score_recency = 10
-        elif recent_count >= 1:
+        elif recent_count >= 2:
             score_recency = 5
         else:
             score_recency = 0
@@ -295,6 +319,11 @@ async def compute_trs(topic: str, stored_details: Optional[Dict] = None, search_
                 "seen_coverage_flags": merged_coverage,
                 "seen_recency_chunk_ids": sorted(all_recency_ids),
                 # Score snapshot (for display/debug)
+                "relevance_filter": {
+                    "threshold": RELEVANCE_THRESHOLD,
+                    "skipped_irrelevant": _skipped_irrelevant,
+                    "passed": len(fresh_unique_chunks),
+                },
                 "scores": {
                     "documents": {"score": score_docs, "max": 20, "count": n_docs},
                     "chunks": {"score": score_chunks, "max": 20, "count": n_chunks},
@@ -315,6 +344,21 @@ async def compute_trs(topic: str, stored_details: Optional[Dict] = None, search_
 # ---------------------------------------------------------------------------
 # Private helpers
 # ---------------------------------------------------------------------------
+
+def _extract_pub_year(chunk_text: str) -> Optional[int]:
+    """Extract publication year from chunk text.
+
+    Ingested documents follow the format:
+        "Titre: ...\n\nAbstract:\n...\n\nAnnée: 2025\nLien: ..."
+    We look for 'Année:', 'Year:', or 'Journal/Année:' patterns.
+    """
+    match = re.search(r'(?:Ann[ée]e|Year|Journal/Ann[ée]e)[:\s]+(\d{4})', chunk_text)
+    if match:
+        year = int(match.group(1))
+        if 1900 <= year <= datetime.utcnow().year + 1:
+            return year
+    return None
+
 
 def _cosine_similarity(a: list, b: list) -> float:
     """Compute cosine similarity between two embedding vectors."""
