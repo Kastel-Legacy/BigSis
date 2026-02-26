@@ -67,9 +67,13 @@ async def generate_social_post(
     if not isinstance(fiche.content, dict) or "error" in fiche.content:
         raise HTTPException(status_code=400, detail="La fiche n'a pas de contenu valide")
 
-    # 2. Generate via LLM
+    # 2. Generate via LLM (hybrid: fiche structure + RAG evidence chunks)
     logger.info(f"Generating social post: fiche={request.fiche_id}, template={request.template_type}")
-    gen_result = await _generator.generate_post(fiche.content, request.template_type)
+    gen_result = await _generator.generate_post(
+        fiche.content,
+        request.template_type,
+        procedure_topic=fiche.topic or "",
+    )
 
     if isinstance(gen_result, dict) and "error" in gen_result:
         raise HTTPException(status_code=500, detail=gen_result["error"])
