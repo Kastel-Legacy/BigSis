@@ -220,10 +220,10 @@ export const listReadyTopics = async (token: string): Promise<ReadyTopic[]> => {
     return response.data;
 };
 
-export const generateFicheForTopic = async (topicId: string, token: string): Promise<{ status: string; slug: string }> => {
+export const generateFiche = async (titre: string, token: string): Promise<{ status: string; slug: string }> => {
     const response = await axios.post(
-        `${API_URL}/trends/topics/${topicId}/generate-fiche`,
-        {},
+        `${API_URL}/fiches/generate`,
+        { titre },
         { headers: { Authorization: `Bearer ${token}` } },
     );
     return response.data;

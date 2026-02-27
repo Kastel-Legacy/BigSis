@@ -14,7 +14,7 @@ import {
     deleteFiche,
     regenerateFiche,
     listReadyTopics,
-    generateFicheForTopic,
+    generateFiche,
     type FicheListItem,
     type FicheData,
     type ReadyTopic,
@@ -223,7 +223,7 @@ export default function FichesManagementPage() {
                                     onClick={async () => {
                                         setGeneratingTopic(topic.id);
                                         try {
-                                            await generateFicheForTopic(topic.id, token);
+                                            await generateFiche(topic.titre, token);
                                             // Remove from ready list, will appear in fiches after generation
                                             setReadyTopics(prev => prev.filter(t => t.id !== topic.id));
                                             // Refresh fiches after a delay (generation takes 30-60s)

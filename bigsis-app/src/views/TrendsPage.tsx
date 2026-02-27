@@ -282,7 +282,7 @@ const TrendsPage: React.FC = () => {
     const handleGenerateFiche = async (topicId: string, titre: string) => {
         setFicheState(prev => ({ ...prev, [topicId]: 'generating' }));
         try {
-            const res = await axios.post(`${API_URL}/trends/topics/${topicId}/generate-fiche`, {}, authHeaders());
+            const res = await axios.post(`${API_URL}/fiches/generate`, { titre }, authHeaders());
             const slug = res.data.slug || makeSlug(titre);
             // Poll the fiche endpoint until it exists (max 3min)
             let attempts = 0;
