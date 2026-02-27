@@ -215,9 +215,8 @@ async def _load_procedure_catalogue() -> tuple[str, dict]:
     for slug, entry in slug_map.items():
         tags_str = ", ".join(entry["tags"]) if entry["tags"] else ""
         trs_str = f" (TRS {entry['trs']}/100)" if entry["trs"] else ""
-        fiche_str = " [FICHE DISPONIBLE]" if entry["has_fiche"] else ""
         catalogue_lines.append(
-            f'- slug: "{slug}" | {entry["name"]}{fiche_str}{trs_str} | '
+            f'- slug: "{slug}" | {entry["name"]}{trs_str} | '
             f'Downtime: {entry["downtime"]} | Prix: {entry["price_range"]} | Tags: {tags_str}'
         )
 
