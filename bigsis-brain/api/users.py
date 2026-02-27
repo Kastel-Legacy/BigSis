@@ -182,6 +182,7 @@ async def save_diagnostic(
                 supabase_uid=user.sub,
                 first_name=user.first_name,
             ))
+            await session.flush()  # ensure profile exists before FK reference
 
         entry = DiagnosticHistory(
             user_id=user.sub,

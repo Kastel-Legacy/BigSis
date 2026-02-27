@@ -1,5 +1,12 @@
 import os
 import logging
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env from the bigsis-brain directory (works regardless of cwd)
+_env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(_env_path)
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
