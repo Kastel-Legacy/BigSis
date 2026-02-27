@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { FileText, Eye, RefreshCw, Trash2, CheckCircle, XCircle, Clock, X, Loader2 } from 'lucide-react';
+import { FileText, Eye, RefreshCw, Trash2, CheckCircle, XCircle, Clock, X, Loader2, Sparkles, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { API_URL } from '../api';
@@ -13,8 +13,11 @@ import {
     unpublishFiche,
     deleteFiche,
     regenerateFiche,
+    listReadyTopics,
+    generateFicheForTopic,
     type FicheListItem,
     type FicheData,
+    type ReadyTopic,
 } from '../api';
 
 type StatusFilter = 'all' | 'draft' | 'published';
@@ -29,6 +32,8 @@ export default function FichesManagementPage() {
     const [previewData, setPreviewData] = useState<FicheData | null>(null);
     const [previewLoading, setPreviewLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [readyTopics, setReadyTopics] = useState<ReadyTopic[]>([]);
+    const [generatingTopic, setGeneratingTopic] = useState<string | null>(null);
 
     const token = session?.access_token || '';
 
@@ -62,8 +67,12 @@ export default function FichesManagementPage() {
         setLoading(true);
         setError(null);
         try {
-            const data = await listFichesAdmin(token);
-            setFiches(data);
+            const [fichesData, readyData] = await Promise.all([
+                listFichesAdmin(token),
+                listReadyTopics(token).catch(() => [] as ReadyTopic[]),
+            ]);
+            setFiches(fichesData);
+            setReadyTopics(readyData);
         } catch (err: any) {
             const status = err?.response?.status;
             if (status === 401 || status === 403) {
@@ -179,6 +188,66 @@ export default function FichesManagementPage() {
                     </button>
                 ))}
             </div>
+
+            {/* Ready Topics — awaiting fiche generation */}
+            {readyTopics.length > 0 && (
+                <div className="mb-8 p-4 sm:p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
+                    <div className="flex items-center gap-3 mb-4">
+                        <Sparkles size={18} className="text-emerald-400" />
+                        <h2 className="text-lg font-bold text-emerald-300">Pret a generer</h2>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">
+                            {readyTopics.length}
+                        </span>
+                    </div>
+                    <p className="text-xs text-gray-400 mb-4">
+                        Ces sujets ont termine l&apos;apprentissage (TRS &ge; 70) mais n&apos;ont pas encore de fiche generee.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {readyTopics.map((topic) => (
+                            <div
+                                key={topic.id}
+                                className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3 hover:border-emerald-500/30 transition-colors"
+                            >
+                                <div>
+                                    <h3 className="text-sm font-bold text-white">{topic.titre}</h3>
+                                    <div className="flex items-center gap-2 mt-1.5">
+                                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/25 font-bold">
+                                            TRS {topic.trs_current?.toFixed(0)}
+                                        </span>
+                                        <span className="text-[10px] text-gray-500">
+                                            {topic.learning_iterations} iteration{topic.learning_iterations > 1 ? 's' : ''}
+                                        </span>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={async () => {
+                                        setGeneratingTopic(topic.id);
+                                        try {
+                                            await generateFicheForTopic(topic.id, token);
+                                            // Remove from ready list, will appear in fiches after generation
+                                            setReadyTopics(prev => prev.filter(t => t.id !== topic.id));
+                                            // Refresh fiches after a delay (generation takes 30-60s)
+                                            setTimeout(() => fetchFiches(), 45000);
+                                        } catch (err) {
+                                            console.error('Generate fiche failed:', err);
+                                        } finally {
+                                            setGeneratingTopic(null);
+                                        }
+                                    }}
+                                    disabled={generatingTopic === topic.id}
+                                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-bold bg-purple-500/15 text-purple-400 border border-purple-500/25 hover:bg-purple-500/25 transition-colors disabled:opacity-50"
+                                >
+                                    {generatingTopic === topic.id ? (
+                                        <><Loader2 size={12} className="animate-spin" /> Generation en cours...</>
+                                    ) : (
+                                        <><Zap size={12} /> Generer la fiche</>
+                                    )}
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Error banner */}
             {error && (

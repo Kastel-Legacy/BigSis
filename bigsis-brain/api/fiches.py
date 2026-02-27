@@ -9,7 +9,7 @@ from sqlalchemy import select, delete
 from core.auth import AuthUser, require_admin, get_optional_user
 from core.social.generator import SocialContentGenerator
 from core.db.database import AsyncSessionLocal
-from core.db.models import SocialGeneration, FicheFeedback
+from core.db.models import SocialGeneration, FicheFeedback, TrendTopic
 from api.schemas import SocialGenerationResponse, FicheFeedbackRequest
 from sqlalchemy import func as sa_func
 
@@ -84,6 +84,44 @@ async def list_fiches(
             }
 
         return list(seen_slugs.values())
+
+
+@router.get("/fiches/ready-topics")
+async def list_ready_topics(admin: AuthUser = Depends(require_admin)):
+    """List TrendTopics that are 'ready' (TRS >= 70) but don't have a [SOCIAL] fiche yet."""
+    async with AsyncSessionLocal() as session:
+        # Get all ready topics
+        topics_result = await session.execute(
+            select(TrendTopic)
+            .filter(TrendTopic.status == "ready")
+            .order_by(TrendTopic.trs_current.desc())
+        )
+        ready_topics = topics_result.scalars().all()
+
+        # Get all existing [SOCIAL] fiches topics
+        fiches_result = await session.execute(
+            select(SocialGeneration.topic)
+            .filter(SocialGeneration.topic.like("[SOCIAL]%"))
+        )
+        existing_fiche_slugs = set()
+        for (topic_str,) in fiches_result.all():
+            raw = topic_str.replace("[SOCIAL] ", "")
+            existing_fiche_slugs.add(_make_slug(raw))
+
+        # Return topics that have no fiche yet
+        pending = []
+        for t in ready_topics:
+            slug = _make_slug(t.titre)
+            if slug not in existing_fiche_slugs:
+                pending.append({
+                    "id": str(t.id),
+                    "titre": t.titre,
+                    "slug": slug,
+                    "trs_current": t.trs_current,
+                    "learning_iterations": t.learning_iterations,
+                    "status": t.status,
+                })
+        return pending
 
 
 @router.get("/fiches/{slug:path}", response_model=SocialGenerationResponse)

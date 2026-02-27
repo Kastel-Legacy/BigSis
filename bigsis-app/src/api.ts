@@ -204,6 +204,31 @@ export const getFicheFeedback = async (slug: string): Promise<{ thumbs_up: numbe
     return response.data;
 };
 
+export interface ReadyTopic {
+    id: string;
+    titre: string;
+    slug: string;
+    trs_current: number;
+    learning_iterations: number;
+    status: string;
+}
+
+export const listReadyTopics = async (token: string): Promise<ReadyTopic[]> => {
+    const response = await axios.get(`${API_URL}/fiches/ready-topics`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+};
+
+export const generateFicheForTopic = async (topicId: string, token: string): Promise<{ status: string; slug: string }> => {
+    const response = await axios.post(
+        `${API_URL}/trends/topics/${topicId}/generate-fiche`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return response.data;
+};
+
 export const getDocument = async (id: string): Promise<any> => {
   const response = await fetch(`${API_URL}/knowledge/documents/${id}`);
   if (!response.ok) {
