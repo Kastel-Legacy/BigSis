@@ -1,5 +1,12 @@
 import os
 import logging
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env from the bigsis-brain directory (works regardless of cwd)
+_env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(_env_path)
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -41,6 +48,7 @@ app.add_middleware(
 )
 
 from api.social import router as social_router
+from api.social_posts import router as social_posts_router
 from api.trends import router as trends_router
 from api.share import router as share_router
 from api.users import router as users_router
@@ -52,6 +60,7 @@ app.include_router(chat_router, prefix="/api/v1")
 app.include_router(ingredients_router, prefix="/api/v1")
 app.include_router(scanner_router, prefix="/api/v1")
 app.include_router(social_router, prefix="/api/v1")
+app.include_router(social_posts_router, prefix="/api/v1")
 app.include_router(trends_router, prefix="/api/v1")
 app.include_router(share_router, prefix="/api/v1")
 app.include_router(users_router, prefix="/api/v1")
@@ -72,6 +81,21 @@ async def startup():
         await conn.execute(text("ALTER TABLE procedures ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW()"))
         await conn.execute(text("ALTER TABLE social_generations ADD COLUMN IF NOT EXISTS status VARCHAR NOT NULL DEFAULT 'published'"))
         await conn.execute(text("ALTER TABLE trend_topics ADD COLUMN IF NOT EXISTS raw_signals JSONB"))
+        # Social Posts table
+        await conn.execute(text("""CREATE TABLE IF NOT EXISTS social_posts (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            fiche_id UUID NOT NULL,
+            template_type VARCHAR NOT NULL,
+            title VARCHAR NOT NULL,
+            slides JSONB NOT NULL,
+            caption TEXT,
+            hashtags VARCHAR[],
+            status VARCHAR NOT NULL DEFAULT 'draft',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )"""))
+        await conn.execute(text("CREATE INDEX IF NOT EXISTS idx_social_posts_status ON social_posts(status)"))
+        await conn.execute(text("CREATE INDEX IF NOT EXISTS idx_social_posts_fiche ON social_posts(fiche_id)"))
         await conn.run_sync(Base.metadata.create_all)
         logger.info("Auto-Migration complete.")
 

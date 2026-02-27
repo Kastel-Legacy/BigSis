@@ -204,6 +204,31 @@ export const getFicheFeedback = async (slug: string): Promise<{ thumbs_up: numbe
     return response.data;
 };
 
+export interface ReadyTopic {
+    id: string;
+    titre: string;
+    slug: string;
+    trs_current: number;
+    learning_iterations: number;
+    status: string;
+}
+
+export const listReadyTopics = async (token: string): Promise<ReadyTopic[]> => {
+    const response = await axios.get(`${API_URL}/fiches/ready-topics`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+};
+
+export const generateFiche = async (titre: string, token: string): Promise<{ status: string; slug: string }> => {
+    const response = await axios.post(
+        `${API_URL}/fiches/generate`,
+        { titre },
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return response.data;
+};
+
 export const getDocument = async (id: string): Promise<any> => {
   const response = await fetch(`${API_URL}/knowledge/documents/${id}`);
   if (!response.ok) {
@@ -239,4 +264,145 @@ export const createShare = async (data: {
 export const getShare = async (id: string): Promise<ShareData> => {
   const response = await axios.get(`${API_URL}/share/${id}`);
   return response.data;
+};
+
+
+// --- Social Posts (Instagram) ---
+
+export interface SlideData {
+    slide_number: number;
+    type: string;          // hook | content | comparison | cta
+    headline: string;
+    body: string;
+    accent_text?: string;
+    emoji?: string;        // check | cross | warning | fire | star | vs
+    bullet_points?: string[];
+    comparison?: { left: string; right: string };
+    background_style: string;
+}
+
+export interface SocialPostItem {
+    id: string;
+    fiche_id: string;
+    fiche_title: string;
+    template_type: string;
+    template_label: string;
+    title: string;
+    slides_count: number;
+    status: string;
+    created_at: string;
+}
+
+export interface SocialPostDetail {
+    id: string;
+    fiche_id: string;
+    template_type: string;
+    template_label: string;
+    title: string;
+    slides: SlideData[];
+    caption: string;
+    hashtags: string[];
+    status: string;
+    created_at: string;
+}
+
+export interface TemplateOption {
+    id: string;
+    label: string;
+}
+
+export const listSocialPosts = async (
+    token: string,
+    status?: string,
+    templateType?: string,
+): Promise<SocialPostItem[]> => {
+    const params = new URLSearchParams();
+    if (status) params.set('status', status);
+    if (templateType) params.set('template_type', templateType);
+    const response = await axios.get(`${API_URL}/social-posts?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+};
+
+export const getSocialPost = async (id: string, token: string): Promise<SocialPostDetail> => {
+    const response = await axios.get(`${API_URL}/social-posts/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+};
+
+export const generateSocialPost = async (
+    ficheId: string,
+    templateType: string,
+    token: string,
+): Promise<SocialPostDetail> => {
+    const response = await axios.post(
+        `${API_URL}/social-posts/generate`,
+        { fiche_id: ficheId, template_type: templateType },
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return response.data;
+};
+
+export const updatePostStatus = async (
+    id: string,
+    status: string,
+    token: string,
+): Promise<{ id: string; status: string }> => {
+    const response = await axios.patch(
+        `${API_URL}/social-posts/${id}/status`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return response.data;
+};
+
+export const updatePostSlides = async (
+    id: string,
+    slides: SlideData[],
+    token: string,
+): Promise<SocialPostDetail> => {
+    const response = await axios.patch(
+        `${API_URL}/social-posts/${id}/slides`,
+        { slides },
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return response.data;
+};
+
+export const deleteSocialPost = async (id: string, token: string): Promise<{ deleted: boolean }> => {
+    const response = await axios.delete(
+        `${API_URL}/social-posts/${id}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return response.data;
+};
+
+export const listSocialTemplates = async (): Promise<TemplateOption[]> => {
+    const response = await axios.get(`${API_URL}/social-posts/templates`);
+    return response.data;
+};
+
+export const listPublishedFiches = async (token: string): Promise<FicheListItem[]> => {
+    const response = await axios.get(`${API_URL}/fiches`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+};
+
+export interface FicheForPost {
+    id: string;
+    title: string;
+    topic: string;
+    status: string;
+    score_efficacite: number | null;
+    score_securite: number | null;
+}
+
+export const listFichesForPosts = async (token: string): Promise<FicheForPost[]> => {
+    const response = await axios.get(`${API_URL}/social-posts/fiches`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
 };

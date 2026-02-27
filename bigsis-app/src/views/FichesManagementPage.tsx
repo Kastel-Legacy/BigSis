@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { FileText, Eye, RefreshCw, Trash2, CheckCircle, XCircle, Clock, X, Loader2 } from 'lucide-react';
+import { FileText, Eye, RefreshCw, Trash2, CheckCircle, XCircle, Clock, X, Loader2, Sparkles, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { API_URL } from '../api';
@@ -13,8 +13,11 @@ import {
     unpublishFiche,
     deleteFiche,
     regenerateFiche,
+    listReadyTopics,
+    generateFiche,
     type FicheListItem,
     type FicheData,
+    type ReadyTopic,
 } from '../api';
 
 type StatusFilter = 'all' | 'draft' | 'published';
@@ -29,6 +32,8 @@ export default function FichesManagementPage() {
     const [previewData, setPreviewData] = useState<FicheData | null>(null);
     const [previewLoading, setPreviewLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [readyTopics, setReadyTopics] = useState<ReadyTopic[]>([]);
+    const [generatingTopic, setGeneratingTopic] = useState<string | null>(null);
 
     const token = session?.access_token || '';
 
@@ -62,8 +67,12 @@ export default function FichesManagementPage() {
         setLoading(true);
         setError(null);
         try {
-            const data = await listFichesAdmin(token);
-            setFiches(data);
+            const [fichesData, readyData] = await Promise.all([
+                listFichesAdmin(token),
+                listReadyTopics(token).catch(() => [] as ReadyTopic[]),
+            ]);
+            setFiches(fichesData);
+            setReadyTopics(readyData);
         } catch (err: any) {
             const status = err?.response?.status;
             if (status === 401 || status === 403) {
@@ -155,15 +164,15 @@ export default function FichesManagementPage() {
     };
 
     return (
-        <div className="p-8 max-w-6xl mx-auto">
+        <div className="p-4 sm:p-8 max-w-6xl mx-auto">
             {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-black text-white mb-2">Fiches Verite</h1>
-                <p className="text-gray-400">Gerez vos fiches : publiez, depubliez, regenerez ou supprimez.</p>
+            <div className="mb-6 sm:mb-8">
+                <h1 className="text-2xl sm:text-3xl font-black text-white mb-2">Fiches Verite</h1>
+                <p className="text-sm sm:text-base text-gray-400">Gerez vos fiches : publiez, depubliez, regenerez ou supprimez.</p>
             </div>
 
             {/* Counters + Filter */}
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-2 sm:gap-3 mb-6 overflow-x-auto pb-1">
                 {(['all', 'draft', 'published'] as StatusFilter[]).map((f) => (
                     <button
                         key={f}
@@ -179,6 +188,66 @@ export default function FichesManagementPage() {
                     </button>
                 ))}
             </div>
+
+            {/* Ready Topics — awaiting fiche generation */}
+            {readyTopics.length > 0 && (
+                <div className="mb-8 p-4 sm:p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
+                    <div className="flex items-center gap-3 mb-4">
+                        <Sparkles size={18} className="text-emerald-400" />
+                        <h2 className="text-lg font-bold text-emerald-300">Pret a generer</h2>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">
+                            {readyTopics.length}
+                        </span>
+                    </div>
+                    <p className="text-xs text-gray-400 mb-4">
+                        Ces sujets ont termine l&apos;apprentissage (TRS &ge; 70) mais n&apos;ont pas encore de fiche generee.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {readyTopics.map((topic) => (
+                            <div
+                                key={topic.id}
+                                className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3 hover:border-emerald-500/30 transition-colors"
+                            >
+                                <div>
+                                    <h3 className="text-sm font-bold text-white">{topic.titre}</h3>
+                                    <div className="flex items-center gap-2 mt-1.5">
+                                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/25 font-bold">
+                                            TRS {topic.trs_current?.toFixed(0)}
+                                        </span>
+                                        <span className="text-[10px] text-gray-500">
+                                            {topic.learning_iterations} iteration{topic.learning_iterations > 1 ? 's' : ''}
+                                        </span>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={async () => {
+                                        setGeneratingTopic(topic.id);
+                                        try {
+                                            await generateFiche(topic.titre, token);
+                                            // Remove from ready list, will appear in fiches after generation
+                                            setReadyTopics(prev => prev.filter(t => t.id !== topic.id));
+                                            // Refresh fiches after a delay (generation takes 30-60s)
+                                            setTimeout(() => fetchFiches(), 45000);
+                                        } catch (err) {
+                                            console.error('Generate fiche failed:', err);
+                                        } finally {
+                                            setGeneratingTopic(null);
+                                        }
+                                    }}
+                                    disabled={generatingTopic === topic.id}
+                                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-bold bg-purple-500/15 text-purple-400 border border-purple-500/25 hover:bg-purple-500/25 transition-colors disabled:opacity-50"
+                                >
+                                    {generatingTopic === topic.id ? (
+                                        <><Loader2 size={12} className="animate-spin" /> Generation en cours...</>
+                                    ) : (
+                                        <><Zap size={12} /> Generer la fiche</>
+                                    )}
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Error banner */}
             {error && (
@@ -206,39 +275,41 @@ export default function FichesManagementPage() {
                     {filtered.map((fiche) => (
                         <div
                             key={fiche.slug}
-                            className="bg-white/5 border border-white/10 rounded-xl p-5 flex items-center gap-4 hover:border-white/20 transition-colors"
+                            className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 hover:border-white/20 transition-colors"
                         >
-                            {/* Status indicator */}
-                            <div className="flex-shrink-0">
-                                {fiche.status === 'published' ? (
-                                    <CheckCircle size={20} className="text-green-400" />
-                                ) : (
-                                    <Clock size={20} className="text-amber-400" />
-                                )}
-                            </div>
-
-                            {/* Info */}
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="text-white font-bold truncate">{fiche.title}</h3>
-                                    {fiche.status === 'draft' && (
-                                        <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[9px] font-black uppercase tracking-widest border border-amber-500/20 flex-shrink-0">
-                                            Brouillon
-                                        </span>
+                            {/* Status indicator + Info row */}
+                            <div className="flex items-start sm:items-center gap-3 flex-1 min-w-0">
+                                <div className="flex-shrink-0 mt-0.5 sm:mt-0">
+                                    {fiche.status === 'published' ? (
+                                        <CheckCircle size={20} className="text-green-400" />
+                                    ) : (
+                                        <Clock size={20} className="text-amber-400" />
                                     )}
                                 </div>
-                                <div className="flex items-center gap-4 text-xs text-gray-500">
-                                    <span>{fiche.created_at}</span>
-                                    <span>Eff: <span className="text-white/60">{fiche.score_efficacite ?? '?'}/10</span></span>
-                                    <span>Sec: <span className="text-white/60">{fiche.score_securite ?? '?'}/10</span></span>
-                                    <span className={trsColor(fiche.trs_score)}>
-                                        TRS: {fiche.trs_score ?? '?'}/100
-                                    </span>
+
+                                {/* Info */}
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <h3 className="text-white font-bold truncate text-sm sm:text-base">{fiche.title}</h3>
+                                        {fiche.status === 'draft' && (
+                                            <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[9px] font-black uppercase tracking-widest border border-amber-500/20 flex-shrink-0">
+                                                Brouillon
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-gray-500 flex-wrap">
+                                        <span>{fiche.created_at}</span>
+                                        <span>Eff: <span className="text-white/60">{fiche.score_efficacite ?? '?'}/10</span></span>
+                                        <span>Sec: <span className="text-white/60">{fiche.score_securite ?? '?'}/10</span></span>
+                                        <span className={trsColor(fiche.trs_score)}>
+                                            TRS: {fiche.trs_score ?? '?'}/100
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Actions */}
-                            <div className="flex items-center gap-2 flex-shrink-0">
+                            <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
                                 <button
                                     onClick={() => openPreview(fiche.slug)}
                                     className="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-colors"
@@ -296,14 +367,14 @@ export default function FichesManagementPage() {
                     onClick={() => setPreviewSlug(null)}
                 >
                     <div
-                        className="bg-[#0B1221] border border-white/10 rounded-2xl w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-300"
+                        className="bg-[#0B1221] border border-white/10 rounded-none sm:rounded-2xl w-full sm:max-w-5xl h-full sm:h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-300"
                         onClick={e => e.stopPropagation()}
                     >
-                        <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 rounded-t-2xl flex-shrink-0">
-                            <div className="flex items-center gap-3 text-cyan-400">
-                                <Eye size={20} />
-                                <h2 className="text-lg font-bold">Preview : {previewSlug}</h2>
-                                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[9px] font-black uppercase tracking-widest border border-amber-500/20">
+                        <div className="p-3 sm:p-4 border-b border-white/5 flex justify-between items-center bg-white/5 sm:rounded-t-2xl flex-shrink-0">
+                            <div className="flex items-center gap-2 sm:gap-3 text-cyan-400 min-w-0">
+                                <Eye size={18} className="flex-shrink-0" />
+                                <h2 className="text-sm sm:text-lg font-bold truncate">Preview : {previewSlug}</h2>
+                                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[9px] font-black uppercase tracking-widest border border-amber-500/20 hidden sm:inline">
                                     Draft
                                 </span>
                             </div>

@@ -282,7 +282,7 @@ const TrendsPage: React.FC = () => {
     const handleGenerateFiche = async (topicId: string, titre: string) => {
         setFicheState(prev => ({ ...prev, [topicId]: 'generating' }));
         try {
-            const res = await axios.post(`${API_URL}/trends/topics/${topicId}/generate-fiche`, {}, authHeaders());
+            const res = await axios.post(`${API_URL}/fiches/generate`, { titre }, authHeaders());
             const slug = res.data.slug || makeSlug(titre);
             // Poll the fiche endpoint until it exists (max 3min)
             let attempts = 0;
@@ -311,30 +311,30 @@ const TrendsPage: React.FC = () => {
         : topics.filter(t => t.status === statusFilter);
 
     return (
-        <div className="min-h-screen bg-transparent pt-6 px-6">
-            <main className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="min-h-screen bg-transparent pt-4 sm:pt-6 px-4 sm:px-6">
+            <main className="max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
                 {/* HERO */}
-                <div className="text-center space-y-4">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-full text-xs font-mono uppercase tracking-widest text-purple-300">
+                <div className="text-center space-y-3 sm:space-y-4">
+                    <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-widest text-purple-300">
                         <TrendingUp size={14} className="animate-pulse" />
                         Trend Intelligence Agent
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-purple-200 drop-shadow-lg tracking-tight">
+                    <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-purple-200 drop-shadow-lg tracking-tight">
                         Trend Discovery
                     </h1>
-                    <p className="text-lg text-gray-400 max-w-2xl mx-auto font-light">
+                    <p className="text-sm sm:text-lg text-gray-400 max-w-2xl mx-auto font-light">
                         Identifiez les sujets tendance, pilotez l'apprentissage, et générez les fiches vérité.
                     </p>
                 </div>
 
                 {/* ACTION BAR */}
-                <div className="flex justify-center items-center gap-4 relative z-10">
+                <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 relative z-10">
                     <button
                         type="button"
                         onClick={handleDiscover}
                         disabled={isDiscovering}
-                        className="cursor-pointer px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-2xl text-white font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-wait disabled:hover:scale-100 flex items-center gap-3"
+                        className="cursor-pointer w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-2xl text-white font-bold text-base sm:text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-wait disabled:hover:scale-100 flex items-center justify-center gap-3"
                     >
                         {isDiscovering ? <><Loader2 size={22} className="animate-spin" />Analyse en cours...</> : <><Target size={22} />Découvrir 5 sujets trending</>}
                     </button>
@@ -361,10 +361,10 @@ const TrendsPage: React.FC = () => {
 
                 {/* FILTERS */}
                 {topics.length > 0 && (
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
                         {['all', 'proposed', 'approved', 'learning', 'ready', 'stagnated', 'rejected'].map(f => (
                             <button key={f} onClick={() => setStatusFilter(f)}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${statusFilter === f ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' : 'text-gray-500 hover:text-gray-300 border border-white/5 hover:border-white/10'}`}>
+                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap shrink-0 ${statusFilter === f ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' : 'text-gray-500 hover:text-gray-300 border border-white/5 hover:border-white/10'}`}>
                                 {f === 'all' ? 'Tous' : (statusConfig[f]?.label || f)}
                                 {f !== 'all' && <span className="ml-1 opacity-60">({topics.filter(t => t.status === f).length})</span>}
                             </button>
@@ -414,11 +414,11 @@ const TrendsPage: React.FC = () => {
                                 )}
 
                                 {/* CARD HEADER */}
-                                <div className="p-6">
-                                    <div className="flex items-start justify-between gap-4">
+                                <div className="p-4 sm:p-6">
+                                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                                         <div className="flex-1 min-w-0">
                                             {/* Badges */}
-                                            <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                            <div className="flex items-center gap-1.5 sm:gap-2 mb-2 flex-wrap">
                                                 <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${sc.color}`}>
                                                     {sc.icon}{sc.label}
                                                 </span>
@@ -437,7 +437,7 @@ const TrendsPage: React.FC = () => {
                                         </div>
 
                                         {/* TRS + Score + Delete */}
-                                        <div className="flex items-center gap-4 shrink-0">
+                                        <div className="flex items-center gap-3 sm:gap-4 shrink-0">
                                             <div className="text-center">
                                                 <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Score</p>
                                                 <p className={`text-2xl font-black ${scoreColor(topic.score_composite)}`}>{topic.score_composite?.toFixed(1)}</p>
@@ -478,14 +478,14 @@ const TrendsPage: React.FC = () => {
                                     </div>
 
                                     {/* EXPERT SCORES */}
-                                    <div className="flex items-center gap-6 mt-4 pt-4 border-t border-white/5">
+                                    <div className="flex flex-wrap items-center gap-3 sm:gap-6 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/5">
                                         <ScorePill icon={<Megaphone size={12} />} label="Marketing" score={topic.score_marketing} />
                                         <ScorePill icon={<FlaskConical size={12} />} label="Science" score={topic.score_science} />
                                         <ScorePill icon={<Brain size={12} />} label="Knowledge" score={topic.score_knowledge} />
-                                        <div className="flex-1" />
+                                        <div className="flex-1 hidden sm:block" />
 
                                         {/* STATUS-BASED ACTIONS */}
-                                        <div className="flex items-center gap-2 flex-wrap justify-end">
+                                        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto justify-start sm:justify-end mt-2 sm:mt-0">
                                             {topic.status === 'proposed' && (
                                                 <>
                                                     <ActionBtn
@@ -581,7 +581,7 @@ const TrendsPage: React.FC = () => {
 
                                 {/* EXPANDED PANEL */}
                                 {isExpanded && (
-                                    <div className="border-t border-white/5 bg-white/[0.02] p-6 space-y-6">
+                                    <div className="border-t border-white/5 bg-white/[0.02] p-4 sm:p-6 space-y-4 sm:space-y-6">
 
                                         {/* RAW SIGNALS — auditable source evidence */}
                                         {topic.raw_signals && (

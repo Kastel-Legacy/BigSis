@@ -75,6 +75,7 @@ def _get_es256_key(token: str):
 
 def _decode_token(token: str) -> AuthUser:
     """Decode and validate a Supabase JWT token."""
+    token_alg = "unknown"
     try:
         header = jwt.get_unverified_header(token)
         token_alg = header.get("alg", "unknown")
@@ -107,7 +108,7 @@ def _decode_token(token: str) -> AuthUser:
             role=user_metadata.get("role"),
             first_name=user_metadata.get("first_name"),
         )
-    except JWTError as e:
+    except (JWTError, Exception) as e:
         logger.warning(f"JWT decode error (alg={token_alg}): {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -1,20 +1,26 @@
+import logging
 import re
 import unicodedata
 from typing import Dict, Optional
 from urllib.parse import unquote
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy import select, delete
 
 from core.auth import AuthUser, require_admin, get_optional_user
 from core.social.generator import SocialContentGenerator
 from core.db.database import AsyncSessionLocal
-from core.db.models import SocialGeneration, FicheFeedback
+from core.db.models import SocialGeneration, FicheFeedback, TrendTopic
 from api.schemas import SocialGenerationResponse, FicheFeedbackRequest
 from sqlalchemy import func as sa_func
 
 router = APIRouter()
 generator = SocialContentGenerator()
+
+
+class GenerateFicheRequest(BaseModel):
+    titre: str
 
 
 def _make_slug(text: str) -> str:
@@ -84,6 +90,95 @@ async def list_fiches(
             }
 
         return list(seen_slugs.values())
+
+
+@router.get("/fiches/ready-topics")
+async def list_ready_topics(admin: AuthUser = Depends(require_admin)):
+    """List TrendTopics that are 'ready' (TRS >= 70) but don't have a [SOCIAL] fiche yet."""
+    async with AsyncSessionLocal() as session:
+        # Get all ready topics
+        topics_result = await session.execute(
+            select(TrendTopic)
+            .filter(TrendTopic.status == "ready")
+            .order_by(TrendTopic.trs_current.desc())
+        )
+        ready_topics = topics_result.scalars().all()
+
+        # Get all existing [SOCIAL] fiches topics
+        fiches_result = await session.execute(
+            select(SocialGeneration.topic)
+            .filter(SocialGeneration.topic.like("[SOCIAL]%"))
+        )
+        existing_fiche_slugs = set()
+        for (topic_str,) in fiches_result.all():
+            raw = topic_str.replace("[SOCIAL] ", "")
+            existing_fiche_slugs.add(_make_slug(raw))
+
+        # Return topics that have no fiche yet
+        pending = []
+        for t in ready_topics:
+            slug = _make_slug(t.titre)
+            if slug not in existing_fiche_slugs:
+                pending.append({
+                    "id": str(t.id),
+                    "titre": t.titre,
+                    "slug": slug,
+                    "trs_current": t.trs_current,
+                    "learning_iterations": t.learning_iterations,
+                    "status": t.status,
+                })
+        return pending
+
+
+async def _run_generate_fiche_bg(titre: str):
+    """Background task: generate a fiche for the given topic title."""
+    logger = logging.getLogger("uvicorn.error")
+    try:
+        cache_topic = f"[SOCIAL] {titre}"
+        await generator.generate_social_content(cache_topic, force=True)
+        logger.info(f"[Fiches] Fiche generated for: {titre}")
+    except Exception as e:
+        logger.error(f"[Fiches] Fiche generation failed for '{titre}': {e}")
+
+
+@router.post("/fiches/generate")
+async def generate_fiche(
+    body: GenerateFicheRequest,
+    background_tasks: BackgroundTasks,
+    admin: AuthUser = Depends(require_admin),
+):
+    """
+    Generate a fiche for any topic by name. Admin only.
+    Decoupled from trends — works with just a titre string.
+    Runs in background. Returns the expected slug immediately.
+    """
+    titre = body.titre.strip()
+    if not titre:
+        raise HTTPException(status_code=400, detail="Le titre est requis")
+
+    slug = _make_slug(titre)
+
+    # Check if fiche already exists
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(SocialGeneration)
+            .filter(SocialGeneration.topic.like("[SOCIAL]%"))
+            .limit(200)
+        )
+        for g in result.scalars().all():
+            topic_raw = g.topic.replace("[SOCIAL] ", "")
+            if _make_slug(topic_raw) == slug:
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"Une fiche existe deja pour '{titre}' (slug: {slug})",
+                )
+
+    background_tasks.add_task(_run_generate_fiche_bg, titre)
+    return {
+        "status": "generating",
+        "slug": slug,
+        "message": f"Generation de la fiche '{titre}' en cours.",
+    }
 
 
 @router.get("/fiches/{slug:path}", response_model=SocialGenerationResponse)
