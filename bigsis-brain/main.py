@@ -99,6 +99,28 @@ async def startup():
         await conn.run_sync(Base.metadata.create_all)
         logger.info("Auto-Migration complete.")
 
+    # Backfill Procedure embeddings (one-time, idempotent)
+    try:
+        from core.db.database import AsyncSessionLocal
+        from core.db.models import Procedure
+        from core.rag.embeddings import get_embedding
+        from sqlalchemy import select
+
+        async with AsyncSessionLocal() as session:
+            result = await session.execute(
+                select(Procedure).filter(Procedure.embedding == None)  # noqa: E711
+            )
+            procs = result.scalars().all()
+            if procs:
+                logger.info(f"Backfilling embeddings for {len(procs)} procedures...")
+                for p in procs:
+                    p.embedding = await get_embedding(p.name)
+                    logger.info(f"  Embedded: {p.name}")
+                await session.commit()
+                logger.info("Procedure embeddings backfill complete.")
+    except Exception as e:
+        logger.warning(f"Procedure embedding backfill skipped: {e}")
+
 @app.on_event("shutdown")
 async def shutdown():
     pass
