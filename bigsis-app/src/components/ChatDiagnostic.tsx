@@ -193,7 +193,7 @@ function DiagnosticCard({ data, enrichment, scoreDetails }: { data: DiagnosticDa
                     opt.pertinence === 'moyenne' ? 'bg-yellow-400' : 'bg-white/30'
                   }`} />
                   <div>
-                    <span className="text-sm text-white font-medium">{opt.name}</span>
+                    <span className="text-sm text-white font-medium">{(opt.slug && slugEnrichment?.name) || opt.name}</span>
                     <div className="mt-1 flex items-center gap-1.5">
                       <TrsBadge trs={trs} hasFiche={hasFiche} learning={isLearning} />
                       {!hasFiche && trs && trs >= 40 && (

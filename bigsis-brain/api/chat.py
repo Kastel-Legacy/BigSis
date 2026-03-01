@@ -147,6 +147,63 @@ def _make_slug(text: str) -> str:
     return re.sub(r"[-\s]+", "-", text).strip("-")
 
 
+async def _resolve_to_canonical(
+    llm_name: str,
+    slug_map: dict,
+    similarity_threshold: float = 0.82,
+) -> tuple[str, str, float]:
+    """Resolve an LLM-generated procedure name to a canonical catalogue entry.
+
+    Returns (canonical_slug, canonical_name, similarity_score).
+    If no match above threshold: (make_slug(llm_name), llm_name, 0.0).
+    """
+    # Fast path: exact slug match (zero API calls)
+    candidate_slug = _make_slug(llm_name)
+    if candidate_slug in slug_map:
+        return candidate_slug, slug_map[candidate_slug]["name"], 1.0
+
+    # Semantic matching via Procedure embeddings
+    from core.rag.embeddings import get_embedding
+    import numpy as np
+
+    try:
+        query_emb = np.array(await get_embedding(llm_name))
+        if np.allclose(query_emb, 0):
+            return candidate_slug, llm_name, 0.0
+
+        async with AsyncSessionLocal() as session:
+            result = await session.execute(
+                select(Procedure).filter(Procedure.embedding != None)  # noqa: E711
+            )
+            procedures = result.scalars().all()
+
+        best_sim, best_slug, best_name = 0.0, candidate_slug, llm_name
+        for proc in procedures:
+            if proc.embedding is None:
+                continue
+            proc_emb = np.array(proc.embedding)
+            if np.allclose(proc_emb, 0):
+                continue
+            cos_sim = float(np.dot(query_emb, proc_emb) / (
+                np.linalg.norm(query_emb) * np.linalg.norm(proc_emb) + 1e-9
+            ))
+            if cos_sim > best_sim:
+                best_sim = cos_sim
+                best_slug = _make_slug(proc.name)
+                best_name = proc.name
+
+        if best_sim >= similarity_threshold:
+            logger.info(
+                f"[Resolve] '{llm_name}' → '{best_name}' (sim={best_sim:.3f})"
+            )
+            return best_slug, best_name, best_sim
+
+    except Exception as e:
+        logger.warning(f"[Resolve] Semantic matching failed for '{llm_name}': {e}")
+
+    return candidate_slug, llm_name, 0.0
+
+
 async def _load_procedure_catalogue() -> tuple[str, dict]:
     """Load procedures from DB + published fiches. Returns (prompt_text, slug_map)."""
     catalogue_lines = []
@@ -410,12 +467,13 @@ Format OBLIGATOIRE de ta reponse :
 3. UNE phrase de conclusion apres le JSON (optionnelle, un conseil concret)
 
 $$DIAGNOSTIC_JSON$$
-{{"score_confiance": {confidence_score}, "zone": "{zone_label}", "concern": "{concern_label}", "options": [{{"name": "Procedure 1", "pertinence": "haute", "slug": "slug-1"}}, {{"name": "Procedure 2", "pertinence": "moyenne", "slug": "slug-2"}}, {{"name": "Procedure 3", "pertinence": "moyenne", "slug": "slug-3"}}, {{"name": "Procedure 4", "pertinence": "basse", "slug": "slug-4"}}], "risques": ["risque specifique 1"], "questions_praticien": ["question praticien 1", "question praticien 2"], "safety_warnings": ["warning zone 1"]}}
+{{"score_confiance": {confidence_score}, "zone": "{zone_label}", "concern": "{concern_label}", "options": [{{"name": "NOM EXACT DU CATALOGUE", "pertinence": "haute", "slug": "slug-du-catalogue"}}, {{"name": "NOM EXACT DU CATALOGUE", "pertinence": "moyenne", "slug": "slug-du-catalogue"}}], "risques": ["risque specifique 1"], "questions_praticien": ["question praticien 1", "question praticien 2"], "safety_warnings": ["warning zone 1"]}}
 $$DIAGNOSTIC_JSON$$
 
 REGLES CRITIQUES :
 - score_confiance DOIT etre exactement {confidence_score}.
 - Les slugs DOIVENT venir du catalogue ci-dessus. Ne jamais inventer.
+- Le champ "name" DOIT etre le nom EXACT tel qu'il apparait dans le catalogue. Ne jamais reformuler, abreger ou traduire (pas "Botox" si le catalogue dit "Toxine Botulique").
 - OBLIGATOIRE : inclus entre 4 et 6 options. Passe en revue TOUT le catalogue et inclus chaque procedure pertinente.
   - haute = traitement de reference pour cette zone/probleme
   - moyenne = option valable en complement ou alternative
@@ -497,13 +555,25 @@ async def _trigger_auto_learning(slugs: list[str], slug_map: dict) -> list[dict]
                 continue
             name = entry["name"]
 
-            # Check if a TrendTopic already exists for this procedure
+            # Resolve name to canonical via semantic matching
+            canonical_slug, canonical_name, sim = await _resolve_to_canonical(name, slug_map)
+            search_name = canonical_name if sim >= 0.82 else name
+
+            # Check if a TrendTopic already exists (exact match first, then ilike fallback)
             result = await session.execute(
                 select(TrendTopic).filter(
-                    TrendTopic.titre.ilike(f"%{name}%")
+                    TrendTopic.titre == search_name
                 ).limit(1)
             )
             topic = result.scalar_one_or_none()
+            if not topic:
+                # Fallback: loose match
+                result = await session.execute(
+                    select(TrendTopic).filter(
+                        TrendTopic.titre.ilike(f"%{search_name}%")
+                    ).limit(1)
+                )
+                topic = result.scalar_one_or_none()
 
             if topic:
                 # Already exists — only trigger learning if it's not already done
@@ -526,8 +596,11 @@ async def _trigger_auto_learning(slugs: list[str], slug_map: dict) -> list[dict]
                     })
                 # stagnated/rejected → skip
             else:
+                # Use canonical name for the TrendTopic to avoid duplicates
+                topic_name = canonical_name if sim >= 0.82 else name
+
                 # Build procedure-specific search queries
-                queries = _build_search_queries(name)
+                queries = _build_search_queries(topic_name)
 
                 # Compute composite score: (marketing*0.3) + (science*0.4) + (knowledge*0.3)
                 composite = round(
@@ -539,7 +612,7 @@ async def _trigger_auto_learning(slugs: list[str], slug_map: dict) -> list[dict]
 
                 # Create a new TrendTopic with proper scores
                 new_topic = TrendTopic(
-                    titre=name,
+                    titre=topic_name,
                     topic_type="procedure",
                     description=f"Procédure de l'atlas — apprentissage déclenché par le diagnostic",
                     search_queries=queries,
@@ -703,12 +776,14 @@ Reponds maintenant. Si tu generes la synthese, inclus OBLIGATOIREMENT le bloc $$
                     enrichment[slug] = {
                         "has_fiche": has_fiche,
                         "trs": trs,
+                        "name": entry["name"],
                     }
                 else:
                     # No fiche, no TRS → candidate for auto-learning
                     enrichment[slug] = {
                         "has_fiche": False,
                         "trs": None,
+                        "name": entry["name"],
                         "learning": True,
                     }
                     learning_slugs.append(slug)

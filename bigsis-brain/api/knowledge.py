@@ -259,13 +259,16 @@ async def trigger_semantic_ingestion(request: SemanticRequest, background_tasks:
 @router.post("/knowledge/procedures")
 async def create_procedure(proc: ProcedureCreate, admin: AuthUser = Depends(require_admin)):
     """Adds a new medical procedure to the Knowledge Base. Admin only."""
+    from core.rag.embeddings import get_embedding
     async with AsyncSessionLocal() as session:
+        embedding = await get_embedding(proc.name)
         new_proc = Procedure(
             name=proc.name,
             description=proc.description,
             downtime=proc.downtime,
             price_range=proc.price_range,
-            tags=proc.tags
+            tags=proc.tags,
+            embedding=embedding,
         )
         session.add(new_proc)
         await session.commit()
