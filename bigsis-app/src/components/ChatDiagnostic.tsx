@@ -36,6 +36,7 @@ interface EnrichmentData {
     has_fiche: boolean;
     trs?: number | null;
     learning?: boolean;
+    name?: string;
   };
 }
 
@@ -140,6 +141,34 @@ function DiagnosticCard({ data, enrichment, scoreDetails }: { data: DiagnosticDa
   const sciScore = scoreDetails?.scientific ?? Math.round(data.score_confiance * 0.5);
   const persScore = scoreDetails?.personal ?? Math.round(data.score_confiance * 0.5);
 
+  // Resolve enrichment: the LLM may generate a slug that differs from the catalogue
+  // (e.g. "botox" instead of "toxine-botulique"). Build a reverse lookup by name.
+  const resolveEnrichment = React.useCallback((opt: DiagnosticOption) => {
+    // Direct slug match (fast path)
+    if (opt.slug && enrichment[opt.slug]) return { slug: opt.slug, data: enrichment[opt.slug] };
+    // Fallback: find enrichment entry whose canonical name matches opt.name
+    const optLower = opt.name.toLowerCase();
+    for (const [slug, entry] of Object.entries(enrichment)) {
+      if (entry.name && entry.name.toLowerCase() === optLower) return { slug, data: entry };
+    }
+    return { slug: opt.slug, data: undefined };
+  }, [enrichment]);
+
+  // Deduplicate options: after canonical name normalization, multiple LLM options
+  // can resolve to the same procedure (e.g. "Botox" + "Toxine Botulique" → same).
+  // Keep the first occurrence (highest pertinence since LLM orders by relevance).
+  const uniqueOptions = React.useMemo(() => {
+    const seen = new Set<string>();
+    return data.options.filter(opt => {
+      const resolved = resolveEnrichment(opt);
+      const canonicalName = resolved.data?.name || opt.name;
+      const key = canonicalName.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [data.options, resolveEnrichment]);
+
   return (
     <div className="mt-4 space-y-3">
       {/* Split score bars */}
@@ -175,12 +204,14 @@ function DiagnosticCard({ data, enrichment, scoreDetails }: { data: DiagnosticDa
         </div>
       </div>
 
-      {/* Procedure cards with TRS badges — Fix 1+3: conditional link vs div */}
-      {data.options.length > 0 && (
+      {/* Procedure cards with TRS badges — deduplicated by canonical name */}
+      {uniqueOptions.length > 0 && (
         <div className="space-y-2">
           <span className="text-xs text-blue-200/60 uppercase tracking-wider font-medium px-1">Options a explorer</span>
-          {data.options.map((opt, j) => {
-            const slugEnrichment = opt.slug ? enrichment[opt.slug] : undefined;
+          {uniqueOptions.map((opt, j) => {
+            const resolved = resolveEnrichment(opt);
+            const slugEnrichment = resolved.data;
+            const resolvedSlug = resolved.slug;
             const hasFiche = slugEnrichment?.has_fiche ?? false;
             const trs = slugEnrichment?.trs;
             const isLearning = slugEnrichment?.learning && !hasFiche;
@@ -211,11 +242,11 @@ function DiagnosticCard({ data, enrichment, scoreDetails }: { data: DiagnosticDa
             );
 
             // Only link if fiche is published
-            if (hasFiche && opt.slug) {
+            if (hasFiche && resolvedSlug) {
               return (
                 <div key={j}>
                   <Link
-                    href={`/fiches/${opt.slug}`}
+                    href={`/fiches/${resolvedSlug}`}
                     className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-cyan-500/30 transition-all group"
                   >
                     {cardContent}
