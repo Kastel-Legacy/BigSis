@@ -37,7 +37,7 @@ import InstagramSlide from '@/components/InstagramSlide';
 // Types
 // ---------------------------------------------------------------------------
 type StatusFilter = 'all' | 'draft' | 'approved' | 'published';
-type TemplateFilter = 'all' | 'verdict' | 'vrai_faux' | 'chiffres' | 'face_a_face';
+type TemplateFilter = 'all' | 'verdict' | 'vrai_faux' | 'chiffres' | 'face_a_face' | 'prix_verite' | 'timeline_recup';
 
 const STATUS_LABELS: Record<string, string> = {
     all: 'Tous',
@@ -58,6 +58,8 @@ const TEMPLATE_LABELS: Record<string, string> = {
     vrai_faux: 'Vrai/Faux',
     chiffres: 'Chiffres',
     face_a_face: 'Face a Face',
+    prix_verite: 'Prix Verite',
+    timeline_recup: 'Timeline',
 };
 
 const TEMPLATE_COLORS: Record<string, string> = {
@@ -65,6 +67,8 @@ const TEMPLATE_COLORS: Record<string, string> = {
     vrai_faux: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
     chiffres: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
     face_a_face: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+    prix_verite: 'bg-lime-500/20 text-lime-300 border-lime-500/30',
+    timeline_recup: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
 };
 
 // ---------------------------------------------------------------------------
@@ -489,6 +493,8 @@ function GenerateModal({
         { id: 'vrai_faux', label: 'Vrai / Faux', desc: 'Demystifier un mythe courant' },
         { id: 'chiffres', label: 'Les Chiffres', desc: 'Stats et donnees cles' },
         { id: 'face_a_face', label: 'Face a Face', desc: 'Comparer deux procedures' },
+        { id: 'prix_verite', label: 'Prix de la Verite', desc: 'Le vrai cout d\'une procedure' },
+        { id: 'timeline_recup', label: 'Timeline Recup', desc: 'Planning de recuperation jour par jour' },
     ];
 
     return (
@@ -528,7 +534,7 @@ function GenerateModal({
                     <label className="block text-sm font-medium text-gray-400 mb-2">
                         Template
                     </label>
-                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                         {templates.map((t) => (
                             <button
                                 key={t.id}

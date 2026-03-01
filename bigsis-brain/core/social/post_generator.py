@@ -6,7 +6,7 @@ then uses LLM to produce structured slide content for Instagram carousels.
 
 Hybrid approach: fiche data (structure/skeleton) + RAG chunks (rich evidence).
 
-Templates: verdict, vrai_faux, chiffres, face_a_face
+Templates: verdict, vrai_faux, chiffres, face_a_face, prix_verite, timeline_recup
 """
 
 import json
@@ -21,6 +21,8 @@ from core.prompts.social_posts import (
     VRAI_FAUX_SYSTEM_PROMPT, VRAI_FAUX_USER_TEMPLATE,
     CHIFFRES_SYSTEM_PROMPT, CHIFFRES_USER_TEMPLATE,
     FACE_A_FACE_SYSTEM_PROMPT, FACE_A_FACE_USER_TEMPLATE,
+    PRIX_VERITE_SYSTEM_PROMPT, PRIX_VERITE_USER_TEMPLATE,
+    TIMELINE_RECUP_SYSTEM_PROMPT, TIMELINE_RECUP_USER_TEMPLATE,
 )
 
 logger = logging.getLogger(__name__)
@@ -30,6 +32,8 @@ TEMPLATE_MAP = {
     "vrai_faux": (VRAI_FAUX_SYSTEM_PROMPT, VRAI_FAUX_USER_TEMPLATE),
     "chiffres": (CHIFFRES_SYSTEM_PROMPT, CHIFFRES_USER_TEMPLATE),
     "face_a_face": (FACE_A_FACE_SYSTEM_PROMPT, FACE_A_FACE_USER_TEMPLATE),
+    "prix_verite": (PRIX_VERITE_SYSTEM_PROMPT, PRIX_VERITE_USER_TEMPLATE),
+    "timeline_recup": (TIMELINE_RECUP_SYSTEM_PROMPT, TIMELINE_RECUP_USER_TEMPLATE),
 }
 
 VALID_TEMPLATES = list(TEMPLATE_MAP.keys())
@@ -40,6 +44,8 @@ TEMPLATE_LABELS = {
     "vrai_faux": "Vrai / Faux",
     "chiffres": "Les Chiffres",
     "face_a_face": "Face a Face",
+    "prix_verite": "Prix de la Verite",
+    "timeline_recup": "Timeline Recuperation",
 }
 
 # ---------------------------------------------------------------------------
@@ -70,6 +76,18 @@ _TEMPLATE_QUERIES = {
         "comparative clinical trial head to head {proc}",
         "advantages disadvantages pros cons {proc}",
         "patient preference satisfaction comparison {proc}",
+    ],
+    "prix_verite": [
+        "cost pricing fee session {proc}",
+        "number of sessions treatment frequency {proc}",
+        "maintenance retreatment longevity duration results {proc}",
+        "value cost-effectiveness compared alternative {proc}",
+    ],
+    "timeline_recup": [
+        "recovery time downtime healing timeline {proc}",
+        "return to activities work social recovery {proc}",
+        "post procedure care restrictions first week {proc}",
+        "swelling bruising resolution timeline {proc}",
     ],
 }
 
