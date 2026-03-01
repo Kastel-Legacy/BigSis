@@ -2,7 +2,7 @@
 
 import React, { forwardRef } from 'react';
 import type { SlideData } from '@/api';
-import { Check, X, AlertTriangle, Flame, Star, Swords } from 'lucide-react';
+import { Check, X, AlertTriangle, Flame, Star, Swords, Clock, Euro } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // Background styles — inline CSS gradients for PNG export compatibility
@@ -33,6 +33,8 @@ const EMOJI_ICONS: Record<string, React.ReactNode> = {
     fire: <Flame style={{ width: 64, height: 64, color: '#fdba74' }} strokeWidth={2} />,
     star: <Star style={{ width: 64, height: 64, color: '#fde047' }} strokeWidth={2} fill="currentColor" />,
     vs: <Swords style={{ width: 64, height: 64, color: '#d8b4fe' }} strokeWidth={2} />,
+    clock: <Clock style={{ width: 64, height: 64, color: '#93c5fd' }} strokeWidth={2} />,
+    euro: <Euro style={{ width: 64, height: 64, color: '#a3e635' }} strokeWidth={2} />,
 };
 
 // ---------------------------------------------------------------------------
@@ -89,6 +91,9 @@ const InstagramSlide = forwardRef<HTMLDivElement, InstagramSlideProps>(
                         )}
                         {slide.type === 'comparison' && (
                             <ComparisonLayout slide={slide} />
+                        )}
+                        {slide.type === 'timeline' && (
+                            <TimelineLayout slide={slide} emojiIcon={emojiIcon} />
                         )}
                         {slide.type === 'cta' && (
                             <CTALayout slide={slide} emojiIcon={emojiIcon} />
@@ -226,6 +231,77 @@ function ComparisonLayout({ slide }: { slide: SlideData }) {
                     </div>
                 </div>
             </div>
+        </div>
+    );
+}
+
+function TimelineLayout({ slide, emojiIcon }: { slide: SlideData; emojiIcon: React.ReactNode }) {
+    return (
+        <div className="w-full px-8" style={{ maxWidth: 960 }}>
+            {/* Header with emoji + headline */}
+            <div className="flex items-center gap-6 mb-12">
+                {emojiIcon && (
+                    <div className="shrink-0 w-20 h-20 rounded-2xl bg-white/15 flex items-center justify-center">
+                        {emojiIcon}
+                    </div>
+                )}
+                <h2 className="text-6xl font-black leading-none tracking-tight">
+                    {slide.headline}
+                </h2>
+            </div>
+
+            {/* Timeline items with vertical line and dots */}
+            {slide.bullet_points && slide.bullet_points.length > 0 ? (
+                <div className="relative" style={{ paddingLeft: 60 }}>
+                    {/* Vertical timeline line */}
+                    <div
+                        className="absolute top-0 bottom-0 rounded-full"
+                        style={{
+                            left: 22,
+                            width: 4,
+                            backgroundColor: 'rgba(255,255,255,0.2)',
+                        }}
+                    />
+                    <div className="space-y-8">
+                        {slide.bullet_points.map((point, i) => (
+                            <div key={i} className="relative flex items-start gap-6">
+                                {/* Dot on timeline */}
+                                <div
+                                    className="absolute flex items-center justify-center shrink-0"
+                                    style={{
+                                        left: -46,
+                                        top: 16,
+                                        width: 32,
+                                        height: 32,
+                                        borderRadius: '50%',
+                                        backgroundColor: 'rgba(255,255,255,0.25)',
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            width: 12,
+                                            height: 12,
+                                            borderRadius: '50%',
+                                            backgroundColor: '#fff',
+                                        }}
+                                    />
+                                </div>
+                                {/* Content card */}
+                                <div
+                                    className="flex-1 rounded-2xl px-8 py-7"
+                                    style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                                >
+                                    <span className="text-3xl font-semibold leading-snug">{point}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ) : slide.body ? (
+                <p className="text-4xl opacity-85 leading-relaxed font-medium">
+                    {slide.body}
+                </p>
+            ) : null}
         </div>
     );
 }

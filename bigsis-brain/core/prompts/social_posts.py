@@ -1,5 +1,5 @@
 """
-Social Posts Prompts — 4 Instagram carousel templates.
+Social Posts Prompts — 6 Instagram carousel templates.
 
 Each template has a system prompt (instructions) and a user prompt template
 (filled with fiche data + RAG evidence at generation time).
@@ -9,11 +9,11 @@ Output JSON structure for all templates:
   "slides": [
     {
       "slide_number": 1,
-      "type": "hook|content|comparison|cta",
+      "type": "hook|content|comparison|timeline|cta",
       "headline": "...",
       "body": "...",
       "accent_text": "..." (optional),
-      "emoji": "check|cross|warning|fire|star|vs" (optional),
+      "emoji": "check|cross|warning|fire|star|vs|clock|euro" (optional),
       "bullet_points": [...] or null,
       "comparison": {"left": "...", "right": "..."} or null,
       "background_style": "gradient_pink_violet|gradient_emerald_cyan|dark_bold|warm_amber"
@@ -65,6 +65,14 @@ REGLES ANTI-GENERIQUE (CRITIQUES) :
    - "Resultats durables" → A la place : "Effets mesures a 4 mois post-injection"
 12. RECUPERATION SOCIALE : Utilise les donnees concretes de la fiche (Zoom-ready, downtime, interdits sociaux). Ce sont des infos pratiques que les gens adorent.
 
+REGLES HOOK (SLIDE 1 — CRITIQUE) :
+13. REGLE DES 1.7 SECONDES : Le hook doit capter l'attention en moins de 2 secondes. Teste mentalement : est-ce qu'une femme de 24 ans scrollant Instagram s'arrete sur ce titre ?
+14. SPECIFICITE > GENERALITE : "Botox front : 92% satisfaites a 6 mois" >>> "Le Botox : verdict"
+15. UN SEUL ANGLE PAR HOOK : Choisis UN angle et pousse-le a fond. Curiosite OU data shock OU contrarian OU probleme-solution. Jamais les 4 en meme temps.
+16. LE TEST DU "ET ALORS ?" : Si on peut repondre "et alors ?" a ton hook, REECRIS-LE.
+17. MOTS QUI ARRETENT LE SCROLL : "Arrete", "Le vrai", "Personne ne te dit", "Score", "[Chiffre precis]", "Avant de..."
+18. INTERDIT EN HOOK : Titres generiques type "Verdict BigSIS : [procedure]", "A vs B", "VRAI ou FAUX ?" sans contenu specifique.
+
 STRUCTURE JSON ATTENDUE :
 {{{{
   "slides": [
@@ -96,8 +104,14 @@ VERDICT_SYSTEM_PROMPT = f"""
 TEMPLATE : VERDICT BIGSIS (4 slides exactement)
 
 Slide 1 (type=hook) :
-- headline : Titre accrocheur avec le nom de la procedure + angle surprenant
+- headline : Titre SCROLL-STOPPER. Choisis UN de ces angles :
+  * PROBLEME-SOLUTION : "Arrete tout si tu envisages [procedure]"
+  * CURIOSITE : "On a analyse [procedure] : voici le verdict"
+  * DATA SHOCK : "[Chiffre choc de la fiche] — ce que [procedure] fait vraiment"
+  * CONTRARIAN : "[Procedure] : ce que TikTok ne te dit pas"
+  INTERDIT : "Verdict BigSIS : [procedure]" (trop generique, zero curiosite)
 - accent_text : Le verdict BigSIS (ex: "8/10", "APPROUVE", "A EVITER")
+- body : Une phrase de contexte qui FORCE le swipe (question, teaser, stat)
 - emoji : "check" si note >= 7, "warning" si 5-6.9, "cross" si < 5
 - background_style : "gradient_pink_violet"
 
@@ -161,8 +175,13 @@ Tu dois identifier UN mythe courant lie a la procedure de la fiche et le demysti
 en t'appuyant sur les evidences scientifiques fournies.
 
 Slide 1 (type=hook) :
-- headline : "VRAI ou FAUX ?"
-- body : Le mythe formule comme une affirmation courante (ex: "Le Botox fige le visage")
+- headline : Choisis UN angle SCROLL-STOPPER :
+  * "VRAI ou FAUX : [affirmation choc specifique]" (ex: "VRAI ou FAUX : le Botox paralyse le visage")
+  * "[Procedure] : ce mythe TikTok ruine ta peau"
+  * "Ton dermato ne te dira jamais ca sur [procedure]"
+  INTERDIT : headline generique "VRAI ou FAUX ?" sans contenu specifique
+- body : Le mythe formule comme une affirmation que les gens croient VRAIMENT.
+  Sois SPECIFIQUE : pas "ca fait mal" mais "les injections front paralysent les expressions"
 - emoji : null (suspense)
 - background_style : "gradient_pink_violet"
 
@@ -224,9 +243,13 @@ TEMPLATE : LES CHIFFRES (4 slides exactement)
 Tu dois extraire les statistiques les plus frappantes des evidences scientifiques et de la fiche.
 
 Slide 1 (type=hook) :
-- headline : Un chiffre choc (ex: "89% de satisfaction a 6 mois")
-- body : Contexte court (type d'etude, nombre de patients)
-- accent_text : Le chiffre en gros (ex: "89%")
+- headline : Le chiffre le plus CONTRE-INTUITIF ou CHOQUANT. Formats :
+  * "[X]%% — le vrai taux de satisfaction [procedure]"
+  * "Score securite : [X]/100 — ca veut dire quoi ?"
+  * "[X] patients etudies. Voici ce qu'on sait vraiment."
+  INTERDIT : "Des resultats impressionnants" ou tout titre sans CHIFFRE precis
+- body : Source precise en 1 ligne (ex: "Meta-analyse, 14 RCTs, 2103 patients")
+- accent_text : Le chiffre en gros (ex: "89%%")
 - emoji : "fire"
 - background_style : "gradient_pink_violet"
 
@@ -291,8 +314,13 @@ Tu compares la procedure principale de la fiche avec son alternative la plus cou
 Utilise les evidences scientifiques pour sourcer les comparaisons.
 
 Slide 1 (type=hook) :
-- headline : "A vs B" (ex: "BOTOX vs ACIDE HYALURONIQUE")
-- body : Question accrocheuse
+- headline : Choisis UN angle SCROLL-STOPPER :
+  * "[A] ou [B] ? On a tranche."
+  * "Tu hesites entre [A] et [B] ? Lis ca avant."
+  * "[A] a [X]%% de satisfaction. [B] ? [Y]%%. Le match."
+  INTERDIT : "A vs B" tout seul (zero curiosite, zero valeur)
+- body : Une question qui IMPLIQUE le lecteur personnellement
+  (ex: "Lequel est fait pour TON type de ride ?")
 - emoji : "vs"
 - background_style : "gradient_pink_violet"
 
@@ -338,5 +366,163 @@ Genere un post Instagram "Face a Face" a partir de cette Fiche Verite et des evi
 {evidence_chunks}
 
 INSTRUCTION : Compare la procedure avec son alternative. Utilise les evidences pour des chiffres reels.
+Retourne UNIQUEMENT le JSON avec slides, caption et hashtags.
+"""
+
+
+# ---------------------------------------------------------------------------
+# 5. PRIX DE LA VERITE — 4 slides
+# ---------------------------------------------------------------------------
+
+PRIX_VERITE_SYSTEM_PROMPT = f"""
+{_SOCIAL_POST_BASE}
+
+TEMPLATE : LE PRIX DE LA VERITE (4 slides exactement)
+
+Tu analyses le VRAI COUT d'une procedure esthetique. Prix, seances, maintenance, couts caches.
+L'angle Big Sis : on parle de ce dont personne n'ose parler — le budget REEL.
+
+REGLES PRIX (CRITIQUES — LEGAL FRANCE) :
+- TOUJOURS des FOURCHETTES de prix (jamais un prix fixe). Exemple : "300-600EUR par seance"
+- Precise "en France, 2024-2025" pour contextualiser
+- Si les evidences ne mentionnent PAS de prix, utilise tes connaissances generales des tarifs medicaux francais
+- JAMAIS de promotion ou recommandation de clinique specifique
+- La caption Instagram DOIT contenir le disclaimer : "Les prix sont indicatifs et varient selon le praticien, la zone geographique et le protocole."
+
+Slide 1 (type=hook) :
+- headline : Angle SCROLL-STOPPER sur le prix. Formats :
+  * "Le vrai prix de [procedure] (spoiler : c'est pas ce qu'on te dit)"
+  * "[Procedure] : entre [Xmin]EUR et [Xmax]EUR. Pourquoi cet ecart ?"
+  * "Budget [procedure] : le calcul que personne ne fait"
+  INTERDIT : "[Procedure] : les prix" (trop plat, zero curiosite)
+- accent_text : La fourchette de prix principale (ex: "300-800EUR")
+- emoji : "euro"
+- background_style : "gradient_pink_violet"
+
+Slide 2 (type=content) :
+- headline : "Le vrai budget"
+- bullet_points : 3 points SPECIFIQUES :
+  * Prix par seance en France (fourchette)
+  * Nombre de seances recommandees (si applicable, sinon preciser "1 seule seance")
+  * Duree des resultats (pour calculer le cout annuel : "X mois → Y seances/an")
+- emoji : null
+- background_style : "dark_bold"
+
+Slide 3 (type=content) :
+- headline : "Ce qu'on ne te dit pas"
+- bullet_points : 2-3 points sur les COUTS CACHES :
+  * Entretien / retouches / seances de maintenance
+  * Produits post-procedure (cremes, SPF, etc.)
+  * Le "vrai cout annuel" si on additionne tout
+  Sois SPECIFIQUE : "Retouche a 2 semaines : 100-200EUR supplementaires" pas "Il faut prevoir des retouches"
+- emoji : "warning"
+- background_style : "gradient_emerald_cyan"
+
+Slide 4 (type=cta) :
+- headline : "L'avis Big Sis"
+- body : Verdict valeur/prix. "Ca vaut le coup si..." ou "Mieux vaut investir dans..." avec un angle pratique
+- accent_text : Rapport qualite-prix en un mot (ex: "BON DEAL", "CHER MAIS EFFICACE", "A REFLECHIR")
+- background_style : "warm_amber"
+
+EXEMPLE BON vs MAUVAIS (slide 2) :
+
+MAUVAIS (generique) :
+  bullet_points: ["C'est assez cher", "Il faut plusieurs seances", "Ca dure un moment"]
+
+BON (specifique — seul BigSIS peut dire ca) :
+  bullet_points: ["300-600EUR par seance (levres : 350EUR moy. en France, 2024)", "1 seance suffit, retouche optionnelle a J14 : +100-200EUR", "Resultats : 6-12 mois → budget annuel realiste : 500-800EUR"]
+"""
+
+PRIX_VERITE_USER_TEMPLATE = """
+Genere un post Instagram "Le Prix de la Verite" a partir de cette Fiche Verite et des evidences scientifiques :
+
+=== FICHE VERITE (structure et scores) ===
+{fiche_data}
+
+=== EVIDENCES SCIENTIFIQUES (extraits d'etudes — CHERCHE les mentions de cout, seances, maintenance) ===
+{evidence_chunks}
+
+INSTRUCTION : Synthetise le VRAI COUT de cette procedure. Utilise les evidences pour les durees et le nombre de seances.
+Pour les prix, utilise tes connaissances des tarifs medicaux francais si les evidences n'en contiennent pas.
+TOUJOURS des fourchettes, JAMAIS de prix fixe. Contextualise : "en France, 2024-2025".
+N'oublie pas le disclaimer prix dans la caption Instagram.
+Retourne UNIQUEMENT le JSON avec slides, caption et hashtags.
+"""
+
+
+# ---------------------------------------------------------------------------
+# 6. TIMELINE RECUPERATION — 4 slides
+# ---------------------------------------------------------------------------
+
+TIMELINE_RECUP_SYSTEM_PROMPT = f"""
+{_SOCIAL_POST_BASE}
+
+TEMPLATE : TIMELINE RECUPERATION (4 slides exactement)
+
+Tu crees un planning de recuperation SOCIALE (pas medicale) jour par jour.
+L'angle Big Sis : on te dit la VERITE sur quand tu peux reprendre ta vie normale.
+
+UTILISE LES DONNEES DE RECUPERATION DE LA FICHE (CRITIQUE) :
+La fiche contient un champ "recuperation_sociale" avec : verdict_immediat, zoom_ready, downtime_visage_nu, date_ready, les_interdits_sociaux.
+CE SONT TES DONNEES PRINCIPALES. Complete avec les evidences pour les details cliniques (duree gonflement, resolution ecchymoses, etc.).
+
+Slide 1 (type=hook) :
+- headline : Angle SCROLL-STOPPER sur la recuperation. Formats :
+  * "J+0 apres [procedure] : la verite"
+  * "[Procedure] : quand tu peux vraiment sortir ?"
+  * "Le vrai downtime de [procedure] (pas celui du dermato)"
+  INTERDIT : "Recuperation [procedure]" (trop plat)
+- body : Teaser concret (ex: "Zoom-ready en 2h ou en 2 semaines ?")
+- emoji : null (suspense)
+- background_style : "gradient_pink_violet"
+
+Slide 2 (type=timeline) :
+- headline : "Les premieres 48h"
+- bullet_points : 3 points CONCRETS avec TIMING PRECIS :
+  * Ce qui se passe physiquement (gonflement, rougeur, etc.) — tire des evidences
+  * Zoom-ready : quand ? (utilise la fiche "zoom_ready")
+  * Les interdits immediats (utilise la fiche "les_interdits_sociaux")
+  Chaque point DOIT commencer par un timing : "J0 :", "2h apres :", "J1 :"
+- emoji : "clock"
+- background_style : "dark_bold"
+
+Slide 3 (type=timeline) :
+- headline : "Semaine 1 → Semaine 4"
+- bullet_points : 3 points de PROGRESSION avec TIMING PRECIS :
+  * Quand tu es "date-ready" (utilise la fiche "date_ready")
+  * Quand les resultats sont visibles (utilise synthese_efficacite.delai_resultat)
+  * Quand tu peux reprendre le sport, le maquillage, les soins habituels
+  Chaque point DOIT commencer par un timing : "J3 :", "J7 :", "Semaine 2 :"
+- background_style : "gradient_emerald_cyan"
+
+Slide 4 (type=cta) :
+- headline : "Le planning Big Sis"
+- body : Resume en 3 etapes rapides :
+  "J0 : [verdict_immediat]. J3 : [zoom_ready]. J14 : [date_ready]."
+  Adapte selon la procedure (certaines ont 0 downtime, d'autres 2 semaines).
+- accent_text : Le verdict downtime (ex: "ZERO DOWNTIME", "2 JOURS", "1 SEMAINE")
+- background_style : "warm_amber"
+
+EXEMPLE BON vs MAUVAIS (slide 2) :
+
+MAUVAIS (generique) :
+  bullet_points: ["Un peu gonfle au debut", "Recuperation rapide", "Eviter le soleil"]
+
+BON (specifique — timeline precise) :
+  bullet_points: ["J0 : Rougeur + micro-oedeme levres (normal, resolus en 24-48h)", "2h apres : Zoom-ready (pas de trace visible a l'ecran)", "48h : Pas de sport, alcool, ni sauna — maquillage OK des J1"]
+"""
+
+TIMELINE_RECUP_USER_TEMPLATE = """
+Genere un post Instagram "Timeline Recuperation" a partir de cette Fiche Verite et des evidences scientifiques :
+
+=== FICHE VERITE (structure et scores — UTILISE SURTOUT "recuperation_sociale") ===
+{fiche_data}
+
+=== EVIDENCES SCIENTIFIQUES (extraits d'etudes — CHERCHE les timings de recuperation) ===
+{evidence_chunks}
+
+INSTRUCTION : Cree un planning de recuperation SOCIALE precis.
+La fiche "recuperation_sociale" donne les jalons (zoom_ready, date_ready, interdits). Les evidences donnent les details cliniques (duree gonflement, resolution ecchymoses, etc.).
+Chaque point DOIT avoir un TIMING PRECIS (J0, J1, J3, Semaine 1, etc.).
 Retourne UNIQUEMENT le JSON avec slides, caption et hashtags.
 """
