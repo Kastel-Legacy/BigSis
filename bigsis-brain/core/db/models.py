@@ -241,12 +241,15 @@ class SocialPost(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     fiche_id = Column(UUID(as_uuid=True), nullable=False, index=True)
-    template_type = Column(String, nullable=False, index=True)  # verdict | vrai_faux | chiffres | face_a_face
+    template_type = Column(String, nullable=False, index=True)  # verdict | vrai_faux | chiffres | face_a_face | score_reveal | mythbuster | price_reveal
     title = Column(String, nullable=False)
-    slides = Column(JSONB, nullable=False)      # Array of slide objects
+    slides = Column(JSONB, nullable=False)      # Array of slide objects (carousel) or empty [] (reel)
     caption = Column(Text)                       # Instagram caption text
     hashtags = Column(ARRAY(String))             # ["#bigsis", "#esthetique", ...]
     status = Column(String, server_default="draft", nullable=False, index=True)  # draft | approved | published
+    format = Column(String, server_default="carousel", nullable=False)  # "carousel" | "reel"
+    video_url = Column(String, nullable=True)    # MP4 filename for reels (e.g. "score_reveal_botox_abc123.mp4")
+    reel_props = Column(JSONB, nullable=True)    # Remotion props for reel rendering
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 

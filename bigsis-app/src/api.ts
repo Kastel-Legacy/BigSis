@@ -290,6 +290,8 @@ export interface SocialPostItem {
     title: string;
     slides_count: number;
     status: string;
+    format: string;            // "carousel" | "reel"
+    video_url?: string | null; // API path to MP4 for reels
     created_at: string;
 }
 
@@ -303,22 +305,28 @@ export interface SocialPostDetail {
     caption: string;
     hashtags: string[];
     status: string;
+    format: string;            // "carousel" | "reel"
+    video_url?: string | null; // API path to MP4 for reels
+    reel_props?: Record<string, any> | null;
     created_at: string;
 }
 
 export interface TemplateOption {
     id: string;
     label: string;
+    format?: string;           // "carousel" | "reel"
 }
 
 export const listSocialPosts = async (
     token: string,
     status?: string,
     templateType?: string,
+    format?: string,
 ): Promise<SocialPostItem[]> => {
     const params = new URLSearchParams();
     if (status) params.set('status', status);
     if (templateType) params.set('template_type', templateType);
+    if (format) params.set('format', format);
     const response = await axios.get(`${API_URL}/social-posts?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
     });
@@ -341,6 +349,38 @@ export const generateSocialPost = async (
         `${API_URL}/social-posts/generate`,
         { fiche_id: ficheId, template_type: templateType },
         { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return response.data;
+};
+
+export const generateReel = async (
+    ficheId: string,
+    reelTemplate: string,
+    token: string,
+): Promise<SocialPostDetail> => {
+    const response = await axios.post(
+        `${API_URL}/social-posts/generate-reel`,
+        { fiche_id: ficheId, reel_template: reelTemplate },
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return response.data;
+};
+
+export interface BatchResult {
+    status: string;
+    total: number;
+    generated: number;
+    results: Array<{ format: string; template: string; status: string; error?: string }>;
+}
+
+export const generateBatch = async (
+    ficheId: string,
+    token: string,
+): Promise<BatchResult> => {
+    const response = await axios.post(
+        `${API_URL}/social-posts/generate-batch`,
+        { fiche_id: ficheId },
+        { headers: { Authorization: `Bearer ${token}` }, timeout: 600000 },
     );
     return response.data;
 };

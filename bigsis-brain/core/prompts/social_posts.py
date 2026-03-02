@@ -65,6 +65,13 @@ REGLES ANTI-GENERIQUE (CRITIQUES) :
    - "Resultats durables" → A la place : "Effets mesures a 4 mois post-injection"
 12. RECUPERATION SOCIALE : Utilise les donnees concretes de la fiche (Zoom-ready, downtime, interdits sociaux). Ce sont des infos pratiques que les gens adorent.
 
+REGLE EVIDENCE VIDE (CRITIQUE) :
+19. Si la section "EVIDENCES SCIENTIFIQUES" indique "Aucune donnee scientifique supplementaire disponible", tu DOIS :
+   - Utiliser UNIQUEMENT les donnees presentes dans la fiche (scores, verdicts, recuperation_sociale, statistiques_consolidees)
+   - NE PAS inventer de chiffres, pourcentages ou resultats d'etudes
+   - Remplacer les bullet_points chiffres par des infos pratiques de la fiche (recuperation, interdits, type de peau)
+   - Preciser "Donnees basees sur la fiche BigSIS" dans la caption au lieu de citer des etudes
+
 REGLES HOOK (SLIDE 1 — CRITIQUE) :
 13. REGLE DES 1.7 SECONDES : Le hook doit capter l'attention en moins de 2 secondes. Teste mentalement : est-ce qu'une femme de 24 ans scrollant Instagram s'arrete sur ce titre ?
 14. SPECIFICITE > GENERALITE : "Botox front : 92% satisfaites a 6 mois" >>> "Le Botox : verdict"
@@ -385,7 +392,10 @@ L'angle Big Sis : on parle de ce dont personne n'ose parler — le budget REEL.
 REGLES PRIX (CRITIQUES — LEGAL FRANCE) :
 - TOUJOURS des FOURCHETTES de prix (jamais un prix fixe). Exemple : "300-600EUR par seance"
 - Precise "en France, 2024-2025" pour contextualiser
-- Si les evidences ne mentionnent PAS de prix, utilise tes connaissances generales des tarifs medicaux francais
+- Si les evidences ET la fiche ne mentionnent PAS de prix :
+  * Pour les procedures COURANTES (botox, acide hyaluronique, peeling, laser) : utilise les fourchettes connues du marche francais
+  * Pour les procedures RARES ou NOUVELLES : ecris "Tarif variable selon praticien — demandez un devis" au lieu d'inventer un prix
+  * JAMAIS de prix precis invente. En cas de doute, elargis la fourchette ou indique "prix non standardise"
 - JAMAIS de promotion ou recommandation de clinique specifique
 - La caption Instagram DOIT contenir le disclaimer : "Les prix sont indicatifs et varient selon le praticien, la zone geographique et le protocole."
 

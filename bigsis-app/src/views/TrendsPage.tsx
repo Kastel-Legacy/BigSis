@@ -113,6 +113,11 @@ const TrendsPage: React.FC = () => {
     // Per-topic fiche generation state: null | 'generating' | slug string
     const [ficheState, setFicheState] = useState<Record<string, string>>({});
 
+    // Batch fiche generation state
+    const [batchFicheStatus, setBatchFicheStatus] = useState<'idle' | 'running' | 'done'>('idle');
+    const [batchFicheProgress, setBatchFicheProgress] = useState('');
+    const [batchFicheResult, setBatchFicheResult] = useState<{ total: number; generated: number } | null>(null);
+
     useEffect(() => { fetchTopics(); }, []);
 
     const fetchTopics = async () => {
@@ -306,6 +311,51 @@ const TrendsPage: React.FC = () => {
         }
     };
 
+    const handleGenerateAllFiches = async () => {
+        setBatchFicheStatus('running');
+        setBatchFicheProgress('Lancement...');
+        setBatchFicheResult(null);
+        try {
+            const res = await axios.post(`${API_URL}/trends/generate-all-fiches`, {}, authHeaders());
+            if (res.data.status === 'nothing_to_do') {
+                setBatchFicheStatus('done');
+                setBatchFicheProgress(res.data.message);
+                setBatchFicheResult({ total: 0, generated: 0 });
+                return;
+            }
+            const jobId = res.data.job_id;
+            const total = res.data.total;
+            setBatchFicheProgress(`0/${total}`);
+
+            // Poll for completion
+            let attempts = 0;
+            while (attempts < 200) {
+                await new Promise(r => setTimeout(r, 5000));
+                attempts++;
+                try {
+                    const poll = await axios.get(`${API_URL}/trends/fiche-job/${jobId}`);
+                    setBatchFicheProgress(poll.data.progress || `${poll.data.results?.length || 0}/${total}`);
+                    if (poll.data.current_topic) {
+                        setBatchFicheProgress(`${poll.data.progress} — ${poll.data.current_topic}`);
+                    }
+                    if (poll.data.status === 'completed') {
+                        setBatchFicheStatus('done');
+                        setBatchFicheResult({ total, generated: poll.data.total_generated || 0 });
+                        await fetchTopics();
+                        return;
+                    }
+                } catch { /* continue polling */ }
+            }
+            setBatchFicheStatus('done');
+            setBatchFicheProgress('Timeout — verifiez manuellement.');
+        } catch (e: any) {
+            setBatchFicheStatus('done');
+            setBatchFicheProgress(getErrorMessage(e, 'Erreur lors du lancement.'));
+        }
+    };
+
+    const readyWithoutFiche = topics.filter(t => t.status === 'ready').length;
+
     const filteredTopics = statusFilter === 'all'
         ? topics
         : topics.filter(t => t.status === statusFilter);
@@ -350,6 +400,28 @@ const TrendsPage: React.FC = () => {
                             <Trash2 size={16} />
                             Vider la corbeille ({topics.filter(t => t.status === 'rejected').length})
                         </button>
+                    )}
+                    {readyWithoutFiche > 0 && batchFicheStatus !== 'running' && (
+                        <button
+                            type="button"
+                            onClick={handleGenerateAllFiches}
+                            className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-semibold text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+                        >
+                            <FileText size={16} />
+                            Generer fiches manquantes ({readyWithoutFiche})
+                        </button>
+                    )}
+                    {batchFicheStatus === 'running' && (
+                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm font-medium">
+                            <Loader2 size={16} className="animate-spin" />
+                            {batchFicheProgress}
+                        </div>
+                    )}
+                    {batchFicheStatus === 'done' && batchFicheResult && (
+                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm font-medium">
+                            <CheckCircle size={16} />
+                            {batchFicheResult.generated}/{batchFicheResult.total} fiches generees
+                        </div>
                     )}
                 </div>
 
