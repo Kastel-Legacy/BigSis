@@ -16,20 +16,26 @@ import {
     Instagram,
     Sparkles,
     Copy,
+    Film,
+    LayoutGrid,
 } from 'lucide-react';
 import {
     listSocialPosts,
     getSocialPost,
     generateSocialPost,
+    generateReel,
+    generateBatch,
     updatePostStatus,
     deleteSocialPost,
     listFichesForPosts,
+    API_URL,
 } from '@/api';
 import type {
     SocialPostItem,
     SocialPostDetail,
     SlideData,
     FicheForPost,
+    BatchResult,
 } from '@/api';
 import InstagramSlide from '@/components/InstagramSlide';
 
@@ -37,7 +43,8 @@ import InstagramSlide from '@/components/InstagramSlide';
 // Types
 // ---------------------------------------------------------------------------
 type StatusFilter = 'all' | 'draft' | 'approved' | 'published';
-type TemplateFilter = 'all' | 'verdict' | 'vrai_faux' | 'chiffres' | 'face_a_face' | 'prix_verite' | 'timeline_recup';
+type TemplateFilter = string; // Dynamic — includes carousel + reel templates
+type FormatFilter = 'all' | 'carousel' | 'reel';
 
 const STATUS_LABELS: Record<string, string> = {
     all: 'Tous',
@@ -60,6 +67,9 @@ const TEMPLATE_LABELS: Record<string, string> = {
     face_a_face: 'Face a Face',
     prix_verite: 'Prix Verite',
     timeline_recup: 'Timeline',
+    score_reveal: 'Score Reveal',
+    mythbuster: 'MythBuster',
+    price_reveal: 'Price Reveal',
 };
 
 const TEMPLATE_COLORS: Record<string, string> = {
@@ -69,6 +79,15 @@ const TEMPLATE_COLORS: Record<string, string> = {
     face_a_face: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
     prix_verite: 'bg-lime-500/20 text-lime-300 border-lime-500/30',
     timeline_recup: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
+    score_reveal: 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/30',
+    mythbuster: 'bg-red-500/20 text-red-300 border-red-500/30',
+    price_reveal: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+};
+
+const FORMAT_LABELS: Record<string, string> = {
+    all: 'Tous',
+    carousel: 'Carousels',
+    reel: 'Reels',
 };
 
 // ---------------------------------------------------------------------------
@@ -86,13 +105,19 @@ export default function SocialPostsPage() {
     // Filters
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
     const [templateFilter, setTemplateFilter] = useState<TemplateFilter>('all');
+    const [formatFilter, setFormatFilter] = useState<FormatFilter>('all');
 
     // Generate modal
     const [showGenerateModal, setShowGenerateModal] = useState(false);
     const [fiches, setFiches] = useState<FicheForPost[]>([]);
     const [selectedFiche, setSelectedFiche] = useState('');
     const [selectedTemplate, setSelectedTemplate] = useState('verdict');
+    const [selectedFormat, setSelectedFormat] = useState<'carousel' | 'reel'>('carousel');
     const [generating, setGenerating] = useState(false);
+
+    // Batch generation
+    const [batchGenerating, setBatchGenerating] = useState(false);
+    const [batchResult, setBatchResult] = useState<BatchResult | null>(null);
 
     // Preview modal
     const [previewPost, setPreviewPost] = useState<SocialPostDetail | null>(null);
@@ -111,6 +136,7 @@ export default function SocialPostsPage() {
                 token,
                 statusFilter !== 'all' ? statusFilter : undefined,
                 templateFilter !== 'all' ? templateFilter : undefined,
+                formatFilter !== 'all' ? formatFilter : undefined,
             );
             setPosts(data);
             setError('');
@@ -119,7 +145,7 @@ export default function SocialPostsPage() {
         } finally {
             setLoading(false);
         }
-    }, [token, statusFilter, templateFilter]);
+    }, [token, statusFilter, templateFilter, formatFilter]);
 
     useEffect(() => {
         fetchPosts();
@@ -137,7 +163,12 @@ export default function SocialPostsPage() {
         if (!selectedFiche || !selectedTemplate) return;
         setGenerating(true);
         try {
-            const result = await generateSocialPost(selectedFiche, selectedTemplate, token);
+            let result: SocialPostDetail;
+            if (selectedFormat === 'reel') {
+                result = await generateReel(selectedFiche, selectedTemplate, token);
+            } else {
+                result = await generateSocialPost(selectedFiche, selectedTemplate, token);
+            }
             setShowGenerateModal(false);
             setSelectedFiche('');
             await fetchPosts();
@@ -148,6 +179,21 @@ export default function SocialPostsPage() {
             setError(e?.response?.data?.detail || 'Erreur de generation');
         } finally {
             setGenerating(false);
+        }
+    };
+
+    const handleGenerateBatch = async () => {
+        if (!selectedFiche) return;
+        setBatchGenerating(true);
+        setBatchResult(null);
+        try {
+            const result = await generateBatch(selectedFiche, token);
+            setBatchResult(result);
+            await fetchPosts();
+        } catch (e: any) {
+            setError(e?.response?.data?.detail || 'Erreur de generation batch');
+        } finally {
+            setBatchGenerating(false);
         }
     };
 
@@ -224,7 +270,6 @@ export default function SocialPostsPage() {
     const handleExportAll = async () => {
         for (let i = 0; i < (previewPost?.slides.length || 0); i++) {
             await handleExportSlide(i);
-            // Small delay between downloads
             await new Promise(r => setTimeout(r, 300));
         }
     };
@@ -233,6 +278,23 @@ export default function SocialPostsPage() {
         if (!previewPost?.caption) return;
         const text = previewPost.caption + '\n\n' + (previewPost.hashtags || []).join(' ');
         navigator.clipboard.writeText(text);
+    };
+
+    const handleDownloadVideo = () => {
+        if (!previewPost?.video_url) return;
+        // Use same-origin proxy path (Next.js rewrite → backend)
+        const videoSrc = previewPost.video_url.startsWith('/api/')
+            ? previewPost.video_url
+            : previewPost.video_url.startsWith('http')
+                ? previewPost.video_url
+                : `/api/v1/social-posts/video/${previewPost.video_url.split('/').pop()}`;
+        const a = document.createElement('a');
+        a.href = videoSrc;
+        const name = previewPost.title?.replace(/[^a-zA-Z0-9]/g, '-') || 'reel';
+        a.download = `bigsis-${name}.mp4`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     };
 
     // ---- Render ----
@@ -274,7 +336,25 @@ export default function SocialPostsPage() {
 
             {/* Filters */}
             <div className="px-4 sm:px-8 mb-4 sm:mb-6 space-y-3">
-                {/* Status tabs — horizontal scroll on mobile */}
+                {/* Format filter */}
+                <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
+                    {(Object.keys(FORMAT_LABELS) as FormatFilter[]).map((f) => (
+                        <button
+                            key={f}
+                            onClick={() => setFormatFilter(f)}
+                            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
+                                formatFilter === f
+                                    ? 'bg-white/10 text-white border border-white/20'
+                                    : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                            }`}
+                        >
+                            {f === 'carousel' && <LayoutGrid size={14} />}
+                            {f === 'reel' && <Film size={14} />}
+                            {FORMAT_LABELS[f]}
+                        </button>
+                    ))}
+                </div>
+                {/* Status tabs */}
                 <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
                     {(Object.keys(STATUS_LABELS) as StatusFilter[]).map((s) => (
                         <button
@@ -292,17 +372,17 @@ export default function SocialPostsPage() {
                 </div>
                 {/* Template tabs */}
                 <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
-                    {(Object.keys(TEMPLATE_LABELS) as TemplateFilter[]).map((t) => (
+                    {Object.entries(TEMPLATE_LABELS).map(([key, label]) => (
                         <button
-                            key={t}
-                            onClick={() => setTemplateFilter(t)}
+                            key={key}
+                            onClick={() => setTemplateFilter(key)}
                             className={`px-3 py-1 rounded-lg text-xs font-medium transition-all whitespace-nowrap shrink-0 ${
-                                templateFilter === t
+                                templateFilter === key
                                     ? 'bg-white/10 text-white border border-white/20'
                                     : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
                             }`}
                         >
-                            {TEMPLATE_LABELS[t]}
+                            {label}
                         </button>
                     ))}
                 </div>
@@ -348,11 +428,21 @@ export default function SocialPostsPage() {
                     fiches={fiches}
                     selectedFiche={selectedFiche}
                     selectedTemplate={selectedTemplate}
+                    selectedFormat={selectedFormat}
                     generating={generating}
                     onSelectFiche={setSelectedFiche}
                     onSelectTemplate={setSelectedTemplate}
+                    onSelectFormat={(f) => {
+                        setSelectedFormat(f);
+                        // Auto-select first template of new format
+                        if (f === 'carousel') setSelectedTemplate('verdict');
+                        else setSelectedTemplate('score_reveal');
+                    }}
                     onGenerate={handleGenerate}
-                    onClose={() => setShowGenerateModal(false)}
+                    onGenerateBatch={handleGenerateBatch}
+                    batchGenerating={batchGenerating}
+                    batchResult={batchResult}
+                    onClose={() => { setShowGenerateModal(false); setBatchResult(null); }}
                 />
             )}
 
@@ -367,6 +457,7 @@ export default function SocialPostsPage() {
                     onExportSlide={handleExportSlide}
                     onExportAll={handleExportAll}
                     onCopyCaption={handleCopyCaption}
+                    onDownloadVideo={handleDownloadVideo}
                     onApprove={() => handleStatusChange(previewPost.id, 'approved')}
                     onPublish={() => handleStatusChange(previewPost.id, 'published')}
                     loading={loadingAction === previewPost.id}
@@ -377,7 +468,7 @@ export default function SocialPostsPage() {
 }
 
 // ---------------------------------------------------------------------------
-// PostCard — responsive: stacks on mobile
+// PostCard — responsive: stacks on mobile, shows format badge
 // ---------------------------------------------------------------------------
 function PostCard({
     post,
@@ -394,11 +485,20 @@ function PostCard({
     onPublish: () => void;
     onDelete: () => void;
 }) {
+    const isReel = (post.format || 'carousel') === 'reel';
     return (
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4 sm:p-5 hover:bg-white/[0.05] transition-all">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                {/* Left: badge + title */}
-                <div className="flex items-center gap-3 min-w-0">
+                {/* Left: badges + title */}
+                <div className="flex items-center gap-2 min-w-0">
+                    {/* Format badge */}
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border shrink-0 ${
+                        isReel
+                            ? 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/30'
+                            : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                    }`}>
+                        {isReel ? 'Reel' : 'Carousel'}
+                    </span>
                     <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold border shrink-0 ${
                         TEMPLATE_COLORS[post.template_type] || 'bg-gray-500/20 text-gray-300 border-gray-500/30'
                     }`}>
@@ -407,7 +507,7 @@ function PostCard({
                     <div className="min-w-0">
                         <h3 className="font-medium text-sm truncate">{post.title}</h3>
                         <p className="text-xs text-gray-500 mt-0.5 truncate">
-                            {post.fiche_title} · {post.slides_count} slides ·{' '}
+                            {post.fiche_title} · {isReel ? 'Video 10s' : `${post.slides_count} slides`} ·{' '}
                             {new Date(post.created_at).toLocaleDateString('fr-FR')}
                         </p>
                     </div>
@@ -465,30 +565,38 @@ function ActionBtn({
 }
 
 // ---------------------------------------------------------------------------
-// GenerateModal — full-screen on mobile
+// GenerateModal — with Carousel/Reel format toggle
 // ---------------------------------------------------------------------------
 function GenerateModal({
     fiches,
     selectedFiche,
     selectedTemplate,
+    selectedFormat,
     generating,
     onSelectFiche,
     onSelectTemplate,
+    onSelectFormat,
     onGenerate,
+    onGenerateBatch,
+    batchGenerating,
+    batchResult,
     onClose,
 }: {
     fiches: FicheForPost[];
     selectedFiche: string;
     selectedTemplate: string;
+    selectedFormat: 'carousel' | 'reel';
     generating: boolean;
     onSelectFiche: (id: string) => void;
     onSelectTemplate: (t: string) => void;
+    onSelectFormat: (f: 'carousel' | 'reel') => void;
     onGenerate: () => void;
+    onGenerateBatch: () => void;
+    batchGenerating: boolean;
+    batchResult: BatchResult | null;
     onClose: () => void;
 }) {
-    const availableFiches = fiches;
-
-    const templates = [
+    const carouselTemplates = [
         { id: 'verdict', label: 'Verdict BigSIS', desc: 'Analyse et verdict sur une procedure' },
         { id: 'vrai_faux', label: 'Vrai / Faux', desc: 'Demystifier un mythe courant' },
         { id: 'chiffres', label: 'Les Chiffres', desc: 'Stats et donnees cles' },
@@ -496,6 +604,14 @@ function GenerateModal({
         { id: 'prix_verite', label: 'Prix de la Verite', desc: 'Le vrai cout d\'une procedure' },
         { id: 'timeline_recup', label: 'Timeline Recup', desc: 'Planning de recuperation jour par jour' },
     ];
+
+    const reelTemplates = [
+        { id: 'score_reveal', label: 'Score Reveal', desc: 'Score anime avec breakdown' },
+        { id: 'mythbuster', label: 'MythBuster', desc: 'Vrai/Faux avec stamp anime' },
+        { id: 'price_reveal', label: 'Price Reveal', desc: 'Fourchette prix animee' },
+    ];
+
+    const templates = selectedFormat === 'carousel' ? carouselTemplates : reelTemplates;
 
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm">
@@ -510,6 +626,37 @@ function GenerateModal({
                     </button>
                 </div>
 
+                {/* Format toggle: Carousel / Reel */}
+                <div className="mb-5">
+                    <label className="block text-sm font-medium text-gray-400 mb-2">
+                        Format
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                        <button
+                            onClick={() => onSelectFormat('carousel')}
+                            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border font-medium text-sm transition-all ${
+                                selectedFormat === 'carousel'
+                                    ? 'border-pink-500/50 bg-pink-500/10 text-white'
+                                    : 'border-white/10 text-gray-400 hover:border-white/20 hover:bg-white/5'
+                            }`}
+                        >
+                            <LayoutGrid size={16} />
+                            Carousel
+                        </button>
+                        <button
+                            onClick={() => onSelectFormat('reel')}
+                            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border font-medium text-sm transition-all ${
+                                selectedFormat === 'reel'
+                                    ? 'border-fuchsia-500/50 bg-fuchsia-500/10 text-white'
+                                    : 'border-white/10 text-gray-400 hover:border-white/20 hover:bg-white/5'
+                            }`}
+                        >
+                            <Film size={16} />
+                            Reel Video
+                        </button>
+                    </div>
+                </div>
+
                 {/* Fiche selector */}
                 <div className="mb-5">
                     <label className="block text-sm font-medium text-gray-400 mb-2">
@@ -521,7 +668,7 @@ function GenerateModal({
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-pink-500/50 appearance-none"
                     >
                         <option value="">Selectionnez une fiche...</option>
-                        {availableFiches.map((f) => (
+                        {fiches.map((f) => (
                             <option key={f.id} value={f.id} className="bg-[#0f1419]">
                                 {f.title}
                             </option>
@@ -541,7 +688,9 @@ function GenerateModal({
                                 onClick={() => onSelectTemplate(t.id)}
                                 className={`p-3 rounded-xl border text-left transition-all ${
                                     selectedTemplate === t.id
-                                        ? 'border-pink-500/50 bg-pink-500/10'
+                                        ? selectedFormat === 'reel'
+                                            ? 'border-fuchsia-500/50 bg-fuchsia-500/10'
+                                            : 'border-pink-500/50 bg-pink-500/10'
                                         : 'border-white/10 hover:border-white/20 hover:bg-white/5'
                                 }`}
                             >
@@ -552,31 +701,81 @@ function GenerateModal({
                     </div>
                 </div>
 
-                {/* Generate button */}
+                {/* Generate single button */}
                 <button
                     onClick={onGenerate}
-                    disabled={!selectedFiche || generating}
+                    disabled={!selectedFiche || generating || batchGenerating}
                     className="w-full py-3 bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 rounded-xl font-medium text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                     {generating ? (
                         <>
                             <Loader2 size={16} className="animate-spin" />
-                            Generation en cours...
+                            {selectedFormat === 'reel'
+                                ? 'Generation video en cours... (1-2 min)'
+                                : 'Generation en cours...'}
                         </>
                     ) : (
                         <>
                             <Sparkles size={16} />
-                            Generer le post
+                            {selectedFormat === 'reel' ? 'Generer le Reel' : 'Generer le post'}
                         </>
                     )}
                 </button>
+
+                {/* Separator */}
+                <div className="flex items-center gap-3 my-2">
+                    <div className="flex-1 h-px bg-white/10" />
+                    <span className="text-xs text-gray-500 uppercase tracking-wide">ou</span>
+                    <div className="flex-1 h-px bg-white/10" />
+                </div>
+
+                {/* Generate ALL button */}
+                <button
+                    onClick={onGenerateBatch}
+                    disabled={!selectedFiche || generating || batchGenerating}
+                    className="w-full py-3 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 rounded-xl font-medium text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                    {batchGenerating ? (
+                        <>
+                            <Loader2 size={16} className="animate-spin" />
+                            Generation de 9 contenus en cours... (5-10 min)
+                        </>
+                    ) : (
+                        <>
+                            <Sparkles size={16} />
+                            Generer tout (6 carousels + 3 reels)
+                        </>
+                    )}
+                </button>
+
+                {/* Batch result */}
+                {batchResult && (
+                    <div className="mt-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                        <div className="flex items-center gap-2 text-emerald-300 text-sm font-medium mb-2">
+                            <CheckCircle size={16} />
+                            {batchResult.generated}/{batchResult.total} contenus generes
+                        </div>
+                        <div className="space-y-1">
+                            {batchResult.results.map((r, i) => (
+                                <div key={i} className="flex items-center gap-2 text-xs">
+                                    <span className={r.status === 'ok' ? 'text-emerald-400' : 'text-red-400'}>
+                                        {r.status === 'ok' ? '✓' : '✗'}
+                                    </span>
+                                    <span className="text-gray-400">{r.format}</span>
+                                    <span className="text-gray-300">{r.template}</span>
+                                    {r.error && <span className="text-red-400 truncate max-w-48">{r.error}</span>}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
 }
 
 // ---------------------------------------------------------------------------
-// PreviewModal — responsive carousel preview with export
+// PreviewModal — supports both carousel and video preview
 // ---------------------------------------------------------------------------
 function PreviewModal({
     post,
@@ -587,6 +786,7 @@ function PreviewModal({
     onExportSlide,
     onExportAll,
     onCopyCaption,
+    onDownloadVideo,
     onApprove,
     onPublish,
     loading,
@@ -599,10 +799,12 @@ function PreviewModal({
     onExportSlide: (i: number) => void;
     onExportAll: () => void;
     onCopyCaption: () => void;
+    onDownloadVideo: () => void;
     onApprove: () => void;
     onPublish: () => void;
     loading: boolean;
 }) {
+    const isReel = (post.format || 'carousel') === 'reel';
     const slides = post.slides || [];
     const currentSlide = slides[slideIndex];
 
@@ -611,15 +813,32 @@ function PreviewModal({
         slideRefs.current = slideRefs.current.slice(0, slides.length);
     }, [slides.length, slideRefs]);
 
-    // Responsive scale: smaller on mobile
+    // Responsive scale
     const slideScale = typeof window !== 'undefined' && window.innerWidth < 640 ? 0.28 : 0.45;
+
+    // Video source URL — use same-origin proxy (Next.js rewrite)
+    const videoSrc = post.video_url
+        ? (post.video_url.startsWith('/api/')
+            ? post.video_url
+            : post.video_url.startsWith('http')
+                ? post.video_url
+                : `/api/v1/social-posts/video/${post.video_url.split('/').pop()}`)
+        : '';
 
     return (
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex flex-col">
-            {/* Header — wraps on mobile */}
+            {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-white/10 gap-2 sm:gap-0">
                 {/* Left: title + badges */}
                 <div className="flex items-center gap-2 min-w-0">
+                    {/* Format badge */}
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border shrink-0 ${
+                        isReel
+                            ? 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/30'
+                            : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                    }`}>
+                        {isReel ? 'Reel' : 'Carousel'}
+                    </span>
                     <span className={`px-2 py-0.5 rounded-lg text-xs font-semibold border shrink-0 ${
                         TEMPLATE_COLORS[post.template_type] || ''
                     }`}>
@@ -652,84 +871,122 @@ function PreviewModal({
                             Publier
                         </button>
                     )}
-                    <button
-                        onClick={onExportAll}
-                        className="px-3 py-1.5 bg-gradient-to-r from-pink-500/20 to-violet-500/20 hover:from-pink-500/30 hover:to-violet-500/30 border border-pink-500/30 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap shrink-0"
-                    >
-                        <Download size={14} className="inline mr-1" />
-                        Tout ({slides.length})
-                    </button>
+                    {isReel ? (
+                        <button
+                            onClick={onDownloadVideo}
+                            className="px-3 py-1.5 bg-gradient-to-r from-fuchsia-500/20 to-violet-500/20 hover:from-fuchsia-500/30 hover:to-violet-500/30 border border-fuchsia-500/30 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap shrink-0"
+                        >
+                            <Download size={14} className="inline mr-1" />
+                            MP4
+                        </button>
+                    ) : (
+                        <button
+                            onClick={onExportAll}
+                            className="px-3 py-1.5 bg-gradient-to-r from-pink-500/20 to-violet-500/20 hover:from-pink-500/30 hover:to-violet-500/30 border border-pink-500/30 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap shrink-0"
+                        >
+                            <Download size={14} className="inline mr-1" />
+                            Tout ({slides.length})
+                        </button>
+                    )}
                     <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg shrink-0">
                         <X size={18} />
                     </button>
                 </div>
             </div>
 
-            {/* Carousel */}
+            {/* Content: Video or Carousel */}
             <div className="flex-1 flex items-center justify-center relative overflow-hidden">
-                {/* Left arrow */}
-                {slideIndex > 0 && (
-                    <button
-                        onClick={() => onSlideChange(slideIndex - 1)}
-                        className="absolute left-2 sm:left-4 z-10 p-2 sm:p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all"
-                    >
-                        <ChevronLeft size={20} />
-                    </button>
-                )}
-
-                {/* Slide display — responsive scale */}
-                <div className="flex items-center justify-center">
-                    {currentSlide && (
-                        <div style={{ width: 1080 * slideScale, height: 1350 * slideScale }}>
-                            <InstagramSlide
-                                slide={currentSlide}
-                                slideIndex={slideIndex}
-                                totalSlides={slides.length}
-                                scale={slideScale}
+                {isReel && videoSrc ? (
+                    /* Video preview for Reels */
+                    <div className="flex items-center justify-center">
+                        <div
+                            style={{
+                                width: 1080 * 0.35,
+                                height: 1920 * 0.35,
+                                borderRadius: 16,
+                                overflow: 'hidden',
+                                background: '#111',
+                            }}
+                        >
+                            <video
+                                src={videoSrc}
+                                controls
+                                autoPlay
+                                loop
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                         </div>
-                    )}
-                </div>
+                    </div>
+                ) : (
+                    /* Carousel preview */
+                    <>
+                        {/* Left arrow */}
+                        {slideIndex > 0 && (
+                            <button
+                                onClick={() => onSlideChange(slideIndex - 1)}
+                                className="absolute left-2 sm:left-4 z-10 p-2 sm:p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all"
+                            >
+                                <ChevronLeft size={20} />
+                            </button>
+                        )}
 
-                {/* Right arrow */}
-                {slideIndex < slides.length - 1 && (
-                    <button
-                        onClick={() => onSlideChange(slideIndex + 1)}
-                        className="absolute right-2 sm:right-4 z-10 p-2 sm:p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all"
-                    >
-                        <ChevronRight size={20} />
-                    </button>
+                        {/* Slide display */}
+                        <div className="flex items-center justify-center">
+                            {currentSlide && (
+                                <div style={{ width: 1080 * slideScale, height: 1350 * slideScale }}>
+                                    <InstagramSlide
+                                        slide={currentSlide}
+                                        slideIndex={slideIndex}
+                                        totalSlides={slides.length}
+                                        scale={slideScale}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Right arrow */}
+                        {slideIndex < slides.length - 1 && (
+                            <button
+                                onClick={() => onSlideChange(slideIndex + 1)}
+                                className="absolute right-2 sm:right-4 z-10 p-2 sm:p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all"
+                            >
+                                <ChevronRight size={20} />
+                            </button>
+                        )}
+
+                        {/* Hidden full-size slides for export */}
+                        <div className="fixed" style={{ left: -9999, top: -9999 }}>
+                            {slides.map((slide, i) => (
+                                <InstagramSlide
+                                    key={i}
+                                    ref={(el) => { slideRefs.current[i] = el; }}
+                                    slide={slide}
+                                    slideIndex={i}
+                                    totalSlides={slides.length}
+                                    scale={1}
+                                />
+                            ))}
+                        </div>
+                    </>
                 )}
+            </div>
 
-                {/* Hidden full-size slides for export */}
-                <div className="fixed" style={{ left: -9999, top: -9999 }}>
-                    {slides.map((slide, i) => (
-                        <InstagramSlide
+            {/* Slide indicator (carousel only) */}
+            {!isReel && slides.length > 0 && (
+                <div className="flex justify-center gap-2 py-2 sm:py-3">
+                    {slides.map((_, i) => (
+                        <button
                             key={i}
-                            ref={(el) => { slideRefs.current[i] = el; }}
-                            slide={slide}
-                            slideIndex={i}
-                            totalSlides={slides.length}
-                            scale={1}
+                            onClick={() => onSlideChange(i)}
+                            className={`w-2.5 h-2.5 rounded-full transition-all ${
+                                i === slideIndex ? 'bg-white scale-125' : 'bg-white/30 hover:bg-white/50'
+                            }`}
                         />
                     ))}
                 </div>
-            </div>
+            )}
 
-            {/* Slide indicator */}
-            <div className="flex justify-center gap-2 py-2 sm:py-3">
-                {slides.map((_, i) => (
-                    <button
-                        key={i}
-                        onClick={() => onSlideChange(i)}
-                        className={`w-2.5 h-2.5 rounded-full transition-all ${
-                            i === slideIndex ? 'bg-white scale-125' : 'bg-white/30 hover:bg-white/50'
-                        }`}
-                    />
-                ))}
-            </div>
-
-            {/* Caption & Hashtags — stacks on mobile */}
+            {/* Caption & Hashtags */}
             <div className="border-t border-white/10 px-4 sm:px-6 py-3 sm:py-4 max-h-48 overflow-auto">
                 <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 max-w-4xl mx-auto">
                     <div className="flex-1 min-w-0">

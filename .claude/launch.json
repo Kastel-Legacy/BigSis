@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "bigsis-app",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "bigsis-app", "run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "bigsis-brain",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "DATABASE_URL='postgresql+asyncpg://bigsis_user:bigsis_password@localhost:5434/bigsis' python3 -m uvicorn main:app --reload --port 8000 --app-dir bigsis-brain"],
+      "port": 8000
+    },
+    {
+      "name": "bigsis-db",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "up", "db"],
+      "port": 5434
+    }
+  ]
+}

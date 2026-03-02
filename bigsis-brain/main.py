@@ -96,6 +96,10 @@ async def startup():
         )"""))
         await conn.execute(text("CREATE INDEX IF NOT EXISTS idx_social_posts_status ON social_posts(status)"))
         await conn.execute(text("CREATE INDEX IF NOT EXISTS idx_social_posts_fiche ON social_posts(fiche_id)"))
+        # Reel video columns on social_posts
+        await conn.execute(text("ALTER TABLE social_posts ADD COLUMN IF NOT EXISTS format VARCHAR NOT NULL DEFAULT 'carousel'"))
+        await conn.execute(text("ALTER TABLE social_posts ADD COLUMN IF NOT EXISTS video_url VARCHAR"))
+        await conn.execute(text("ALTER TABLE social_posts ADD COLUMN IF NOT EXISTS reel_props JSONB"))
         await conn.run_sync(Base.metadata.create_all)
         logger.info("Auto-Migration complete.")
 
